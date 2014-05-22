@@ -1,2 +1,2 @@
-listas-ingreso
-==============
+Listas de ingreso
+=================
