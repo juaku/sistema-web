@@ -11,3 +11,16 @@ Para describir un segmento de código se colocará en la parte superior del mism
 | `@param {tipo}` | Listado y descripción de argumentos necesarios, se escribirá una de estas líneas por argumento. Ejemplo: `@param {string} Nombre del usuario que...` |
 | `@return {tipo}` | Descripción del valor de retorno. Ejemplo: `@return {function(id:string, userDetail:object)} Retorna una función que...` |
 
+
+El bloque de comentarios deberá comenzar con un `/**` dejando esta linea inicial en blanco y continuar con un ` *` por cada nueva linea del cuerpo seguido de un espacio antes del texto y finalizar con un ` */`. Ejemplo:
+
+``` Javascript
+/**
+ * Bloque de comentario.
+ * Información adicional
+ * Cuerpo del comentario incluyendo los identificadores.
+ */
+
+```
+
+La identación de este bloque será la misma del bloque de código al que hace referencia.
