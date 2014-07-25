@@ -7,7 +7,7 @@ Para describir un segmento de código se colocará en la parte superior del mism
 
 | IdentificadoresClave | Significado |
 | --- | --- | 
-| `@descrip` | Descripción del bloque de código |
+| `@descrip` | Descripción del bloque de código, se debe realizar en detalle incluyendo ejemplos de ser necesario. |
 | `@param {tipo}` | Listado y descripción de argumentos necesarios, se escribirá una de estas líneas por argumento. Ejemplo: `@param {string} Nombre del usuario que...` |
 | `@return {tipo}` | Descripción del valor de retorno. Ejemplo: `@return {function(id:string, userDetail:object)} Retorna una función que...` |
 
@@ -16,9 +16,9 @@ El bloque de comentarios deberá comenzar con un `/**` dejando esta linea inicia
 
 ``` Javascript
 /**
- * Bloque de comentario.
- * Información adicional.
- * Cuerpo del comentario incluyendo los identificadores.
+ * Comentarios generales.
+ * Continuación de comentarios generales.
+ * Desarrollo de los identificadores.
  */
 
 ```
