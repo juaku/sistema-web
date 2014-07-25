@@ -5,7 +5,7 @@ Se deben usar tantos comentarios como sean necesarios para garantizar que cualqu
 
 Para describir un segmento de código se colocará en la parte superior del mismo un bloque de texto que contenga la siguiente información:
 
-| Identificadores | Significado |
+| IdentificadoresClave | Significado |
 | --- | --- | 
 | `@descrip` | Descripción del bloque de código |
 | `@param {tipo}` | Listado y descripción de argumentos necesarios, se escribirá una de estas líneas por argumento. Ejemplo: `@param {string} Nombre del usuario que...` |
@@ -17,7 +17,7 @@ El bloque de comentarios deberá comenzar con un `/**` dejando esta linea inicia
 ``` Javascript
 /**
  * Bloque de comentario.
- * Información adicional
+ * Información adicional.
  * Cuerpo del comentario incluyendo los identificadores.
  */
 
