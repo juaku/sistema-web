@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  p Usuario: #{user.firstName}
+  p Lista de eventos:
+  form(method='get')
+    each val in eventos
+      if val.checked
+        input(type='checkbox', name="evento" value='#{val.id}', checked)
+      else
+        input(type='checkbox', name="evento" value='#{val.id}')
+      | #{val.nombre}
+      br
+    input(type='submit', name='actualizar', value='Actualizar')
+
+
+  form(method='get')
+    input(type='input', name='nombreEvento', value='')
+    input(type='submit', value='Crear')

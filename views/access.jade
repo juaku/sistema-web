@@ -1,0 +1,10 @@
+extends layout
+
+block append head
+  script.    
+    if(window.opener == null) {
+      window.location = "/";
+    } else {
+      window.opener.location = "/";
+      window.close();
+    }

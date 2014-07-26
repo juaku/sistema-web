@@ -1,0 +1,26 @@
+
+extends layout
+
+block append head
+  script(src='http://code.jquery.com/jquery-latest.min.js')
+  script.
+    $(document).ready(function() {
+      function popupwindow(url, title, w, h) {
+        wLeft = window.screenLeft ? window.screenLeft : window.screenX;
+        wTop = window.screenTop ? window.screenTop : window.screenY;
+        var left = wLeft + (window.innerWidth / 2) - (w / 2);
+        var top = wTop + (window.innerHeight / 2) - (h / 2);
+        return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+      }
+      $('.pop-up').click(function(event) {
+        event.preventDefault();
+        url = $(this).attr('href');
+        popupwindow(url, 'Acceso Juaku', 530, 300);
+        return false;
+      });
+    });
+
+block content
+  h1= title
+  p Welcome to #{title}
+  a.pop-up(href='/auth/facebook') Ingresar
