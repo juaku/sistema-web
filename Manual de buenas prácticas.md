@@ -12,7 +12,7 @@ Para describir un segmento de código se colocará en la parte superior del mism
 | `@return {tipo}` | Descripción del valor de retorno. Ejemplo: `@return {function(id:string, userDetail:object)} Retorna una función que...` |
 
 
-El bloque de comentarios deberá comenzar con un `/**` dejando esta linea inicial en blanco y continuar con un ` *` por cada nueva linea del cuerpo seguido de un espacio antes del texto y finalizar con un ` */`. Ejemplo:
+El bloque de comentarios deberá comenzar con un `/**` dejando esta línea inicial en blanco y continuar con un ` *` por cada nueva línea del cuerpo seguido de un espacio antes del texto y finalizar con un ` */`. Ejemplo:
 
 ``` Javascript
 /**
