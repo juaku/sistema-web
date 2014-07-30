@@ -5,7 +5,11 @@ var router = express.Router();
  * Renderiza la vista 'index.jade'
  */
 router.get('/', function(req, res){
-  res.render('index', { title: 'Express', user: req.user });
+	if (req.isAuthenticated()) {
+		res.render('index', { title: 'Express', user: req.user });
+	} else {
+		res.redirect('/login');
+	}
 });
 
 module.exports = router;
