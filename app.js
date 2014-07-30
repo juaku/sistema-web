@@ -40,7 +40,7 @@ function saveRememberMeToken(token, uid, fn) {
 passport.use(new FacebookStrategy({
 	clientID: FACEBOOK_APP_ID,
 	clientSecret: FACEBOOK_APP_SECRET,
-	callbackURL: "http://juaku-dev.cloudapp.net:3000/auth/facebook/callback",
+	callbackURL: 'http://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
 },
 function(accessToken, refreshToken, profile, done) {
     // verificación asíncrona, para el efecto de ... 
@@ -106,7 +106,7 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 //   redirigir al usuario a facebook.com.  Después de la autorizacón, Facebook
 //   redirigirá al usuario a esta aplicación at /auth/facebook/callback
 app.get('/auth/facebook',
-	passport.authenticate('facebook', { scope: ['user_birthday', 'user_photos', 'read_stream', 'read_friendlists', 'rsvp_event','manage_pages', 'publish_actions', 'email'], failureRedirect: '/login', display: 'popup'  }),
+	passport.authenticate('facebook', { scope: ['user_birthday', 'user_photos', 'user_events', 'read_friendlists', 'email', 'publish_actions'], failureRedirect: '/login', display: 'popup'  }),
 	function(req, res){
     // La petición será redirigida a Facebook para la autenticación, por lo que
     // esta función no se llamará.
@@ -118,7 +118,7 @@ app.get('/auth/facebook',
 //   página de inicio de sesión.  De lo contrario, la función de la ruta principal se llamará
 //   el cual, en este ejemplo, se redirigirá al usuario a la página de inicio.
 app.get('/auth/facebook/callback',
-	passport.authenticate('facebook', { scope: ['user_birthday', 'user_photos', 'read_stream', 'read_friendlists', 'rsvp_event','manage_pages', 'publish_actions'], failureRedirect: '/login' }),
+	passport.authenticate('facebook', {failureRedirect: '/login' }),
 	function(req, res, next) {
     // Emite un remember me cookie si la opción se aprobó
     //if (!req.body.remember_me) { return next(); }
