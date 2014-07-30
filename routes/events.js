@@ -4,8 +4,6 @@ var router = express.Router();
 var ensureAuthenticated = require('./ensureAuth');
 
 var FB = require('fb');
-//TODO: Cambiar este token por uno del usuario actual.
-var accessToken = "CAAD9Q8hVF7gBAF7B8DxI63KkofOTKZCw6x4VhCAxHkpYnCXA8GwHo7MAV944Oqqkn8bLn05tNR7XVpGaY2erHPL3m1NyoeNT7ZCbl33a5CXLx1mvtb2Clnsqqel83Wn7lmQBFaS75OWspUhowB6sm4BLKHshqqrInEETEiMmuXoQru0vf4wcmQKNnge04bagOcBC7bOhMYKvPU1NP3pzL76tqb7wkZD";
 
 //Clases jPack
 var jPack = require('../jPack');
@@ -16,7 +14,8 @@ var Parse = require('../parseConnect').Parse;
 router.get('/', ensureAuthenticated, function(req, res) {
 	//TODO: Pasar esto a jPack
 	var Eventos = Parse.Object.extend("Eventos");
-	
+	var accessToken = req.session.passport.user.accessToken;
+
 	//Exportación del evento de Facebook
 	FB.api('me/events/created',{ access_token: accessToken }, function(res){
 		if(!res || res.error) {
@@ -48,8 +47,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
                 location : location
               });
 				var jEvent = req.session.jEvent;
-				console.log('PRUEBA: ');
-				console.log(jEvent.prueba());
+
 
 
 			});
