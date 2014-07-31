@@ -5,7 +5,7 @@ var router = express.Router();
  * Borra la cookie, sale de la sesión y redirecciona a '/'.
  */
 router.get('/', function(req, res){
-  res.clearCookie('remember_me');
+  res.clearCookie('locale');
   req.logout();
   res.redirect('/');
 });

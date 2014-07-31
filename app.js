@@ -15,6 +15,15 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var redisStore = require('connect-redis')(session);
 var utils = require('./utils');
 
+//i18n
+var i18n = require("i18n");
+
+i18n.configure({
+	locales: ['en', 'es'],
+	cookie: 'locale',
+	directory: __dirname + '/locales'
+});
+
 //Codigos de aplicación de Facebook
 var FACEBOOK_APP_ID = "278467565655992"
 var FACEBOOK_APP_SECRET = "57aba3bad7902b1e4c21284ad49ff4cc";
@@ -28,6 +37,8 @@ passport.deserializeUser(function(obj, done) {
 	done(null, obj);
 });
 
+// TODO: Verificar si este bloque es necesario
+/*
 //Token
 var tokens = {}
 
@@ -35,6 +46,8 @@ function saveRememberMeToken(token, uid, fn) {
 	tokens[token] = uid;
 	return fn();
 }
+*/
+// END TODO
 
 //FacebookStrategy
 passport.use(new FacebookStrategy({
@@ -55,13 +68,16 @@ function(accessToken, refreshToken, profile, done) {
 }
 ));
 
+// TODO: Verificar si este bloque es necesario
+/*
 function issueToken(user, done) {
 	var token = utils.randomString(64);
 	saveRememberMeToken(token, user.id, function(err) {
 		if (err) { return done(err); }
 		return done(null, token);
 	});
-}
+}*/
+// END TODO
 
 var routes = require('./routes/index');
 var access = require('./routes/access');
@@ -84,21 +100,26 @@ app.use(cookieParser());
 app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 	host: 'localhost',
 	port: '6379'
-}), cookie: { path: '/', maxAge: 3600000 }
+}), cookie: { path: '/', maxAge: 1000*60*60*24*15 } // 15 Días
 }));
-  // Inicializar Passport!  También use el middleware passport.session(), para apoyar
-  // Sesiones de inicio de sesión persistentes (recomendado).
-  app.use(require('stylus').middleware(path.join(__dirname, 'public')));
-  app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(express.static(path.join(__dirname, 'public')));
 
-  app.use('/', routes);
-  app.use('/access', access);
-  app.use('/account', account);
-  app.use('/login', login);
-  app.use('/logout', logout);
-  app.use('/events', events);
+// Inicializar Passport!  También use el middleware passport.session(), para apoyar
+// Sesiones de inicio de sesión persistentes (recomendado).
+app.use(require('stylus').middleware(path.join(__dirname, 'public')));
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
+
+//Inicializar i18n
+app.use(i18n.init);
+
+//Usar rutas
+app.use('/', routes);
+app.use('/access', access);
+app.use('/account', account);
+app.use('/login', login);
+app.use('/logout', logout);
+app.use('/events', events);
 
 // GET /auth/facebook
 //   Use passport.authenticate() como una ruta middleware para autenticar la
@@ -121,19 +142,22 @@ app.get('/auth/facebook/callback',
 	passport.authenticate('facebook', {failureRedirect: '/login' }),
 	function(req, res, next) {
     // Emite un remember me cookie si la opción se aprobó
-    //if (!req.body.remember_me) { return next(); }
+    // if (!req.body.remember_me) { return next(); }
 
+    next();  // Si el bloque de abajo no es necesario
+    // TODO: Verificar si este bloque es necesario
+		/*
     issueToken(req.user, function(err, token) {
     	if (err) { return next(err); }
     	res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
     	return next();
-    });
+    });*/
+		// END TODO
 },
 function(req, res, next) {
 	res.redirect('/access');
 }
 );
-
 
 /// captura un 404 y reenvia un error al manejador
 app.use(function(req, res, next) {

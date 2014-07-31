@@ -28,7 +28,12 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	});
 
 	var jUser = req.session.jUser;
-	
+
+	// Establecer 'Locale'
+	var locale = jUser.locale.split('_')[0];
+	res.cookie('locale', locale, { maxAge: 1000*60*60*25*15, httpOnly: true });
+
+	// Loguear al usuario en Parse
 	jUser.signUp(req.session, function() {
 		res.render('access', { user: req.user });
 	}, function(error) {
