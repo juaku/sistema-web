@@ -26,8 +26,6 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		expires : req.session.cookie._expires
 	});
 
-	console.log(req.session.jUser);
-
 	var jUser = req.session.jUser;
 
 	// Establecer 'Locale'
