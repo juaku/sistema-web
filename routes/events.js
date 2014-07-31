@@ -11,49 +11,58 @@ var jPack = require('../jPack');
 //Concección con Parse
 var Parse = require('../parseConnect').Parse;
 
+
+//TODO: Implementar angularjs
+router.post('/', ensureAuthenticated,function(req, res) {
+	var accessToken = req.session.passport.user.accessToken;
+
+	if(accessToken!=undefined && accessToken!='' ) {
+			exportarEvento();
+		};
+
+		function exportarEvento() {
+			//Exportación del evento de Facebook
+			FB.api('me/events/created',{ access_token: accessToken }, function(results){
+				if(!results || results.error) {
+					console.log(results.error);
+					return;
+				}
+				var id = results.data[0].id;
+				var name = results.data[0].name;
+				var startTime = results.data[0].start_time;
+				var endTime = results.data[0].end_time;
+				var location = results.data[0].location;
+
+				FB.api('fql', { q: [
+					'SELECT description FROM event WHERE eid ='+results.data[0].id,
+					'SELECT attending_count FROM event WHERE eid ='+results.data[0].id
+					], access_token: accessToken }, function (results) {
+						if(!results || results.error) {
+							console.log(results.error);
+							return;
+						}
+						req.session.jEvent = new jPack.event ({
+							id : id,
+							name : name,
+							description :results.data[0].fql_result_set[0].description ,
+							startTime : startTime,
+							endTime : endTime,
+							assistantNumber : results.data[1].fql_result_set[0].attending_count ,
+							//cover :,
+							location : location
+						});
+						var jEvent = req.session.jEvent;
+						jEvent.exportEvent();
+						res.render('index');
+					});
+			});
+		}
+});
+
+
 router.get('/', ensureAuthenticated, function(req, res) {
 	//TODO: Pasar esto a jPack
 	var Eventos = Parse.Object.extend("Eventos");
-	var accessToken = req.session.passport.user.accessToken;
-
-	//Exportación del evento de Facebook
-	FB.api('me/events/created',{ access_token: accessToken }, function(res){
-		if(!res || res.error) {
-			console.log(res.error);
-			return;
-		}
-		var id = res.data[0].id;
-		var name = res.data[0].name;
-		var startTime = res.data[0].start_time;
-		var endTime = res.data[0].end_time;
-		var location = res.data[0].location;
-
-		FB.api('fql', { q: [
-			'SELECT description FROM event WHERE eid ='+res.data[0].id,
-			'SELECT attending_count FROM event WHERE eid ='+res.data[0].id
-			], access_token: accessToken }, function (res) {
-				if(!res || res.error) {
-					console.log(res.error);
-					return;
-				}
-				req.session.jEvent = new jPack.event ({
-					id : id,
-					name : name,
-					description :res.data[0].fql_result_set[0].description ,
-					startTime : startTime,
-					endTime : endTime,
-					assistantNumber : res.data[1].fql_result_set[0].attending_count ,
-                //      cover :,
-                location : location
-              });
-				var jEvent = req.session.jEvent;
-
-
-
-			});
-
-	});
-
 
 	if(req.query['evento']!=undefined && req.query['evento']!='' && req.query['actualizar'] != undefined) {
 		if(typeof req.query['evento'] == 'string') {
