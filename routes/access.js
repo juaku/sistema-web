@@ -31,7 +31,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
 
 	// Establecer 'Locale'
 	var locale = jUser.locale.split('_')[0];
-	res.cookie('locale', locale, { maxAge: 1000*60*60*25*15, httpOnly: true });
+	res.cookie('locale', locale, { maxAge: 1000*60*60*24*15, httpOnly: true });
 
 	// Loguear al usuario en Parse
 	jUser.signUp(req.session, function() {
