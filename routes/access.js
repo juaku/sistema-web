@@ -18,13 +18,15 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		email : req.user._json.email,
 		birthday : req.user._json.birthday,
 		gender : req.user.gender,
-		location : req.user_json.location,
-		hometown : req.user_json.hometown,
+		location : req.user._json.location,
+		hometown : req.user._json.hometown,
 		locale : req.user._json.locale,
 		facebookUrl : req.user.profileUrl,
 		accessToken : req.user.accessToken,
 		expires : req.session.cookie._expires
 	});
+
+	console.log(req.session.jUser);
 
 	var jUser = req.session.jUser;
 
