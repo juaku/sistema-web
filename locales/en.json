@@ -1,3 +1,5 @@
 {
-	"Welcome to {{name}}, how are you today?": "Welcome to {{name}}, how are you today?"
+	"Welcome to {{title}}, how are you today?": "Welcome to {{title}}, how are you today?",
+	"Welcome to {{title}}": "Welcome to {{title}}",
+	"Sign in": "Sign in"
 }

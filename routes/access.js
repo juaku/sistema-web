@@ -11,19 +11,18 @@ var jPack = require('../jPack');
  * Autentica al usuario y crea un jUser y lo loguea/registra en Parse.com
  */
 router.get('/', ensureAuthenticated, function(req, res) {
-	var passportUser = req.session.passport.user;
 	req.session.jUser = new jPack.user ({
-		id : req.session.passport.user.id,
-		firstName : passportUser.name.givenName,
-		lastName : passportUser.name.familyName,
-		email : passportUser._json.email,
-		birthday : passportUser._json.birthday,
-		gender : passportUser.gender,
-		location : passportUser._json.location,
-		hometown : passportUser._json.hometown,
-		locale : passportUser._json.locale,
-		facebookUrl : passportUser.profileUrl,
-		accessToken : passportUser.accessToken,
+		id : req.user.id,
+		firstName : req.user.name.givenName,
+		lastName : req.user.name.familyName,
+		email : req.user._json.email,
+		birthday : req.user._json.birthday,
+		gender : req.user.gender,
+		location : req.user._json.location,
+		hometown : req.user._json.hometown,
+		locale : req.user._json.locale,
+		facebookUrl : req.user.profileUrl,
+		accessToken : req.user.accessToken,
 		expires : req.session.cookie._expires
 	});
 
