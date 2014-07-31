@@ -1,3 +1,5 @@
 {
-	"Welcome to {{name}}, how are you today?": "Bienvenido a {{name}}, ¿cómo está hoy?"
+	"Welcome to {{title}}, how are you today?": "Bienvenido a {{title}}, ¿cómo está hoy?",
+	"Welcome to {{title}}": "Bienvenido a {{title}}",
+	"Sign in": "Ingresar"
 }

@@ -22,5 +22,5 @@ block append head
 
 block content
   h1= title
-  p Welcome to #{title}
-  a.pop-up(href='/auth/facebook') Ingresar
+  p #{__('Welcome to {{title}}', { title: title })}
+  a.pop-up(href='/auth/facebook') #{__('Sign in')}

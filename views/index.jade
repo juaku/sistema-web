@@ -2,4 +2,5 @@ extends layout
 
 block content
   h1= title
-  p #{__('Welcome to {{name}}, how are you today?', { name: 'Express' })}
+  p #{__('Welcome to {{title}}, how are you today?', { title: title })}
+
