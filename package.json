@@ -3,7 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "forever start -w -a --uid juaku-dev-$PORT ./bin/www",
+    "stop": "forever stop juaku-dev-$PORT",
+    "test": "tail -f -n 25 ~/.forever/juaku-dev-$PORT.log"
   },
   "dependencies": {
     "express": "~4.4.1",
