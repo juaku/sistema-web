@@ -113,6 +113,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Inicializar i18n
 app.use(i18n.init);
 
+//Título de aplicación
+app.locals.title = 'Juaku';
+
 //Usar rutas
 app.use('/', routes);
 app.use('/access', access);
