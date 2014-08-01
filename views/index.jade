@@ -1,6 +1,15 @@
 extends layout
 
 block content
-  h1= title
-  p #{__('Welcome to {{title}}, how are you today?', { title: title })}
-
+  header
+   #main-area
+      #title
+        a(href="/?ref=logo", target="_self")
+          h1 #{title}
+      #search-box
+        input(type="text", placeholder="#{__('Search events')}")
+    navigation
+      ul
+        li #{__('All events')}
+        li #{__('My events')}
+        li #{__('Event map')}
