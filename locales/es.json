@@ -1,5 +1,7 @@
 {
-	"Welcome to {{title}}, how are you today?": "Bienvenido a {{title}}, ¿cómo está hoy?",
-	"Welcome to {{title}}": "Bienvenido a {{title}}",
-	"Sign in": "Ingresar"
+	"Sign in": "Ingresar",
+	"Search events": "Buscar eventos",
+	"All events": "Todos los eventos",
+	"My events": "Mis eventos",
+	"Event map": "Mapa de eventos"
 }
