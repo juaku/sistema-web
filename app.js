@@ -119,11 +119,11 @@ app.locals.title = 'Juaku';
 //DEV: Restringir el uso a usuarios que no sean clientes del servidor
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
-	  if (req.ip == process.env.SSH_CLIENT.split(' ')[0]) {
-	    next();
-	  } else {
-	    res.end(403, 'forbidden');
-	  }
+		if(req.ip == process.env.SSH_CLIENT.split(' ')[0]) {
+			next();
+		} else {
+			res.status(403).end();
+		}
 	});
 }
 
