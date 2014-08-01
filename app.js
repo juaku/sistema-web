@@ -116,6 +116,17 @@ app.use(i18n.init);
 //Título de aplicación
 app.locals.title = 'Juaku';
 
+//DEV: Restringir el uso a usuarios que no sean clientes del servidor
+if (app.get('env') === 'development') {
+	app.use(function(req, res, next) {
+	  if (req.ip == process.env.SSH_CLIENT.split(' ')[0]) {
+	    next();
+	  } else {
+	    res.end(403, 'forbidden');
+	  }
+	});
+}
+
 //Usar rutas
 app.use('/', routes);
 app.use('/access', access);
