@@ -2,16 +2,25 @@ extends layout
 
 block content
   header
-   #main-area
-      #title
-        a(href="/?ref=logo", target="_self")
-          h1 #{title}
-      #search-box
-        input(type="text", placeholder="#{__('Search events')}")
-    navigation
+    #title
+      a(href="/?ref=logo", target="_self")
+        h1 #{title}
+    #search-box
+      input(type="text", placeholder="#{__('Search events')}")
+    nav
       ul
         li #{__('All events')}
         li #{__('My events')}
         li #{__('Event map')}
-  #content
-    img(src=profilePicture)
+  main
+    aside
+      section#profile
+        img(src=user.profilePicture)
+        h1 #{user.firstName} #{user.lastName}
+      section#events-filter
+        ul
+          li.all #{__('All')}
+          li.con #{__('Concerts')}
+          li.par #{__('Partys')}
+          li.cul #{__('Cultural')}
+          li.div #{__('Diverse')}

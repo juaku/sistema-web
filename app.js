@@ -7,6 +7,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//Stylus y Nib
+var stylus = require('stylus')
+var nib = require('nib');
+
 //Coneccion con Facebook
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -88,6 +92,14 @@ var events = require('./routes/events');
 
 var app = express();
 
+// Inicializar Nib
+function compile(str, path) {
+	return stylus(str)
+		.set('filename', path)
+		.set('compress', true)
+		.use(nib());
+}
+
 // ver configuración de motor
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -105,7 +117,7 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 
 // Inicializar Passport!  También use el middleware passport.session(), para apoyar
 // Sesiones de inicio de sesión persistentes (recomendado).
-app.use(require('stylus').middleware(path.join(__dirname, 'public')));
+app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
