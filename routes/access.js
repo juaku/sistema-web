@@ -12,49 +12,37 @@ var FB = require('fb');
  * Autentica al usuario y crea un jUser y lo loguea/registra en Parse.com
  */
 router.get('/', ensureAuthenticated, function(req, res) {
-	var profilePic;
-	var idProfile = req.session.passport.user.id;
-	console.log(req.session.passport.user.id);
-	FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
-		profilePic = response.data.url;
-		console.log(response.data.url);
-		next();
-		//res.render('events', { user: req.user , profilePicture: profilePicture });
-		});
+	req.session.jUser = new jPack.user ({
+		id : req.user.id,
+		firstName : req.user.name.givenName,
+		lastName : req.user.name.familyName,
+		email : req.user._json.email,
+		birthday : req.user._json.birthday,
+		gender : req.user.gender,
+		location : req.user._json.location,
+		hometown : req.user._json.hometown,
+		locale : req.user._json.locale,
+		facebookUrl : req.user.profileUrl,
+		accessToken : req.user.accessToken,
+		expires : req.session.cookie._expires
+	});
 
-	function next(){
-		//console.log(response.data.url);
-		req.session.jUser = new jPack.user ({
-			id : req.user.id,
-			profilePicture : profilePic,
-			firstName : req.user.name.givenName,
-			lastName : req.user.name.familyName,
-			email : req.user._json.email,
-			birthday : req.user._json.birthday,
-			gender : req.user.gender,
-			location : req.user._json.location,
-			hometown : req.user._json.hometown,
-			locale : req.user._json.locale,
-			facebookUrl : req.user.profileUrl,
-			accessToken : req.user.accessToken,
-			expires : req.session.cookie._expires
-		});
-
-	//console.log(req.user.name.givenName);
 	
-		var jUser = req.session.jUser;
+	var jUser = req.session.jUser;
 
-		// Establecer 'Locale'
-		var locale = jUser.locale.split('_')[0];
-		res.cookie('locale', locale, { maxAge: 1000*60*60*24*15, httpOnly: true });
+	// Establecer 'Locale'
+	var locale = jUser.locale.split('_')[0];
+	res.cookie('locale', locale, { maxAge: 1000*60*60*24*15, httpOnly: true });
 
-		// Loguear al usuario en Parse
-		jUser.signUp(req.session, function() {
+	// Loguear al usuario en Parse
+	jUser.signUp(req.session, function() {
+		jUser.getProfilePicture(req.session, function() {
 			res.render('access', { user: req.user});
-		}, function(error) {
-			res.redirect('/login');
 		});
-	}
+	}, function(error) {
+		res.redirect('/login');
+	});
+	
 });
 
 module.exports = router;

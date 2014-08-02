@@ -6,6 +6,8 @@ var crip = require('./crip');
 
 var jPack = jPack || {}
 
+var FB = require('fb');
+
 /*
 
 * Clase User 
@@ -18,7 +20,6 @@ var jPack = jPack || {}
 
 jPack.user = function (user) {
 	this.id = user.id;																			//{string}
-	this.profilePicture = user.profilePicture;
 	this.firstName = user.firstName;												//{string}
 	this.lastName = user.lastName;													//{string}
 	this.email = user.email;																//{string}
@@ -31,6 +32,7 @@ jPack.user = function (user) {
 	this.accessToken = user.accessToken;										//{string}
 	this.expires = user.expires;														//{string}
 	this.parseSessionToken = user.parseSessionToken;				//{string}
+	this.profilePicture = user.profilePicture;							//{url}
 }
 
 jPack.user.prototype.prueba = function() {
@@ -73,12 +75,32 @@ jPack.user.prototype.signUp = function(session, s,e) {
 
 /*
 
+* Metodo para obtener la foto de perfil 
+* @descrip este método es el encargado de tomar la foto de perfil
+* de fb y asignarla como un atributo más a la clase user
+* @param {session, s}   
+* @return {session.jUser.profilePicture}
+
+*/
+
+jPack.user.prototype.getProfilePicture = function(session, s) {
+	var profilePic;
+	var idProfile = session.passport.user.id;
+	FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
+		profilePic = response.data.url;
+		session.jUser.profilePicture = profilePic;
+		s();
+	});
+}
+
+/*
+
 * Clase Evento 
 * @descrip esta clase es la encargada de exportar los datos
 * correspondientes de un evento en Facebook que necesite un usuario para crear
 * un evento
-* @param {objeto} user     
-* @return {jPack.user()}
+* @param {objeto} event     
+* @return {jPack.event()}
 
 */
 
