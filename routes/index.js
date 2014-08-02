@@ -7,7 +7,7 @@ var router = express.Router();
  */
 router.get('/', function(req, res){
 	if (req.isAuthenticated()) {
-		res.render('index', { user: req.user });
+		res.render('index', { user: req.user, profilePicture: req.session.jUser.profilePicture});
 	} else {
 		res.render('login');
 	}

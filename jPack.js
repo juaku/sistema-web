@@ -18,6 +18,7 @@ var jPack = jPack || {}
 
 jPack.user = function (user) {
 	this.id = user.id;																			//{string}
+	this.profilePicture = user.profilePicture;
 	this.firstName = user.firstName;												//{string}
 	this.lastName = user.lastName;													//{string}
 	this.email = user.email;																//{string}
