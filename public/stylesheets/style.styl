@@ -28,9 +28,10 @@ input
 header
 	background-color: #FFF
 	width: 100%
-	position: fixed
 	min-width: 995px
+	position: fixed
 	top: 0
+	z-index: 1
 
 header #header
 	display: flex
@@ -58,6 +59,7 @@ header #header #search-box input
 	height: 19px
 	font-size: 14px
 	padding: 3px 5px
+	border: 1px solid #EEE
 	font-weight: normal // IE
 
 header #header nav
@@ -78,7 +80,7 @@ header #header nav:before
 header #header nav select
 	font-size: 14px
 	color: #333
-	border: 1px solid #AAA
+	border: 1px solid #EEE
 	margin: 0px
 	vertical-align: top
 	height: 27px
@@ -207,11 +209,45 @@ main section#list .event
 	width: 370px
 	height: 235px
 	margin-bottom: 10px
+	padding: 10px 0
+
+main section#list .event:after
+	content: ''
+	position: relative
+	bottom: 240px
+	left: 370px
+	border: none
+	border-top: 1px solid #AAA
+	display: inline-block
+	width: 10px
+
+main section#list .event .event-image
+	background-color: #EEE
+	width: 350px
+	height: 130px
+	margin: 0 10px 10px
+
+main section#list .event .event-data
+	width: 350px
+	height: 65px
+	margin: 10px
+
+main section#list .event .event-controls
+	border-top: 1px solid #EEE
+	height: 29px;
 
 /*
  * Cuerpo / Detalle
  */
 main section#detail
 	background-color: #333
-	margin-left: 10px;
+	margin-left: 20px;
 	flex: 1;
+
+// TODO: Ver si es necesario con Angular.js
+#type-filter,
+#profile,
+#time-finder,
+header nav select {
+	cursor: pointer
+}
