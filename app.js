@@ -96,7 +96,7 @@ var app = express();
 function compile(str, path) {
 	return stylus(str)
 		.set('filename', path)
-		.set('compress', true)
+		.set('compress', false)		// .css final comprimido en una linea
 		.use(nib());
 }
 
