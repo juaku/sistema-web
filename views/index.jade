@@ -2,25 +2,39 @@ extends layout
 
 block content
   header
-    #title
-      a(href="/?ref=logo", target="_self")
-        h1 #{title}
-    #search-box
-      input(type="text", placeholder="#{__('Search events')}")
-    nav
-      ul
-        li #{__('All events')}
-        li #{__('My events')}
-        li #{__('Event map')}
+    #header
+      #title
+        a(href="/?ref=logo", target="_self")
+          h1 #{title}
+      #search-box
+        input(type="text", placeholder="#{__('Search events')}")
+      nav
+        select
+          option #{__('All events')}
+          option #{__('My events')}
+          option #{__('Event map')}
   main
     aside
       section#profile
         img(src=user.profilePicture)
         h1 #{user.firstName} #{user.lastName}
-      section#events-filter
+      section#type-filter
         ul
           li.all #{__('All')}
           li.con #{__('Concerts')}
           li.par #{__('Partys')}
           li.cul #{__('Cultural')}
           li.div #{__('Diverse')}
+      section#time-finder
+        ul
+          li #{__('upcoming')}
+          li #{__('tomorrow')}
+          li #{__('today')}
+          li #{__('past')}
+    section#list
+      .event
+      .event
+      .event
+      .event
+      .event
+    section#detail

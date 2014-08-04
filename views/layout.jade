@@ -1,13 +1,14 @@
 doctype html
-html(ng-app)
+html(lang='#{locale}' ng-app)
   head
     meta(charset='utf-8')
+    title= title
+    link(rel='icon' type='image/png' href='/images/favicon.png')
     script(src='//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js')
     script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js')
     script(src="/socket.io/socket.io.js")
     script(src='/javascripts/application.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
-    title= title
     block head
   body
     block content

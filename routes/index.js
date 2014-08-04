@@ -7,7 +7,7 @@ var router = express.Router();
  */
 router.get('/', function(req, res){
 	if (req.isAuthenticated()) {
-		res.render('index', { user: req.session.jUser});
+		res.render('index', { user: req.session.jUser, locale: req.getLocale()});
 	} else {
 		res.render('login');
 	}

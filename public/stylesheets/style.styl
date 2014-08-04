@@ -14,6 +14,9 @@ body
 a
   color: #00B7FF
 
+input
+		border: 1px solid #CCC
+
 /*
  * Estilos específicos
  * ------- -----------
@@ -24,53 +27,82 @@ a
  */
 header
 	background-color: #FFF
-	height: 50px
-	margin: 0 auto
-	display: flex
-	padding: 5px 20px
-	align-items: center
+	width: 100%
+	position: fixed
+	min-width: 995px
+	top: 0
 
-header #title a
-	background-image: url('../images/sprite.png?v=sdfbh')
+header #header
+	display: flex
+	align-items: center
+	margin: 0 20px
+	height: 60px
+
+header #header #title a
+	background-image: url('../images/sprite.png?v=1001')
 	background-repeat: no-repeat
+	background-size: 105px
 	width: 105px
 	height: 45px
 	display: block
 
-header #title a h1
+header #header #title a h1
 	display: none
 
-header #search-box input
-	color: #777
-	width: 370px
-	height: 20px
-	margin-left: 20px
-	padding: 0 3px
-	border: 1px solid #CCC
+header #header #search-box
+	margin-left: 26px
 
-header nav ul
-	margin: 0
-	padding: 0
-	display: flex
+header #header #search-box input
+	color: #555
+	width: 358px
+	height: 19px
+	font-size: 14px
+	padding: 3px 5px
+	font-weight: normal // IE
 
-header nav ul li
-	list-style: none
-	margin: 0 20px;
+header #header nav
+	align-self: flex-end
+
+header #header nav:before
+	content: ''
+	border: 1px solid #AAA
+	width: 10px
+	height: 30px
+	display: inline-block
+	margin-left: 10px
+	border-bottom: none
+	border-right: none
+	vertical-align: bottom
+	margin-top: 12px
+
+header #header nav select
+	font-size: 14px
+	color: #333
+	border: 1px solid #AAA
+	margin: 0px
+	vertical-align: top
+	height: 27px
 
 /*
  * Cuerpo
  */
 main
 	display: flex
-	margin: 0 20px
+	margin: 60px 20px 0 20px
 
-// Lado
+/*
+ * Cuerpo / Lado
+ */
 main aside
-	padding: 15px 10px
+	background-color: #EEE
+	padding: 15px 10px 15px 0
 	width: 110px
-	border-right: 1px solid #FFF
 	text-align: right
+	position: fixed
 
+/*
+ * Cuerpo / Lado / Perfil
+ */
 main aside section#profile img
 	width: 100px
 	height: 100px
@@ -79,37 +111,107 @@ main aside section#profile img
 main aside section#profile h1
 	font-size: 12px
 	font-weight: normal
+	margin: 5px;
 
-main aside section#events-filter ul
+/*
+ * Cuerpo / Lado / Filtro de tipo
+ */
+ main aside section#type-filter
+ 	margin: 50px 5px
+ 	
+main aside section#type-filter ul
 	margin: 0
 	padding: 0
 
-main aside section#events-filter li
+main aside section#type-filter li
 	list-style: none
-	margin: 5px 0
+	margin: 10px 0
+	border-radius: 20px
 
-main aside section#events-filter li:after
+main aside section#type-filter li:after
 	content: ''
-	width: 20px
-	height: 20px
+	width: 10px
+	height: 10px
 	margin-left: 10px
 	display: inline-block
-	border-radius: 15px
-	position: relative
-	top: 5px
-	border: 3px solid #FFF
+	border-radius: 20px
+	border: 5px solid transparent
+	vertical-align: middle
+	box-shadow: 0 0 0 2px #FFF
 
-main aside section#events-filter li.all:after
+main aside section#type-filter li.all:after
+	background-color: transparent
+
+main aside section#type-filter li.all:hover:after
 	background-color: #FFF
+	border-color: #EEE
 
-main aside section#events-filter li.con:after
+main aside section#type-filter li.con:after
 	background-color: #F05
 
-main aside section#events-filter li.par:after
+main aside section#type-filter li.con:hover:after
+	background-color: #FF80AA
+	border-color: #F05
+
+main aside section#type-filter li.par:after
 	background-color: #70F
 
-main aside section#events-filter li.cul:after
+main aside section#type-filter li.par:hover:after
+	background-color: #BB80FF
+	border-color: #70F
+
+main aside section#type-filter li.cul:after
 	background-color: #0A9
 
-main aside section#events-filter li.div:after
+main aside section#type-filter li.cul:hover:after
+	background-color: #80D5CC
+	border-color: #0A9
+
+main aside section#type-filter li.div:after
 	background-color: #F90
+
+main aside section#type-filter li.div:hover:after
+	background-color: #FFCC80
+	border-color: #F90
+
+/*
+ * Cuerpo / Lado / Buscador por tiempo
+ */
+main aside section#time-finder
+	margin: 60px 5px 20px
+
+main aside section#time-finder ul
+	margin: 0
+	padding: 0
+
+main aside section#time-finder li
+	list-style: none
+	height: 20px
+	color: #999
+
+main aside section#time-finder li:hover
+	color: #000
+
+/*
+ * Cuerpo / Lista
+ */
+main section#list
+	width: 370px
+	padding: 15px 10px
+	border-left: 1px solid #FFF
+	border-right: 1px solid #AAA
+	margin-left: 120px
+
+main section#list .event
+	background-color: #FFF
+	width: 370px
+	height: 235px
+	margin-bottom: 10px
+
+/*
+ * Cuerpo / Detalle
+ */
+main section#detail
+	background-color: #333
+	margin-left: 10px;
+	flex: 1;
