@@ -142,10 +142,14 @@ main aside section#type-filter ul {
   padding: 0;
 }
 main aside section#type-filter li {
+  color: #555;
   list-style: none;
   margin: 10px 0;
   -webkit-border-radius: 20px;
   border-radius: 20px;
+}
+main aside section#type-filter li:hover {
+  color: #000;
 }
 main aside section#type-filter li:after {
   content: '';
