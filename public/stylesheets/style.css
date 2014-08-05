@@ -7,7 +7,6 @@ body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
   margin: 0;
-  min-width: 995px;
 }
 a {
   color: #00b7ff;
@@ -211,6 +210,7 @@ main aside section#time-finder li:hover {
  */
 main section#list {
   width: 370px;
+  min-width: 370px;
   padding: 15px 10px;
   border-left: 1px solid #fff;
   border-right: 1px solid #aaa;
@@ -254,6 +254,7 @@ main section#list .event .event-controls {
  */
 main section#detail {
   background-color: #333;
+  min-width: 420px;
   margin-left: 20px;
   -webkit-box-flex: 1;
   -moz-box-flex: 1;

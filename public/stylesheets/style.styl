@@ -9,7 +9,6 @@ body
   font-family: Helvetica, Arial, sans-serif
   font-size: 14px
   margin: 0
-  min-width: 995px
 
 a
   color: #00B7FF
@@ -116,7 +115,7 @@ main aside section#profile img
 main aside section#profile h1
 	font-size: 12px
 	font-weight: normal
-	margin: 5px;
+	margin: 5px
 
 /*
  * Cuerpo / Lado / Filtro de tipo
@@ -163,7 +162,7 @@ main aside section#type-filter li.div:after
 	background-color: #F90
 
 main aside section#type-filter li:hover:after
-	background-image: radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.9) 35%, rgba(255, 255, 255, 0) 40%);
+	background-image: radial-gradient(rgba(255, 255, 255, 0.9) 35%, rgba(255, 255, 255, 0) 40%)
 
 /*
  * Cuerpo / Lado / Buscador por tiempo
@@ -188,6 +187,7 @@ main aside section#time-finder li:hover
  */
 main section#list
 	width: 370px
+	min-width: 370px
 	padding: 15px 10px
 	border-left: 1px solid #FFF
 	border-right: 1px solid #AAA
@@ -224,15 +224,16 @@ main section#list .event .event-data
 
 main section#list .event .event-controls
 	border-top: 1px solid #EEE
-	height: 29px;
+	height: 29px
 
 /*
  * Cuerpo / Detalle
  */
 main section#detail
 	background-color: #333
-	margin-left: 20px;
-	flex: 1;
+	min-width: 420px
+	margin-left: 20px
+	flex: 1
 
 // TODO: Ver si es necesario con Angular.js
 #type-filter,
