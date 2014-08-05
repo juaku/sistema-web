@@ -112,8 +112,8 @@ jPack.event = function (event) {
  	this.startTime = event.startTime;												//{date}
  	this.endTime = event.endTime;														//{date}
  	this.timeZone = event.timeZone;													//{date}
- 	this.assistantsNumber = event.assistantsNumber;					//{int}
-//this.cover = event.cover;
+//this.assistantsNumber = event.assistantsNumber;					//{int}
+	this.cover = event.cover;																//{url}
 	this.location = event.location;													//{string}
  //this.geoPoint = geoPoint;
 }
