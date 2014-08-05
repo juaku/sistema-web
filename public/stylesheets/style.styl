@@ -10,6 +10,11 @@ body
   font-size: 14px
   margin: 0
 
+html
+body
+	width: 100%
+	height: 100%
+
 a
   color: #00B7FF
 
@@ -17,7 +22,52 @@ input
 		border: 1px solid #CCC
 
 /*
- * Estilos específicos
+ * Estilos específicos: /login
+ * ------- -----------
+ */
+main#start
+	background-color: #333
+	margin: 0px
+	width: 100%
+	height: 100%
+
+main#start section#access
+	background-color: #FFF
+	width: 300px
+	height: 500px
+	text-align: center
+	position: relative
+	top: 50%
+	left: 50%
+	transform: translate(-50%, -50%)
+	display: flex
+	flex-direction: column
+	align-items: center
+	justify-content: space-between
+
+main#start section#access #logo
+	background-image: url('/images/sprite.png?v=1005')
+	width: 210px
+	height: 90px
+	background-size: 210px
+	background-repeat: no-repeat
+	margin: 20px
+
+main#start section#access #logo h1
+	display: none
+
+main#start section#access #methods #FB
+	background-color: #3B5998
+	color: #FFF
+	font-weight: bold
+	width: 230px
+	margin: 20px
+	padding: 10px 0
+	text-decoration: none
+	display: block
+	
+/*
+ * Estilos específicos: /index
  * ------- -----------
  */
 
@@ -27,7 +77,6 @@ input
 header
 	background-color: #FFF
 	width: 100%
-	min-width: 995px
 	position: fixed
 	top: 0
 	z-index: 1
@@ -42,7 +91,7 @@ header #header #title
 	margin-left: 5px
 
 header #header #title a
-	background-image: url('../images/sprite.png?v=1001')
+	background-image: url('/images/sprite.png?v=1005')
 	background-repeat: no-repeat
 	background-size: 105px
 	width: 105px

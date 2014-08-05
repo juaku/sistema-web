@@ -2,7 +2,6 @@
 extends layout
 
 block append head
-  script(src='http://code.jquery.com/jquery-latest.min.js')
   script.
     $(document).ready(function() {
       function popupwindow(url, title, w, h) {
@@ -21,5 +20,9 @@ block append head
     });
 
 block content
-  h1= title
-  a.pop-up(href='/auth/facebook') #{__('Sign in')}
+  main#start
+    section#access
+      section#logo
+        h1 #{title}
+      section#methods
+        a.pop-up(href='/auth/facebook')#FB #{__('Continue with Facebook')}
