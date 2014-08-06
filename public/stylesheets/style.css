@@ -100,6 +100,7 @@ main#start section#access #methods #FB {
 header {
   background-color: #fff;
   width: 100%;
+  min-width: 995px;
   position: fixed;
   top: 0;
   z-index: 1;
