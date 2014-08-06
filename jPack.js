@@ -123,33 +123,20 @@ jPack.event.prototype.prueba = function() {
 	return this.name;
 }
 
-jPack.event.prototype.exportEvent = function() {
-		var Eventos = Parse.Object.extend("Eventos");
-		if(this.name!=undefined && this.name!='') {
-			var evento = new Eventos();
-			evento.set("Nombre", this.name);
-			evento.save().then(function () {
-				n();
-			}, function(error) {
-				n();
-			});
-		} else {
-				n();
-		}
-	
-
-		function n() {
-			var lista = [];
-			var limit = 0;
-			function cumplido() {
-				limit--;
-				if(limit == 0) {
-					res.render('events', { user: req.session.jUser , eventos: lista});
-				}
-			}
-		}
+jPack.event.prototype.exportEvent = function(next, error) {
+	var Eventos = Parse.Object.extend("Eventos");
+	if(this.name!=undefined && this.name!='') {
+		var evento = new Eventos();
+		evento.set("Nombre", this.name);
+		evento.save().then(function () {
+			next();
+		}, function(error) {
+			error(error);
+		});
+	} else {
+		error('Nombre vacio');
+	}
 }
-
 
 jPack.agenda = function () {
 

@@ -11,97 +11,128 @@ var jPack = require('../jPack');
 //Concección con Parse
 var Parse = require('../parseConnect').Parse;
 
+var request = require('request');
 
 //TODO: Implementar angularjs
-router.post('/', ensureAuthenticated,function(req, res) {
-	var accessToken = req.session.passport.user.accessToken;
 
+router.post('/', function(req, res) {
+	var c = 0;
+	req.body.events.forEach( function(event) {
+		var jEvent = new jPack.event ({
+			id : event.id,
+			name : event.name,
+			//description : event.description ,
+			startTime : event.startTime,
+			endTime : event.endTime,
+			//assistantNumber : results.data[1].fql_result_set[0].attending_count ,
+			//cover : event.cover.source,
+			location : event.location,
+			timezone : event.timezone 
+		});
+
+		jEvent.exportEvent(function() {
+			c++;
+			cumplido(c);
+		}, function(error) {
+			console.log(error);
+		});
+	});
+	
+	function cumplido(c) {
+		console.log(c);
+		if(c==3)
+			res.json({});
+	}
+
+/*
 	if(accessToken!=undefined && accessToken!='' ) {
 			exportarEvento();
-		};
+	};
 
-		function exportarEvento() {
-			//Exportación del evento de Facebook
-			FB.api('me/events/created',{ access_token: accessToken }, function(results){
-				if(!results || results.error) {
-					console.log(results.error);
-					return;
-				}
-				var id = results.data[0].id;
-				var name = results.data[0].name;
-				var startTime = results.data[0].start_time;
-				var endTime = results.data[0].end_time;
-				var location = results.data[0].location;
+	function exportarEvento() {
+		//Exportación del evento de Facebook
 
-				FB.api(id, {access_token: accessToken}, function (response) {
-						if (!response && response.error) {
-							console.log(results.error);
-							return;
-						}
-						var description = response.description;
-						FB.api(id, {fields: 'cover', access_token: accessToken }, function (response) {
-							if (!response && response.error) {
-								console.log(results.error);
-								return;
-
-							}
-							req.session.jEvent = new jPack.event ({
-								id : id,
-								name : name,
-								description : description ,
-								startTime : startTime,
-								endTime : endTime,
-								//assistantNumber : results.data[1].fql_result_set[0].attending_count ,
-								cover : response.cover.source,
-								location : location
-							});
-							var jEvent = req.session.jEvent;
-							jEvent.exportEvent();
-							res.json(jEvent);
-							}
-						);
-					}
-				);
-			});
-		}
+	}*/
 });
 
 
 router.get('/', ensureAuthenticated, function(req, res) {
 	//TODO: Pasar esto a jPack
+	var accessToken = req.session.passport.user.accessToken;
 
-	if(req.query['source']=='fb'){
-				var accessToken = req.session.passport.user.accessToken;
-				FB.api('me/events/created',{ access_token: accessToken }, function(results){
-				if(!results || results.error) {
+	if(req.query['source']=='fb') {
+
+		FB.api('me/events/created',{ access_token: accessToken }, function(results) {
+		if(!results || results.error) {
+			console.log(results.error);
+			return;
+		}
+			
+		request.post(
+			'http://juaku-dev.cloudapp.net:3000/events',{ form: { 
+				events : results.data
+			}}, function (error, response, body) { 
+		});
+
+		res.json(results.data)
+
+/*
+		var id = results.data[0].id;
+		var name = results.data[0].name;
+		var startTime = results.data[0].start_time;
+		var endTime = results.data[0].end_time;
+		var location = results.data[0].location;
+
+		FB.api(id, {access_token: accessToken}, function (response) {
+			if (!response && response.error) {
+				console.log(results.error);
+				return;
+			}
+			
+			var description = response.description;
+			FB.api(id, {fields: 'cover', access_token: accessToken }, function (response) {
+				if (!response && response.error) {
 					console.log(results.error);
 					return;
 				}
-						var id = results.data[0].id;
-					FB.api(id, {access_token: accessToken}, function (response) {
-							if (!response && response.error) {
-								console.log(results.error);
-								return;
-							}
-							var description = response.description;
-							FB.api(id, {fields: 'cover', access_token: accessToken }, function (response) {
-								if (!response && response.error) {
-									console.log(results.error);
-									return;
-
-								}
-
-								res.json(results);
-								}
-							);
-						}
-					);
-				
+				req.session.jEvent = new jPack.event ({
+					id : id,
+					name : name,
+					description : description ,
+					startTime : startTime,
+					endTime : endTime,
+					//assistantNumber : results.data[1].fql_result_set[0].attending_count ,
+					cover : response.cover.source,
+					location : location
+				});
+				var jEvent = req.session.jEvent;
+				jEvent.exportEvent();
+				res.json(jEvent);
 			});
-	}
+			});*/
+		});
+	} else if(req.query['fbId']!='' && req.query['fbId']!=undefined) {
+		getEventCoverImage(req.query['fbId'], function(results) {
+			res.json(results);
+		});
 
-	else{
+		function getEventCoverImage(id, next) {
+			FB.api(id, {fields: 'cover', access_token: accessToken }, function (response) {
+				if (!response && response.error) {
+					console.log(results.error);
+					return;
+				}
+				return next(response);
+			});
+		}
+	} else if(req.query['post']!=undefined) {
+
+	} else {
 		var Eventos = Parse.Object.extend("Eventos");
+		var query = new Parse.Query(Eventos);
+		query.find().then(function(results) {
+			res.json(results);
+		});
 /*	
 		if(req.query['evento']!=undefined && req.query['evento']!='' && req.query['actualizar'] != undefined) {
 			if(typeof req.query['evento'] == 'string') {
@@ -139,13 +170,8 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		} else {
 			nPro();
 		}
-*/
 
-var query = new Parse.Query(Eventos);
-				query.find().then(function(results) {
-					res.json(results);
-				});
-/*		function nPro() {
+		function nPro() {
 			if(req.query['nombreEvento']!=undefined && req.query['nombreEvento']!='') {
 				var evento = new Eventos();
 				evento.set("Nombre", req.query['nombreEvento']);
@@ -195,9 +221,7 @@ var query = new Parse.Query(Eventos);
 				}
 			}
 		}*/
-
 	}
-	
 });
 
 module.exports = router;
