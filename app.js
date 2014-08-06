@@ -134,6 +134,7 @@ if (app.get('env') === 'development') {
 		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128') {
 			next();
 		} else {
+			console.log('Acceso denegado para: ' + req.ip )
 			res.status(403).end();
 		}
 	});
