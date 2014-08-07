@@ -145,11 +145,13 @@ header #header #search-box {
 header #header #search-box input {
   color: #555;
   width: 358px;
-  height: 19px;
   font-size: 14px;
-  padding: 3px 5px;
+  padding: 5px;
   border: 1px solid #eee;
   font-weight: normal;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
 }
 header #header nav {
   -webkit-align-self: flex-end;
@@ -160,7 +162,7 @@ header #header nav:before {
   content: '';
   border: 1px solid #aaa;
   width: 20px;
-  height: 30px;
+  height: 31px;
   display: inline-block;
   margin-left: 10px;
   border-bottom: none;
@@ -168,13 +170,41 @@ header #header nav:before {
   vertical-align: bottom;
   margin-top: 12px;
 }
-header #header nav select {
+header #header nav #select {
+  background-color: #fff;
   font-size: 14px;
+  width: 165px;
   color: #333;
-  border: 1px solid #eee;
   margin: 0px;
+  border: 1px solid #eee;
   vertical-align: top;
-  height: 27px;
+  display: inline-block;
+  position: absolute;
+}
+header #header nav #select:after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 145px;
+  top: 10px;
+  border-top: 7px solid #333;
+  border-bottom: 7px solid transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+header #header nav #select #current,
+header #header nav #select #options {
+  padding: 5px 25px 5px 10px;
+}
+header #header nav #select #options ul {
+  margin: 0;
+  padding: 0;
+}
+header #header nav #select #options li {
+  list-style: none;
+  padding: 5px 0;
 }
 /*
  * Cuerpo
@@ -371,6 +401,6 @@ main section#view section#media {
 #type-filter,
 #profile,
 #time-finder,
-header nav select {
+header nav #select {
   cursor: pointer;
 }

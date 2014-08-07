@@ -12,4 +12,29 @@ $(window).on('scroll', function() {
  */
 $(window).on('load resize', function() {
 	$('aside#controls').css('height', $(this).height() - $('header').height());
-})
+});
+
+/*
+ * Menú desplegable de la cabecera
+ */
+$(document).on('ready', function() {
+	$('header nav #select #options').hide();
+
+	$('header nav #select').on('click', function() {
+		$(this).find('#options').show();
+	});
+
+	$('html').on('click', function() {
+		$('header nav #select #options').hide();
+	});
+
+	$('header nav #select').on('click', function(event) {
+		event.stopPropagation();
+	});
+
+	$('header nav #select #options li').on('click', function(event) {
+		$('header nav #select #options').hide();
+		$('header nav #select #current').html($(this).html());
+		event.stopPropagation();
+	});
+});

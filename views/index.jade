@@ -9,10 +9,13 @@ block content
       #search-box
         input(type="text", placeholder="#{__('Search events')}")
       nav
-        select
-          option #{__('All events')}
-          option #{__('My events')}
-          option #{__('Event map')}
+        div#select
+          div#current #{__('All events')}
+          div#options
+            ul
+              li #{__('All events')}
+              li #{__('My events')}
+              li #{__('Event map')}
   main
     aside#controls
       div.content
