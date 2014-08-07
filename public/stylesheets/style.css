@@ -7,15 +7,16 @@ body {
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
   margin: 0;
+  padding: 0;
+  min-width: 995px;
 }
 html,
 body {
   width: 100%;
   height: 100%;
 }
-a {
-  color: #00b7ff;
-}
+a,
+color: #00B7FF,
 input {
   border: 1px solid #ccc;
 }
@@ -103,6 +104,7 @@ header {
   min-width: 995px;
   position: fixed;
   top: 0;
+  left: 0;
   z-index: 1;
 }
 header #header {
@@ -138,16 +140,18 @@ header #header #title a h1 {
   display: none;
 }
 header #header #search-box {
-  margin-left: 21px;
+  margin-left: 31px;
 }
 header #header #search-box input {
   color: #555;
   width: 358px;
-  height: 19px;
   font-size: 14px;
-  padding: 3px 5px;
+  padding: 5px;
   border: 1px solid #eee;
   font-weight: normal;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
 }
 header #header nav {
   -webkit-align-self: flex-end;
@@ -158,7 +162,7 @@ header #header nav:before {
   content: '';
   border: 1px solid #aaa;
   width: 20px;
-  height: 30px;
+  height: 31px;
   display: inline-block;
   margin-left: 10px;
   border-bottom: none;
@@ -166,13 +170,41 @@ header #header nav:before {
   vertical-align: bottom;
   margin-top: 12px;
 }
-header #header nav select {
+header #header nav #select {
+  background-color: #fff;
   font-size: 14px;
+  width: 165px;
   color: #333;
-  border: 1px solid #eee;
   margin: 0px;
+  border: 1px solid #eee;
   vertical-align: top;
-  height: 27px;
+  display: inline-block;
+  position: absolute;
+}
+header #header nav #select:after {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 145px;
+  top: 10px;
+  border-top: 7px solid #333;
+  border-bottom: 7px solid transparent;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+header #header nav #select #current,
+header #header nav #select #options {
+  padding: 5px 25px 5px 10px;
+}
+header #header nav #select #options ul {
+  margin: 0;
+  padding: 0;
+}
+header #header nav #select #options li {
+  list-style: none;
+  padding: 5px 0;
 }
 /*
  * Cuerpo
@@ -184,27 +216,39 @@ main {
   display: -ms-flexbox;
   display: box;
   display: flex;
-  margin: 60px 20px 0 20px;
+  margin: 60px 0 0 0;
 }
 /*
  * Cuerpo / Lado
  */
-main aside {
+main aside#controls {
   background-color: #eee;
-  padding: 15px 10px 15px 0;
-  width: 110px;
   text-align: right;
   position: fixed;
+  left: 0;
+  width: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  text-align: left;
+}
+main aside#controls .content {
+  width: 110px;
+  margin: 0 0 0 20px;
+  display: inline-block;
+  text-align: right;
 }
 /*
  * Cuerpo / Lado / Perfil
  */
-main aside section#profile img {
+main aside#controls section#profile {
+  margin-top: 15px;
+}
+main aside#controls section#profile img {
   width: 100px;
   height: 100px;
   border: 5px solid #fff;
 }
-main aside section#profile h1 {
+main aside#controls section#profile h1 {
   font-size: 12px;
   font-weight: normal;
   margin: 5px;
@@ -212,24 +256,24 @@ main aside section#profile h1 {
 /*
  * Cuerpo / Lado / Filtro de tipo
  */
-main aside section#type-filter {
+main aside#controls section#type-filter {
   margin: 50px 5px;
 }
-main aside section#type-filter ul {
+main aside#controls section#type-filter ul {
   margin: 0;
   padding: 0;
 }
-main aside section#type-filter li {
+main aside#controls section#type-filter li {
   color: #555;
   list-style: none;
   margin: 10px 0;
   -webkit-border-radius: 20px;
   border-radius: 20px;
 }
-main aside section#type-filter li:hover {
+main aside#controls section#type-filter li:hover {
   color: #000;
 }
-main aside section#type-filter li:after {
+main aside#controls section#type-filter li:after {
   content: '';
   width: 20px;
   height: 20px;
@@ -241,22 +285,22 @@ main aside section#type-filter li:after {
   box-shadow: 0 0 0 2px #fff;
   vertical-align: middle;
 }
-main aside section#type-filter li.all:after {
+main aside#controls section#type-filter li.all:after {
   background-color: #ddd;
 }
-main aside section#type-filter li.con:after {
+main aside#controls section#type-filter li.con:after {
   background-color: #f05;
 }
-main aside section#type-filter li.par:after {
+main aside#controls section#type-filter li.par:after {
   background-color: #70f;
 }
-main aside section#type-filter li.cul:after {
+main aside#controls section#type-filter li.cul:after {
   background-color: #0a9;
 }
-main aside section#type-filter li.div:after {
+main aside#controls section#type-filter li.div:after {
   background-color: #f90;
 }
-main aside section#type-filter li:hover:after {
+main aside#controls section#type-filter li:hover:after {
   background-image: -webkit-radial-gradient(rgba(255,255,255,0.9) 35%, rgba(255,255,255,0) 40%);
   background-image: -moz-radial-gradient(rgba(255,255,255,0.9) 35%, rgba(255,255,255,0) 40%);
   background-image: -o-radial-gradient(rgba(255,255,255,0.9) 35%, rgba(255,255,255,0) 40%);
@@ -266,40 +310,55 @@ main aside section#type-filter li:hover:after {
 /*
  * Cuerpo / Lado / Buscador por tiempo
  */
-main aside section#time-finder {
-  margin: 60px 5px 20px;
+main aside#controls section#time-finder {
+  margin: 60px 5px 10px;
 }
-main aside section#time-finder ul {
+main aside#controls section#time-finder ul {
   margin: 0;
   padding: 0;
 }
-main aside section#time-finder li {
+main aside#controls section#time-finder li {
   list-style: none;
   height: 20px;
   color: #999;
 }
-main aside section#time-finder li:hover {
+main aside#controls section#time-finder li:hover {
   color: #000;
 }
 /*
  * Cuerpo / Lista
  */
-main section#list {
+main section#view {
+  margin-left: 150px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: box;
+  display: flex;
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+main section#view section#list {
   width: 370px;
   min-width: 370px;
   padding: 15px 10px;
   border-left: 1px solid #fff;
   border-right: 1px solid #aaa;
-  margin-left: 120px;
 }
-main section#list .event {
+main section#view section#list .event {
   background-color: #fff;
   width: 370px;
   height: 215px;
   margin-bottom: 10px;
   padding: 10px 0;
 }
-main section#list .event:after {
+main section#view section#list .event:after {
   content: '';
   position: relative;
   bottom: 215px;
@@ -310,28 +369,27 @@ main section#list .event:after {
   width: 10px;
   vertical-align: top;
 }
-main section#list .event .event-image {
+main section#view section#list .event .event-image {
   background-color: #eee;
   width: 350px;
   height: 130px;
   margin: 0 10px 10px;
 }
-main section#list .event .event-data {
+main section#view section#list .event .event-data {
   width: 350px;
   height: 45px;
   margin: 10px;
 }
-main section#list .event .event-controls {
+main section#view section#list .event .event-controls {
   border-top: 1px solid #eee;
   height: 29px;
 }
 /*
  * Cuerpo / Detalle
  */
-main section#detail {
+main section#view section#media {
   background-color: #333;
-  min-width: 420px;
-  margin-left: 20px;
+  margin: 0 20px;
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -o-box-flex: 1;
@@ -343,6 +401,6 @@ main section#detail {
 #type-filter,
 #profile,
 #time-finder,
-header nav select {
+header nav #select {
   cursor: pointer;
 }
