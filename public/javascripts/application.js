@@ -1,4 +1,9 @@
 /*
+ * Arreglos jQuery
+ * ---------------
+ */
+
+/*
  * Corregir el scroll horizontal para 'main aside' y 'header'
  */
 $(window).on('scroll', function() {
@@ -38,3 +43,14 @@ $(document).on('ready', function() {
 		event.stopPropagation();
 	});
 });
+
+/*
+ * Framework angular.js
+ * --------------------
+ */
+
+function Application($scope, $http) {
+	$http.get('/events').success(function(data) {
+		$scope.events = data;
+	});
+}

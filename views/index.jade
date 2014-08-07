@@ -8,14 +8,17 @@ block content
           h1 #{title}
       #search-box
         input(type="text", placeholder="#{__('Search events')}")
-      nav
+      nav#select-block
         div#select
           div#current #{__('All events')}
           div#options
             ul
               li #{__('All events')}
               li #{__('My events')}
-              li #{__('Event map')}
+              li #{__('Events map')}
+      nav#main-menu
+          ul
+            li #{__('New event')}
   main
     aside#controls
       div.content
@@ -26,7 +29,7 @@ block content
           ul
             li.all #{__('All')}
             li.con #{__('Concerts')}
-            li.par #{__('Partys')}
+            li.par #{__('Parties')}
             li.cul #{__('Cultural')}
             li.div #{__('Diverse')}
         section#time-finder
@@ -35,38 +38,13 @@ block content
             li #{__('tomorrow')}
             li #{__('today')}
             li #{__('past')}
-    section#view
-      section#list
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-        .event
-          .event-image
-          .event-data
-          .event-controls
-      section#media
+    section#list
+      .event(ng-repeat='(key,event) in events')
+        .event-image
+        .event-data
+          .events-data-name {{event.name}}
+          .events-data-attendance {{event.attendance}}
+        .event-controls
+    section#views
+      section#media.view
+      section#new-event.view.hidden
