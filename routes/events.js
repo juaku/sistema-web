@@ -59,22 +59,19 @@ router.post('/', function(req, res) {
 router.get('/', ensureAuthenticated, function(req, res) {
 	//TODO: Pasar esto a jPack
 	var accessToken = req.session.passport.user.accessToken;
-
 	if(req.query['source']=='fb') {
+		req.session.jUser = new jPack.user (req.session.jUser);
+		var jUser = req.session.jUser;
+		console.log(jUser);
+		jUser.getFbEvents(accessToken, function(results) {
+			request.post(
+				'http://juaku-dev.cloudapp.net:5000/events',{ form: { 
+					events : results.data
+				}}, function (error, response, body) {
 
-		FB.api('me/events/created',{ access_token: accessToken }, function(results) {
-		if(!results || results.error) {
-			console.log(results.error);
-			return;
-		}
-			
-		request.post(
-			'http://juaku-dev.cloudapp.net:3000/events',{ form: { 
-				events : results.data
-			}}, function (error, response, body) { 
+			});
+			res.json(results.data);
 		});
-
-		res.json(results.data)
 
 /*
 		var id = results.data[0].id;
@@ -110,7 +107,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
 				res.json(jEvent);
 			});
 			});*/
-		});
+
 	} else if(req.query['fbId']!='' && req.query['fbId']!=undefined) {
 		getEventCoverImage(req.query['fbId'], function(results) {
 			res.json(results);

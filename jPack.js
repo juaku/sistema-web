@@ -73,6 +73,18 @@ jPack.user.prototype.signUp = function(session, s,e) {
 	});
 }
 
+jPack.user.prototype.getFbEvents = function(accessToken, next) {
+	FB.api('me/events/created',{ access_token: accessToken }, function(results) {
+		if(!results || results.error) {
+			console.log(results.error);
+			return;
+		} else {
+			console.log("hoola");
+			console.log(results);
+			next(results);
+		}
+	});
+}
 /*
 
 * Metodo para obtener la foto de perfil 
@@ -92,6 +104,7 @@ jPack.user.prototype.getProfilePicture = function(session, s) {
 		s();
 	});
 }
+
 
 /*
 
@@ -125,9 +138,9 @@ jPack.event.prototype.prueba = function() {
 
 jPack.event.prototype.exportEvent = function(next, error) {
 	var Eventos = Parse.Object.extend("Eventos");
-	if(this.name!=undefined && this.name!='') {
+	if(this.id!=undefined && this.id!='') {
 		var evento = new Eventos();
-		evento.set("Nombre", this.name);
+		evento.set("IdEventFb", this.id);
 		evento.save().then(function () {
 			next();
 		}, function(error) {
