@@ -118,33 +118,33 @@ header #header #search-box input
 	-webkit-appearance: none	// Safari
 	border-radius: 0px	// Safari
 
-header #header nav
+header #header nav#select-block
+	width: 200px
+	display: flex
 	align-self: flex-end
-
-header #header nav:before
+	
+header #header nav#select-block:before
 	content: ''
-	border: 1px solid #AAA
 	width: 20px
-	height: 31px
-	display: inline-block
-	margin-left: 10px
+	height: 30px
+	margin: 13px 0 0 10px
+	border: 1px solid #AAA
 	border-bottom: none
 	border-right: none
-	vertical-align: bottom
-	margin-top: 12px
 
-header #header nav #select
+header #header nav#select-block #select
 	background-color: #FFF
 	font-size: 14px
-	width: 165px;
+	width: 165px
 	color: #333
 	margin: 0px
 	border: 1px solid #EEE
 	vertical-align: top
 	display: inline-block
 	position: absolute
+	top: 16px
 
-header #header nav #select:after
+header #header nav#select-block #select:after
 	content: ''
 	display: inline-block
 	width: 0
@@ -157,18 +157,28 @@ header #header nav #select:after
 	border-left: 5px solid transparent
 	border-right: 5px solid transparent
 
-header #header nav #select #current
-header #header nav #select #options
+header #header nav#select-block #select #current
+header #header nav#select-block #select #options
 	padding: 5px 25px 5px 10px
 
-header #header nav #select #options ul
+header #header nav#select-block #select #options ul
 	margin: 0
 	padding: 0
 
-header #header nav #select #options li
+header #header nav#select-block #select #options li
 	list-style: none
 	padding: 5px 0
 
+header #header nav#main-menu
+	margin: 0 10px
+
+header #header nav#main-menu ul
+	margin: 0
+	padding: 0
+	
+header #header nav#main-menu li
+	list-style: none
+	
 /*
  * Cuerpo
  */
@@ -279,26 +289,23 @@ main aside#controls section#time-finder li:hover
 /*
  * Cuerpo / Lista
  */
-main section#view
-	margin-left: 150px
-	display: flex
-	flex: 1
 
-main section#view section#list
+main section#list
 	width: 370px
 	min-width: 370px
+	margin-left: 150px
 	padding: 15px 10px
 	border-left: 1px solid #FFF
 	border-right: 1px solid #AAA
 
-main section#view section#list .event
+main section#list .event
 	background-color: #FFF
 	width: 370px
 	height: 215px
 	margin-bottom: 10px
 	padding: 10px 0
 
-main section#view section#list .event:after
+main section#list .event:after
 	content: ''
 	position: relative
 	bottom: 215px
@@ -309,33 +316,43 @@ main section#view section#list .event:after
 	width: 10px
 	vertical-align: top
 
-main section#view section#list .event .event-image
+main section#list .event .event-image
 	background-color: #EEE
 	width: 350px
 	height: 130px
 	margin: 0 10px 10px
 
-main section#view section#list .event .event-data
+main section#list .event .event-data
 	width: 350px
 	height: 45px
 	margin: 10px
 
-main section#view section#list .event .event-controls
+main section#list .event .event-controls
 	border-top: 1px solid #EEE
 	height: 29px
 
 /*
- * Cuerpo / Detalle
+ * Cuerpo / Vistas
  */
-main section#view section#media
-	background-color: #333
-	margin: 0 20px
+main section#views
+	display: flex
 	flex: 1
 
+main section#views .view
+	flex: 1
+
+main section#views .view.hidden
+	display: none
+
+main section#views section#media
+	background-color: #333
+	margin: 0 20px
+	
 // TODO: Ver si es necesario con Angular.js
 #type-filter,
 #profile,
 #time-finder,
-header nav #select {
+header nav #select,
+header #header nav#main-menu li {
 	cursor: pointer
 }

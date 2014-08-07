@@ -153,24 +153,28 @@ header #header #search-box input {
   -webkit-border-radius: 0px;
   border-radius: 0px;
 }
-header #header nav {
+header #header nav#select-block {
+  width: 200px;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: box;
+  display: flex;
   -webkit-align-self: flex-end;
   align-self: flex-end;
   -ms-flex-item-align: end;
 }
-header #header nav:before {
+header #header nav#select-block:before {
   content: '';
-  border: 1px solid #aaa;
   width: 20px;
-  height: 31px;
-  display: inline-block;
-  margin-left: 10px;
+  height: 30px;
+  margin: 13px 0 0 10px;
+  border: 1px solid #aaa;
   border-bottom: none;
   border-right: none;
-  vertical-align: bottom;
-  margin-top: 12px;
 }
-header #header nav #select {
+header #header nav#select-block #select {
   background-color: #fff;
   font-size: 14px;
   width: 165px;
@@ -180,8 +184,9 @@ header #header nav #select {
   vertical-align: top;
   display: inline-block;
   position: absolute;
+  top: 16px;
 }
-header #header nav #select:after {
+header #header nav#select-block #select:after {
   content: '';
   display: inline-block;
   width: 0;
@@ -194,17 +199,27 @@ header #header nav #select:after {
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
 }
-header #header nav #select #current,
-header #header nav #select #options {
+header #header nav#select-block #select #current,
+header #header nav#select-block #select #options {
   padding: 5px 25px 5px 10px;
 }
-header #header nav #select #options ul {
+header #header nav#select-block #select #options ul {
   margin: 0;
   padding: 0;
 }
-header #header nav #select #options li {
+header #header nav#select-block #select #options li {
   list-style: none;
   padding: 5px 0;
+}
+header #header nav#main-menu {
+  margin: 0 10px;
+}
+header #header nav#main-menu ul {
+  margin: 0;
+  padding: 0;
+}
+header #header nav#main-menu li {
+  list-style: none;
 }
 /*
  * Cuerpo
@@ -328,8 +343,51 @@ main aside#controls section#time-finder li:hover {
 /*
  * Cuerpo / Lista
  */
-main section#view {
+main section#list {
+  width: 370px;
+  min-width: 370px;
   margin-left: 150px;
+  padding: 15px 10px;
+  border-left: 1px solid #fff;
+  border-right: 1px solid #aaa;
+}
+main section#list .event {
+  background-color: #fff;
+  width: 370px;
+  height: 215px;
+  margin-bottom: 10px;
+  padding: 10px 0;
+}
+main section#list .event:after {
+  content: '';
+  position: relative;
+  bottom: 215px;
+  left: 370px;
+  border: none;
+  border-top: 1px solid #aaa;
+  display: inline-block;
+  width: 10px;
+  vertical-align: top;
+}
+main section#list .event .event-image {
+  background-color: #eee;
+  width: 350px;
+  height: 130px;
+  margin: 0 10px 10px;
+}
+main section#list .event .event-data {
+  width: 350px;
+  height: 45px;
+  margin: 10px;
+}
+main section#list .event .event-controls {
+  border-top: 1px solid #eee;
+  height: 29px;
+}
+/*
+ * Cuerpo / Vistas
+ */
+main section#views {
   display: -webkit-box;
   display: -moz-box;
   display: -webkit-flex;
@@ -344,52 +402,7 @@ main section#view {
   -ms-flex: 1;
   flex: 1;
 }
-main section#view section#list {
-  width: 370px;
-  min-width: 370px;
-  padding: 15px 10px;
-  border-left: 1px solid #fff;
-  border-right: 1px solid #aaa;
-}
-main section#view section#list .event {
-  background-color: #fff;
-  width: 370px;
-  height: 215px;
-  margin-bottom: 10px;
-  padding: 10px 0;
-}
-main section#view section#list .event:after {
-  content: '';
-  position: relative;
-  bottom: 215px;
-  left: 370px;
-  border: none;
-  border-top: 1px solid #aaa;
-  display: inline-block;
-  width: 10px;
-  vertical-align: top;
-}
-main section#view section#list .event .event-image {
-  background-color: #eee;
-  width: 350px;
-  height: 130px;
-  margin: 0 10px 10px;
-}
-main section#view section#list .event .event-data {
-  width: 350px;
-  height: 45px;
-  margin: 10px;
-}
-main section#view section#list .event .event-controls {
-  border-top: 1px solid #eee;
-  height: 29px;
-}
-/*
- * Cuerpo / Detalle
- */
-main section#view section#media {
-  background-color: #333;
-  margin: 0 20px;
+main section#views .view {
   -webkit-box-flex: 1;
   -moz-box-flex: 1;
   -o-box-flex: 1;
@@ -398,9 +411,17 @@ main section#view section#media {
   -ms-flex: 1;
   flex: 1;
 }
+main section#views .view.hidden {
+  display: none;
+}
+main section#views section#media {
+  background-color: #333;
+  margin: 0 20px;
+}
 #type-filter,
 #profile,
 #time-finder,
-header nav #select {
+header nav #select,
+header #header nav#main-menu li {
   cursor: pointer;
 }

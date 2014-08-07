@@ -3,14 +3,15 @@
 	"Search events": "Search events",
 	"All events": "All events",
 	"My events": "My events",
-	"Event map": "Event map",
+	"Events map": "Events map",
 	"All": "All",
 	"Concerts": "Concerts",
-	"Partys": "Partys",
+	"Parties": "Parties",
 	"Cultural": "Cultural",
 	"Diverse": "Diverse",
 	"upcoming": "upcoming",
 	"tomorrow": "tomorrow",
 	"today": "today",
-	"past": "past"
+	"past": "past",
+	"New event": "New event"
 }
