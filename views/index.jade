@@ -2,29 +2,32 @@ extends layout
 
 block content
   header
-    #header
-      #title
-        a(href='/?ref=logo', target='_self')
-          h1 #{title}
-      #search-box
-        input(type="text", placeholder="#{__('Search events')}")
-      nav#select-block
-        div#select
-          div#current #{__('All events')}
-          div#options
-            ul
-              li #{__('All events')}
-              li #{__('My events')}
-              li #{__('Events map')}
-      nav#main-menu
+    #title
+      a(href='/?ref=logo', target='_self')
+        h1 #{title}
+    #search-box
+      input(type="text", placeholder="#{__('Search events')}")
+    nav#select-block
+      div#select
+        div#current #{__('All events')}
+        div#options
           ul
-            li #{__('New event')}
+            li #{__('All events')}
+            li #{__('My events')}
+            li #{__('Events map')}
+    nav#main-menu
+        ul
+          li 
+            a(href='#media') Media
+          li 
+            a(href='#new-event') #{__('New event')}
   main
     aside#controls
       div.content
         section#profile
           img(src=user.profilePicture)
           h1 #{user.firstName} #{user.lastName}
+          .profile-config
         section#type-filter
           ul
             li.all #{__('All')}
@@ -39,12 +42,51 @@ block content
             li #{__('today')}
             li #{__('past')}
     section#list
-      .event(ng-repeat='(key,event) in events')
+      //.event(ng-repeat='(key,event) in events')
+      //  .event-image
+      //  .event-data
+      //    .events-data-name {{event.name}}
+      //    .events-data-attendance {{event.attendance}}
+      //  .event-controls
+      .event.con
         .event-image
         .event-data
-          .events-data-name {{event.name}}
-          .events-data-attendance {{event.attendance}}
+          .event-date
+            span.event-day-week Jue
+            span.event-day-month 24
+            span.event-month Abr
+          .event-data-container
+            .event-title
+              h2 #selfie
+            .event-base-info
+              .event-location.info Aura AQP
+              .event-time.info 9:00 PM
+              .event-address.info Real plaza, Arequipa
         .event-controls
+          .event-types
+            .type Concierto
+          .event-join-button.con Unirse
     section#views
       section#media.view
       section#new-event.view.hidden
+        div#new-from-scratch.method.hidden
+          h2 Crear nuevo evento
+          div.options
+            p Ingresa los datos para crear un nuevo evento:
+            form
+              input(type='text', placeholder='Nombre')
+              input(type='text', placeholder='Lugar')
+              input(type='text', placeholder='Dirección')
+              textarea(placeholder='Descripción')
+              input(type='submit', value='Guardar')
+        div#new-from-fb.method.hidden
+          h2 Importar evento de Facebook
+          div.options
+            p Selecciona el evento o eventos que deseas importar:
+            form
+              div#fb-events
+                div.checkbox(ng-repeat='(key,event) in eventsFb')
+                  input(type='checkbox', name='fbEvent', value='{{event.id}}', id='{{key}}')
+                  label(for='{{key}}') {{event.name}}
+              input(type='submit', value='Importar')
+
