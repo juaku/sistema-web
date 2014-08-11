@@ -14,23 +14,39 @@ var Parse = require('../parseConnect').Parse;
 var request = require('request');
 
 router.post('/', ensureAuthenticated, function(req, res) {
-	var jEvent = new jPack.event ({
-		id : req.body.id,
-		name : req.body.name,
-		//description : req.body.description ,
-		startTime : req.body.startTime,
-		endTime : req.body.endTime,
-		//assistantNumber : ?,
-		//cover : req.body.cover.source,
-		location : req.body.location,
-		timezone : req.body.timezone 
-	});
+	//Crea eventos y los alamacena en la BD de Parse
+	var eventType = req.body.type;
+	if(req.body!=undefined && req.body!='') {
+		if(true) { 
+			req.session.jUser = new jPack.user(req.session.jUser);
+			var jUser = req.session.jUser;
+			jUser.createEvent(eventType, req, function(response) {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+			});
+		} else {
+			var jEvent = new jPack.event ({
+				id : req.body.id,
+				name : req.body.name,
+				//description : req.body.description ,
+				startTime : req.body.startTime,
+				endTime : req.body.endTime,
+				//assistantNumber : ?,
+				//cover : req.body.cover.source,
+				location : req.body.location,
+				timezone : req.body.timezone 
+			});
 
-	jEvent.exportEvent(function() {
-		res.status(201).end();
-	}, function(error) {
-		console.log(error);
-	});
+			jEvent.setIdFbEvent(eventType, function() {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+			});
+		}
+	} else {
+		res.status(400).end();
+	}
 });
 
 router.get('/', ensureAuthenticated, function(req, res) {
@@ -44,15 +60,15 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		});
 	} else {
 		// Devuelve todos los eventos de la BD
-		var Eventos = Parse.Object.extend("Eventos");
-		var query = new Parse.Query(Eventos);
+		var Events = Parse.Object.extend("Events");
+		var query = new Parse.Query(Events);
 		var events = [];
 		query.find().then(function(results) {
 			var jUser = new jPack.user(req.session.jUser);
 			jUser.getAttendance(function(response) {
 				for(i in results) {
 					events[i] = {};
-					events[i].name = results[i].get('Nombre');
+					events[i].name = results[i].get('name');
 					events[i].attendance = findIfAttended(results[i].id, response);
 				};
 				res.json(events);

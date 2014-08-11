@@ -81,7 +81,7 @@ jPack.user.prototype.getFbEvents = function(accessToken, next) {
 }
 
 /*
-* Metodo para obtener la foto de perfil 
+* Método para obtener la foto de perfil 
 * @descrip este método es el encargado de tomar la foto de perfil
 * de fb y asignarla como un atributo más a la clase user dentro de session
 * @param {session, next}   
@@ -104,8 +104,8 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
  */
 jPack.user.prototype.getAttendance = function(next, error) {
 	Parse.User.become(this.parseSessionToken).then(function (user) {
-		var Eventos = Parse.Object.extend("Eventos");
-		var query = new Parse.Query(Eventos);
+		var Events = Parse.Object.extend("Events");
+		var query = new Parse.Query(Events);
 		query.equalTo("asistente", user);
 		query.find().then(function(results) {
 			next(results);
@@ -114,6 +114,45 @@ jPack.user.prototype.getAttendance = function(next, error) {
 		});
 	}, function(error) {
 			error(error);
+	});
+}
+
+/*
+ * @descrip Método para crear un evento con juaku
+ * @param {string} eType, {function} req, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.createEvent = function(eType, req, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var EventType = Parse.Object.extend("EventType");
+		var Events = Parse.Object.extend("Events");
+		var type = new EventType();
+		var query = new Parse.Query(EventType);
+		query.equalTo("type", eType);
+		query.find({
+			success: function(results) {
+				if(results.length){
+					event = new Events();
+					event.set('name', req.body.name);
+					event.set('place', req.body.place);
+					event.set('date', req.body.date);
+					event.set('type', results[0]);
+					event.save().then(function () {
+						next();
+					}, function(error) {
+						console.log(error);
+					});
+				} else {
+					next();
+				}
+			},
+			error: function(error) {
+				console.log(error);
+		  }
+		});
+
+	}, function(error) {
+				error(error);
 	});
 }
 
@@ -138,25 +177,39 @@ jPack.event = function (event) {
  	//this.geoPoint = geoPoint;
 }
 
-// TODO: Borrar
 /*
-jPack.event.prototype.prueba = function() {
-	return this.name;
-}
+ * @descrip Método para asignar el id de un evento de fb a la base de datos
+ * @param {string} eType, {function} next, {function} error.
+ * @return null
 */
 
-jPack.event.prototype.exportEvent = function(next, error) {
-	var Eventos = Parse.Object.extend("Eventos");
+jPack.event.prototype.setIdFbEvent = function(eType, next, error) {
+	var Events = Parse.Object.extend("Events");
 	if(this.id!=undefined && this.id!='') {
-		var evento = new Eventos();
-		evento.set("IdEventFb", this.id);
-		evento.save().then(function () {
-			next();
-		}, function(error) {
-			error(error);
-		});
+		var event = new Events();
+		var query = new Parse.Query(EventType);
+		query.equalTo("type", eType);
+		query.find({
+			success: function(results) {
+				if(results.length){
+					event = new Events();
+					event.set('idFbEvent', this.id);
+					event.set('type', results[0]);
+					event.save().then(function () {
+						next();
+					}, function(error) {
+						console.log(error);
+					});
+				} else {
+					next();
+				}
+			},
+			error: function(error) {
+				console.log(error);
+		  }
+		});	
 	} else {
-		error('Nombre vacio');
+		error('Id vacio');
 	}
 }
 
