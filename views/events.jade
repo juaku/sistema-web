@@ -1,28 +1,22 @@
 extends layout
 
 block content
+  p Usuario: #{user.firstName}
+  p Lista de eventos:
+  form(method='get')
+    each val in eventos
+      if val.checked
+        input(type='checkbox', name="evento" value='#{val.id}', checked)
+      else
+        input(type='checkbox', name="evento" value='#{val.id}')
+      | #{val.nombre}
+      br
+    input(type='submit', name='actualizar', value='Actualizar')
+
+
+  form(method='get')
+    input(type='input', name='nombreEvento', value='')
+    input(type='submit', value='Crear')
 
   form(method='post')
-    input(type='input', name='name', value='')
-    br
-    input(type='input', name='place', value='')
-    br
-    input(type='input', name='date', value='')
-    br
-    input(type='checkbox', name="type" value='Concerts')
-    | Concerts
-    br
-    input(type='checkbox', name="type" value='Parties')
-    | Parties
-    br
-    input(type='checkbox', name="type" value='Cultural')
-    | Cultural
-    br
-    input(type='checkbox', name="type" value='Diverse')
-    | Diverse
-    br
-    input(type='hidden', id='eventSource', name='eventSource')
-    input(type='submit', name='Crear', value='Crear', onclick='document.getElementById("eventSource").value=ne')
-    input(type='submit', name='Importar', value='Importar evento', onclick='document.getElementById("eventSource").value=fbe')
-
-
+    input(type='submit', value='Exportar evento')
