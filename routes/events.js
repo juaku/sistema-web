@@ -17,7 +17,7 @@ router.post('/', ensureAuthenticated, function(req, res) {
 	//Crea eventos y los alamacena en la BD de Parse
 	var eventType = req.body.type;
 	if(req.body!=undefined && req.body!='') {
-		if(true) { 
+		if(req.body.eventSource == 'ne') { 
 			req.session.jUser = new jPack.user(req.session.jUser);
 			var jUser = req.session.jUser;
 			jUser.createEvent(eventType, req, function(response) {
@@ -25,7 +25,7 @@ router.post('/', ensureAuthenticated, function(req, res) {
 			}, function(error) {
 				console.log(error);
 			});
-		} else {
+		} else if(req.body.eventSource == 'fbe') {
 			var jEvent = new jPack.event ({
 				id : req.body.id,
 				name : req.body.name,
@@ -43,6 +43,8 @@ router.post('/', ensureAuthenticated, function(req, res) {
 			}, function(error) {
 				console.log(error);
 			});
+		} else {
+			res.status(404).end();
 		}
 	} else {
 		res.status(400).end();
