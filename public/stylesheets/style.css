@@ -602,7 +602,7 @@ main section#views .view.hidden {
 }
 main section#views .view .method .options {
   overflow: hidden;
-  height: 320px;
+  height: 500px;
   -webkit-transition: height 500ms;
   -moz-transition: height 500ms;
   -o-transition: height 500ms;
