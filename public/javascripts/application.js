@@ -77,6 +77,7 @@ $(document).on('ready', function() {
  * --------------------
  */
 function Application($scope, $http) {
+
 	$http.get('/events').success(function(data) {
 		$scope.events = data;
 	});
@@ -84,4 +85,10 @@ function Application($scope, $http) {
 	$http.get('/events?source=fb').success(function(data) {
 		$scope.eventsFb = data;
 	});
+
+	$scope.save = function(source) {
+		$scope.newEvent.source = source;
+		$http.post('/events', $scope.newEvent).success(function(data) {
+	  });
+	}
 }

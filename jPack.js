@@ -42,7 +42,7 @@ jPack.user.prototype.prueba = function() {
 * SingUp 
 * @descrip esta clase es la encargada de registrarte, y para mayor
 * seguridad, encripta tu username y password.
-* @param {string} session, {funtcion} next, {funtcion} error  
+* @param {string} session, {function} next, {function} error  
 * @return null
 */
 jPack.user.prototype.signUp = function(session, next, error) {
@@ -106,7 +106,7 @@ jPack.user.prototype.getAttendance = function(next, error) {
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Events = Parse.Object.extend("Events");
 		var query = new Parse.Query(Events);
-		query.equalTo("asistente", user);
+		query.equalTo("attendance", user);
 		query.find().then(function(results) {
 			next(results);
 		}, function(error) {
@@ -118,25 +118,45 @@ jPack.user.prototype.getAttendance = function(next, error) {
 }
 
 /*
- * @descrip Método para crear un evento con juaku
+ * @descrip Método para crear un evento, y relacionarlo con su tipo
  * @param {string} eType, {function} req, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.createEvent = function(eType, req, next, error) {
+jPack.user.prototype.createEvent = function(req, next, error) {
 	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var jEvent = new jPack.event ({
+			name : req.body.name,																	//{string}
+			place : req.body.place,																//{string}													
+			address : req.body.address,														//{string}
+			location : req.body.location,													//{string}
+			startTime : req.body.startTime,												//{date}
+			endTime : req.body.endTime,														//{date}
+			type : req.body.type,																	//{string}
+			description : req.body.description,										//{string}
+			fbEventId : req.body.fbEvents[0],											//{string}
+			source : req.body.source															//{string}
+		});
+
 		var EventType = Parse.Object.extend("EventType");
 		var Events = Parse.Object.extend("Events");
 		var type = new EventType();
 		var query = new Parse.Query(EventType);
-		query.equalTo("type", eType);
+		query.equalTo("type", jEvent.type);
 		query.find({
 			success: function(results) {
-				if(results.length){
+				if(results.length) {
 					event = new Events();
-					event.set('name', req.body.name);
-					event.set('place', req.body.place);
-					event.set('date', req.body.date);
 					event.set('type', results[0]);
+					if(jEvent.source == 'ne') {
+						event.set('name', jEvent.name);
+						event.set('place', jEvent.place);
+						event.set('address', jEvent.address);
+						event.set('location', jEvent.location);
+						event.set('description', jEvent.description);
+					} else if(jEvent.source == 'fbe') {
+						console.log(jEvent.fbEventId);
+						event.set('fbEventId', jEvent.fbEventId);
+					}
 					event.save().then(function () {
 						next();
 					}, function(error) {
@@ -165,63 +185,89 @@ jPack.user.prototype.createEvent = function(eType, req, next, error) {
 * @return null
 */
 jPack.event = function (event) {
-	this.id = event.id;																			//{string}
 	this.name = event.name;																	//{string}
-	this.description = event.description;										//{string}
+	this.place = event.place;																//{string}													
+	this.address = event.address;														//{string}
+	this.location = event.location;													//{string}
  	this.startTime = event.startTime;												//{date}
  	this.endTime = event.endTime;														//{date}
- 	this.timeZone = event.timeZone;													//{date}
+ 	this.type = event.type;																	//{string}
+	this.description = event.description;										//{string}
+	this.fbEventId = event.fbEventId;												//{string}
+	this.source = event.source;															//{string}
 	//this.assistantsNumber = event.assistantsNumber;				//{int}
-	this.cover = event.cover;																//{url}
-	this.location = event.location;													//{string}
- 	//this.geoPoint = geoPoint;
+ 	//this.timeZone = event.timeZone;												//{string}
+ 	//this.geoPoint = geoPoint;															//{array}
 }
 
-/*
- * @descrip Método para asignar el id de un evento de fb a la base de datos
- * @param {string} eType, {function} next, {function} error.
- * @return null
-*/
 
-jPack.event.prototype.setIdFbEvent = function(eType, next, error) {
-	var Events = Parse.Object.extend("Events");
-	if(this.id!=undefined && this.id!='') {
-		var event = new Events();
-		var query = new Parse.Query(EventType);
-		query.equalTo("type", eType);
-		query.find({
-			success: function(results) {
-				if(results.length){
-					event = new Events();
-					event.set('idFbEvent', this.id);
-					event.set('type', results[0]);
-					event.save().then(function () {
-						next();
-					}, function(error) {
-						console.log(error);
-					});
-				} else {
-					next();
-				}
-			},
-			error: function(error) {
-				console.log(error);
-		  }
-		});	
-	} else {
-		error('Id vacio');
-	}
-}
-
-jPack.event.prototype.getEventCoverImage = function(next) {
+jPack.event.prototype.getEventCoverImage = function(next, error) {
 	FB.api(this.id, {fields: 'cover', access_token: accessToken }, function (response) {
 		if (!response && response.error) {
 			console.log(results.error);
-			return;
+			error();
 		}
-		return next(response);
+		next(response);
 	});
 }
+
+/*
+ * @descrip Método para obtener todos los eventos de la DB y la asistencia del
+ * usuario actual en {boolean}
+ * @param {object} req, {function} next, {function} error
+ * @return null
+ */
+jPack.getAllEvents = function(req, next, error) {
+	var Events = Parse.Object.extend("Events");
+	var query = new Parse.Query(Events);
+	var events = [];
+	query.find().then(function(results) {
+		var jUser = new jPack.user(req.session.jUser);
+		jUser.getAttendance(function(response) {
+			var EventType = Parse.Object.extend("EventType");
+			var query = new Parse.Query(EventType);
+			query.find().then(function(types) {
+				for(i in results) {
+					events[i] = {};
+					events[i].name = results[i].get('name');
+					events[i].location = results[i].get('location');
+					events[i].address = results[i].get('address');
+					events[i].attendance = findIfAttended(results[i].id, response);
+					events[i].type = getEventType(results[i].get('type'), types);
+				}
+				next(events);
+			},function(error) {
+				error(error);
+			});
+		}, function(error) {
+			error(error);
+		});
+	}, function(error) {
+		error(error);
+	});
+
+	// TODO: Revisar caso de false
+	function getEventType(typeObject, types) {
+		for(i in types) {
+			if(typeObject != undefined) {
+				if(types[i].id == typeObject.id) {
+					console.log(types[i].get('type'));
+					return types[i].get('type');
+				}
+			}
+		}
+		return false;
+	}
+
+	function findIfAttended(eventId, eventsAttended) {
+		for(i in eventsAttended) {
+			if(eventsAttended[i].id == eventId)
+				return true;
+		}
+		return false;
+	}
+}
+
 
 jPack.agenda = function () {
 

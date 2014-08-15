@@ -48,7 +48,7 @@ block content
       //    .events-data-name {{event.name}}
       //    .events-data-attendance {{event.attendance}}
       //  .event-controls
-      .event.con
+      .event.con(ng-repeat='(key,event) in events')
         .event-image
         .event-data
           .event-date
@@ -57,14 +57,14 @@ block content
             span.event-month Abr
           .event-data-container
             .event-title
-              h2 #selfie
+              h2 {{event.name}}
             .event-base-info
-              .event-location.info Aura AQP
-              .event-time.info 9:00 PM
-              .event-address.info Real plaza, Arequipa
+              .event-location.info {{event.location}}
+              .event-time.info {{event.time}}
+              .event-address.info {{event.address}}
         .event-controls
           .event-types
-            .type Concierto
+            .type {{event.type}}
           .event-join-button.con Unirse
     section#views
       section#media.view
@@ -74,19 +74,26 @@ block content
           div.options
             p Ingresa los datos para crear un nuevo evento:
             form
-              input(type='text', placeholder='Nombre')
-              input(type='text', placeholder='Lugar')
-              input(type='text', placeholder='Dirección')
-              textarea(placeholder='Descripción')
-              input(type='submit', value='Guardar')
+              input(type='text', name='newEventName',  ng-model='newEvent.name', placeholder='Nombre')
+              input(type='text', name='newEventLocation', ng-model='newEvent.location', placeholder='Lugar')
+              input(type='text', name='newEventDate', ng-model='newEvent.date', placeholder='Fecha')
+              input(type='text', name='newEventTime', ng-model='newEvent.time', placeholder='Hora')
+              input(type='text', name='newEventAddress', ng-model='newEvent.address', placeholder='Dirección')
+              textarea(name='newEventAddress', ng-model='newEvent.description', placeholder='Descripción')
+              select(ng-model='newEvent.type')
+                option(value='Concerts') Conciertos
+                option(value='Parties') Fiestas
+                option(value='Cultural') Cultural
+                option(value='Diverse') Diverso
+              input(type='button', value='Guardar', ng-click="save('ne')")
         div#new-from-fb.method.hidden
           h2 Importar evento de Facebook
           div.options
             p Selecciona el evento o eventos que deseas importar:
             form
-              div#fb-events
+              div#fb-events(ng-init='newEvent.fbEvents = []')
                 div.checkbox(ng-repeat='(key,event) in eventsFb')
-                  input(type='checkbox', name='fbEvent', value='{{event.id}}', id='{{key}}')
-                  label(for='{{key}}') {{event.name}}
-              input(type='submit', value='Importar')
+                  input(type='checkbox', name='fbEvent', ng-model='newEvent.fbEvents[key]', ng-true-value='{{event.id}}', id='fbEvent{{key}}')
+                  label(for='fbEvent{{key}}') {{event.name}}
+              input(type='button', value='Importar', ng-click="save('fbe')")
 
