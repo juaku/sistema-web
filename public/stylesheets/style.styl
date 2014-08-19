@@ -413,8 +413,17 @@ main section#list .event .event-controls
 	font-size: 12px
 	transition: border 200ms
 
-main section#list .event .event-controls:hover
+main section#list .event.con .event-controls:hover
 	border-bottom: 3px solid #F05
+
+main section#list .event.par .event-controls:hover
+	border-bottom: 3px solid #70F
+	
+main section#list .event.cul .event-controls:hover
+	border-bottom: 3px solid #0A9
+	
+main section#list .event.div .event-controls:hover
+	border-bottom: 3px solid #F90
 
 main section#list .event .event-controls .event-types
 	display: flex
@@ -422,6 +431,7 @@ main section#list .event .event-controls .event-types
 
 main section#list .event .event-controls .event-types .type
 	margin-right: 10px
+	text-transform: capitalize
 
 main section#list .event .event-controls .event-types .type:before
 	content: ''
@@ -437,7 +447,7 @@ main section#list .event.con .event-controls .event-types .type:before
 main section#list .event.par .event-controls .event-types .type:before
 	background-color: #70F
 
-main section#list .event.cul .event-controls .event-types. type:before
+main section#list .event.cul .event-controls .event-types .type:before
 	background-color: #0A9
 
 main section#list .event.div .event-controls .event-types .type:before

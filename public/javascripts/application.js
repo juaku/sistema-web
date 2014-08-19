@@ -78,9 +78,13 @@ $(document).on('ready', function() {
  */
 function Application($scope, $http) {
 
-	$http.get('/events').success(function(data) {
-		$scope.events = data;
-	});
+	$scope.showEvents = function() {
+		$http.get('/events').success(function(data) {
+			$scope.events = data;
+		});
+	}
+
+	$scope.showEvents();
 
 	$http.get('/events?source=fb').success(function(data) {
 		$scope.eventsFb = data;
@@ -89,6 +93,18 @@ function Application($scope, $http) {
 	$scope.save = function(source) {
 		$scope.newEvent.source = source;
 		$http.post('/events', $scope.newEvent).success(function(data) {
+			$scope.showEvents();
 	  });
 	}
+
+	/*
+	 * Framework socket.io
+	 */
+	/*var socket = io();
+	socket.on('newEvent', function() {
+		$scope.showEvents();
+	});
+	*/
 }
+
+

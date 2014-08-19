@@ -30,12 +30,11 @@ router.post('/', ensureAuthenticated, function(req, res) {
 });
 
 router.get('/', ensureAuthenticated, function(req, res) {
-	var accessToken = req.session.passport.user.accessToken;
 	if(req.query['source']=='fb') {
 		// Devuelve todos los eventos de FB del usuario
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
-		jUser.getFbEvents(accessToken, function(results) {
+		jUser.getFbEvents(function(results) {
 			res.json(results.data);
 		});
 	} else {

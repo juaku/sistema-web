@@ -42,13 +42,7 @@ block content
             li #{__('today')}
             li #{__('past')}
     section#list
-      //.event(ng-repeat='(key,event) in events')
-      //  .event-image
-      //  .event-data
-      //    .events-data-name {{event.name}}
-      //    .events-data-attendance {{event.attendance}}
-      //  .event-controls
-      .event.con(ng-repeat='(key,event) in events')
+      .event(class='{{event.type ? event.type.toLowerCase().substring(0,3) : "none"}}', ng-repeat='(key,event) in events')
         .event-image
         .event-data
           .event-date
@@ -65,7 +59,7 @@ block content
         .event-controls
           .event-types
             .type {{event.type}}
-          .event-join-button.con Unirse
+          .event-join-button Unirse
     section#views
       section#media.view
       section#new-event.view.hidden
@@ -81,10 +75,10 @@ block content
               input(type='text', name='newEventAddress', ng-model='newEvent.address', placeholder='Dirección')
               textarea(name='newEventAddress', ng-model='newEvent.description', placeholder='Descripción')
               select(ng-model='newEvent.type')
-                option(value='Concerts') Conciertos
-                option(value='Parties') Fiestas
-                option(value='Cultural') Cultural
-                option(value='Diverse') Diverso
+                option(value='concerts') Conciertos
+                option(value='parties') Fiestas
+                option(value='cultural') Cultural
+                option(value='diverse') Diverso
               input(type='button', value='Guardar', ng-click="save('ne')")
         div#new-from-fb.method.hidden
           h2 Importar evento de Facebook
