@@ -77,6 +77,7 @@ $(document).on('ready', function() {
  * --------------------
  */
 function Application($scope, $http) {
+	$scope.attendance = false;
 
 	$scope.showEvents = function() {
 		$http.get('/events').success(function(data) {
@@ -95,6 +96,18 @@ function Application($scope, $http) {
 		$http.post('/events', $scope.newEvent).success(function(data) {
 			$scope.showEvents();
 	  });
+	}
+
+	$scope.join = function(eventId, joined) {
+		if(!joined) {
+			$http.put('/events/join', {eventId : eventId}).success(function(data) {
+				$scope.showEvents();
+			});
+		} else {	
+			$http.put('/events/leave', {eventId : eventId}).success(function(data) {
+				$scope.showEvents();
+			});
+		}
 	}
 
 	/*

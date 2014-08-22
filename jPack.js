@@ -109,11 +109,11 @@ jPack.user.prototype.getAttendance = function(next, error) {
 		query.equalTo("attendance", user);
 		query.find().then(function(results) {
 			next(results);
-		}, function(error) {
-			error(error);
+		}, function(e) {
+			error(e);
 		});
-	}, function(error) {
-			error(error);
+	}, function(e) {
+			error(e);
 	});
 }
 
@@ -167,13 +167,71 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 					next();
 				}
 			},
-			error: function(error) {
-				console.log(error);
+			error: function(e) {
+				error(e);
 		  }
 		});
 
-	}, function(error) {
-				error(error);
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @descrip Registra la asistencia de un usuario al evento
+ * @param {string} eventId, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.joinEvent = function(eventId, next, error) {
+	updateEventAttendance(true, this.parseSessionToken, eventId, function () {
+		next();
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @descrip Elimina la asistencia de un usuario al evento
+ * @param {string} eventId, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.leaveEvent = function(eventId, next, error) {
+	updateEventAttendance(false, this.parseSessionToken, eventId, function () {
+		next();
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @descrip Actualiza la asistencia de un usuario al evento
+ * @param {boolean} join, {string} parseSessionToken, {string} eventId,
+ * {function} next, {function} error.
+ * @return null
+ */
+function updateEventAttendance(join, parseSessionToken, eventId, next, error) {
+	Parse.User.become(parseSessionToken).then(function (user) {
+		var Events = Parse.Object.extend("Events"); 
+		var query = new Parse.Query(Events);
+		query.equalTo("objectId", eventId);
+		query.find().then(function(results) {
+			var event = results[0];
+			var relation = event.relation("attendance");
+			if(join) {
+				relation.add(user);
+			} else {
+				relation.remove(user);
+			}
+			event.save().then(function () {
+				next();
+			}, function(e) {
+				error(e);
+			});
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
 	});
 }
 
@@ -232,21 +290,25 @@ jPack.getAllEvents = function(req, next, error) {
 				for(var i in results) {
 					events[i] = {};
 					var fbEventId = results[i].get('fbEventId');
-					events[i].attendance = findIfAttended(results[i].id, response);
-					events[i].type = getEventType(results[i].get('type'), types);
+					events[i].id = results[i].id;
 					if(fbEventId == undefined || fbEventId  == null) {
 						events[i].name = results[i].get('name');
 						events[i].location = results[i].get('location');
 						events[i].address = results[i].get('address');
-						triggerNext();
+						nextInfo(i);
 					} else {
 						jEvent = new jPack.event({fbEventId: results[i].get('fbEventId')});
 						jEvent.getEventCoverObject(req.session.jUser.accessToken, i, function(cover, i) {
 							events[i].cover = cover.cover.source;
-							triggerNext();
+							nextInfo(i);
 						}, function(error) {
 							error(error);
 						});
+					}
+					function nextInfo(i) {
+						events[i].joined = findIfAttended(results[i].id, response);
+						events[i].type = getEventType(results[i].get('type'), types);
+						triggerNext();
 					}
 					function triggerNext() {
 						counter--;
@@ -255,14 +317,14 @@ jPack.getAllEvents = function(req, next, error) {
 						}
 					}
 				}
-			},function(error) {
-				error(error);
+			},function(e) {
+				error(e);
 			});
-		}, function(error) {
-			error(error);
+		}, function(e) {
+			error(e);
 		});
-	}, function(error) {
-		error(error);
+	}, function(e) {
+		error(e);
 	});
 
 	function getEventType(typeObject, types) {

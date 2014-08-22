@@ -47,4 +47,27 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	}
 });
 
+router.put('/:action', ensureAuthenticated, function(req, res) {
+	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
+		req.session.jUser = new jPack.user(req.session.jUser);
+		var jUser = req.session.jUser;
+		var action;
+		if(req.params.action=='join') {
+			action = jUser.joinEvent;
+		} else if (req.params.action=='leave') {
+			action = jUser.leaveEvent;
+		}
+		if(action!=undefined) {
+			action(req.body.eventId, function(response) {;
+				res.status(200).end();
+			}, function(error) {
+				res.status(400).end();
+				console.log(error);
+			});
+		}
+	} else {
+		res.status(400).end();
+	}
+});
+
 module.exports = router;

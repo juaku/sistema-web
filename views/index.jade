@@ -3,7 +3,7 @@ extends layout
 block content
   header
     #title
-      a(href='/?ref=logo', target='_self')
+      a(href="/?ref=logo", target="_self")
         h1 #{title}
     #search-box
       input(type="text", placeholder="#{__('Search events')}")
@@ -18,9 +18,9 @@ block content
     nav#main-menu
         ul
           li 
-            a(href='#media') Media
+            a(href="#media") Media
           li 
-            a(href='#new-event') #{__('New event')}
+            a(href="#new-event") #{__('New event')}
   main
     aside#controls
       div.content
@@ -42,9 +42,9 @@ block content
             li #{__('today')}
             li #{__('past')}
     section#list
-      .event(class='{{event.type ? event.type.toLowerCase().substring(0,3) : "none"}}', ng-repeat='(key,event) in events')
+      .event(class="{{event.type ? event.type.toLowerCase().substring(0,3) : 'none'}}", ng-repeat="(key,event) in events")
         .event-image
-          img(ng-src='{{event.cover}}')
+          img(ng-src="{{event.cover}}")
         .event-data
           .event-date
             span.event-day-week Jue
@@ -60,7 +60,7 @@ block content
         .event-controls
           .event-types
             .type {{event.type}}
-          .event-join-button Unirse
+          .event-join-button(ng-click="join(event.id, event.joined)") {{event.joined?'Dejar':'Unirse'}}
     section#views
       section#media.view
       section#new-event.view.hidden
@@ -69,26 +69,26 @@ block content
           div.options
             p Ingresa los datos para crear un nuevo evento:
             form
-              input(type='text', name='newEventName',  ng-model='newEvent.name', placeholder='Nombre')
-              input(type='text', name='newEventLocation', ng-model='newEvent.location', placeholder='Lugar')
-              input(type='text', name='newEventDate', ng-model='newEvent.date', placeholder='Fecha')
-              input(type='text', name='newEventTime', ng-model='newEvent.time', placeholder='Hora')
-              input(type='text', name='newEventAddress', ng-model='newEvent.address', placeholder='Dirección')
-              textarea(name='newEventAddress', ng-model='newEvent.description', placeholder='Descripción')
-              select(ng-model='newEvent.type')
-                option(value='concerts') Conciertos
-                option(value='parties') Fiestas
-                option(value='cultural') Cultural
-                option(value='diverse') Diverso
-              input(type='button', value='Guardar', ng-click="save('ne')")
+              input(type="text", name="newEventName",  ng-model="newEvent.name", placeholder="Nombre")
+              input(type="text", name="newEventLocation", ng-model="newEvent.location", placeholder="Lugar")
+              input(type="text", name="newEventDate", ng-model="newEvent.date", placeholder="Fecha")
+              input(type="text", name="newEventTime", ng-model="newEvent.time", placeholder="Hora")
+              input(type="text", name="newEventAddress", ng-model="newEvent.address", placeholder="Dirección")
+              textarea(name="newEventAddress", ng-model="newEvent.description", placeholder="Descripción")
+              select(ng-model="newEvent.type")
+                option(value="concerts") Conciertos
+                option(value="parties") Fiestas
+                option(value="cultural") Cultural
+                option(value="diverse") Diverso
+              input(type="button", value="Guardar", ng-click="save('ne')")
         div#new-from-fb.method.hidden
           h2 Importar evento de Facebook
           div.options
             p Selecciona el evento o eventos que deseas importar:
             form
-              div#fb-events(ng-init='newEvent.fbEvents = []')
-                div.checkbox(ng-repeat='(key,event) in eventsFb')
-                  input(type='checkbox', name='fbEvent', ng-model='newEvent.fbEvents[key]', ng-true-value='{{event.id}}', id='fbEvent{{key}}')
-                  label(for='fbEvent{{key}}') {{event.name}}
-              input(type='button', value='Importar', ng-click="save('fbe')")
+              div#fb-events(ng-init="newEvent.fbEvents = []")
+                div.checkbox(ng-repeat="(key,event) in eventsFb")
+                  input(type="checkbox", name="fbEvent", ng-model="newEvent.fbEvents[key]", ng-true-value="{{event.id}}", id="fbEvent{{key}}")
+                  label(for="fbEvent{{key}}") {{event.name}}
+              input(type="button", value="Importar", ng-click="save('fbe')")
 
