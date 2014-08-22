@@ -44,6 +44,7 @@ block content
     section#list
       .event(class='{{event.type ? event.type.toLowerCase().substring(0,3) : "none"}}', ng-repeat='(key,event) in events')
         .event-image
+          img(ng-src='{{event.cover}}')
         .event-data
           .event-date
             span.event-day-week Jue

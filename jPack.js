@@ -156,7 +156,6 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 						event.set('location', jEvent.location);
 						event.set('description', jEvent.description);
 					} else if(jEvent.source == 'fbe') {
-						console.log(jEvent.fbEventId);
 						event.set('fbEventId', jEvent.fbEventId);
 					}
 					event.save().then(function () {
@@ -202,13 +201,13 @@ jPack.event = function (event) {
 	//this.geoPoint = geoPoint;															//{array}
 }
 
-jPack.event.prototype.getEventCoverImage = function(accessToken, next, error) {
-	FB.api(this.id, {fields: 'cover', access_token: accessToken }, function (response) {
+jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, error) {
+	FB.api(this.fbEventId, {fields: 'cover', access_token: accessToken }, function (response) {
 		if (!response && response.error) {
 			console.log(results.error);
 			error();
 		}
-		next(response);
+		next(response, index);
 	});
 }
 
@@ -229,22 +228,33 @@ jPack.getAllEvents = function(req, next, error) {
 			var EventType = Parse.Object.extend("EventType");
 			var query = new Parse.Query(EventType);
 			query.find().then(function(types) {
-				for(i in results) {
+				var counter = results.length;
+				for(var i in results) {
 					events[i] = {};
 					var fbEventId = results[i].get('fbEventId');
-					if(fbEventId != undefined && fbEventId  != null) {
-						jEvent = new jPack.event(events[i]);
-						console.log(results[i]);
-						console.log(jEvent);
-					} else {
+					events[i].attendance = findIfAttended(results[i].id, response);
+					events[i].type = getEventType(results[i].get('type'), types);
+					if(fbEventId == undefined || fbEventId  == null) {
 						events[i].name = results[i].get('name');
 						events[i].location = results[i].get('location');
 						events[i].address = results[i].get('address');
+						triggerNext();
+					} else {
+						jEvent = new jPack.event({fbEventId: results[i].get('fbEventId')});
+						jEvent.getEventCoverObject(req.session.jUser.accessToken, i, function(cover, i) {
+							events[i].cover = cover.cover.source;
+							triggerNext();
+						}, function(error) {
+							error(error);
+						});
 					}
-					events[i].attendance = findIfAttended(results[i].id, response);
-					events[i].type = getEventType(results[i].get('type'), types);
+					function triggerNext() {
+						counter--;
+						if(counter===0) {
+							next(events);
+						}
+					}
 				}
-				next(events);
 			},function(error) {
 				error(error);
 			});
@@ -255,27 +265,24 @@ jPack.getAllEvents = function(req, next, error) {
 		error(error);
 	});
 
-	// TODO: Revisar caso de false
 	function getEventType(typeObject, types) {
-		for(i in types) {
-			if(typeObject != undefined) {
-				if(types[i].id == typeObject.id) {
-					return types[i].get('type');
-				}
+		var type = undefined;
+		for(var i in types) {
+			if(typeObject != undefined && types[i].id == typeObject.id) {
+				type = types[i].get('type');
 			}
 		}
-		return false;
+		return type;
 	}
 
 	function findIfAttended(eventId, eventsAttended) {
-		for(i in eventsAttended) {
+		for(var i in eventsAttended) {
 			if(eventsAttended[i].id == eventId)
 				return true;
 		}
 		return false;
 	}
 }
-
 
 jPack.agenda = function () {
 

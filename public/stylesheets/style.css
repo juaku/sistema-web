@@ -401,6 +401,9 @@ main section#list .event .event-image {
   height: 130px;
   margin: 0 10px 10px;
 }
+main section#list .event .event-image img {
+  width: 100%;
+}
 main section#list .event .event-data {
   width: 350px;
   height: 40px;
@@ -580,6 +583,7 @@ main section#list .event .event-controls .event-join-button {
  * Cuerpo / Vistas
  */
 main section#views {
+  background-color: #333;
   display: -webkit-box;
   display: -moz-box;
   display: -webkit-flex;
@@ -596,7 +600,6 @@ main section#views {
 }
 main section#views .view {
   color: #fff;
-  background-color: #333;
   margin: 0 20px;
   padding: 0 10px;
   -webkit-box-flex: 1;
