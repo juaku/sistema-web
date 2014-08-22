@@ -127,9 +127,10 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 		var jEvent = new jPack.event ({
 			name : req.body.name,
 			place : req.body.place,
+			date : req.body.date,
 			address : req.body.address,
 			location : req.body.location,
-			startTime : req.body.startTime,
+			startTime : req.body.time,
 			endTime : req.body.endTime,
 			type : req.body.type,
 			description : req.body.description,
@@ -149,9 +150,17 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 					var relation = event.relation('admins');
 					relation.add(user);
 					event.set('type', results[0]);
+					var str = jEvent.date;
+					var resDate = str.split("/");
+					resDate[1] = resDate[1] -1; //Se le resta 1 porque Enero es 0
+					var str2 = jEvent.startTime;
+					var resTime = str2.split(":");
+					var date = new Date(Date.UTC(resDate[2], resDate[1], resDate[0], resTime[0], resTime[1],  0));
+
 					if(jEvent.source == 'ne') {
 						event.set('name', jEvent.name);
 						event.set('place', jEvent.place);
+						event.set('date', date);
 						event.set('address', jEvent.address);
 						event.set('location', jEvent.location);
 						event.set('description', jEvent.description);
@@ -245,7 +254,8 @@ function updateEventAttendance(join, parseSessionToken, eventId, next, error) {
 */
 jPack.event = function (event) {
 	this.name = event.name;																	//{string}
-	this.place = event.place;																//{string}													
+	this.place = event.place;																//{string}
+	this.date = event.date;																	//{object}													
 	this.address = event.address;														//{string}
 	this.location = event.location;													//{string}
 	this.startTime = event.startTime;												//{date}
