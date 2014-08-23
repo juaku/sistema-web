@@ -583,7 +583,6 @@ main section#list .event .event-controls .event-join-button {
  * Cuerpo / Vistas
  */
 main section#views {
-  background-color: #333;
   display: -webkit-box;
   display: -moz-box;
   display: -webkit-flex;
@@ -599,6 +598,7 @@ main section#views {
   flex: 1;
 }
 main section#views .view {
+  background-color: #333;
   color: #fff;
   margin: 0 20px;
   padding: 0 10px;
