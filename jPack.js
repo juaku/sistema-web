@@ -134,7 +134,7 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 			endTime : req.body.endTime,
 			type : req.body.type,
 			description : req.body.description,
-			fbEventId : req.body.fbEvents[0],
+			fbEventId : req.body.fbEvents,
 			source : req.body.source
 		});
 
@@ -165,7 +165,7 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 						event.set('location', jEvent.location);
 						event.set('description', jEvent.description);
 					} else if(jEvent.source == 'fbe') {
-						event.set('fbEventId', jEvent.fbEventId);
+						event.set('fbEventId', jEvent.fbEventId.split(',')[0]);
 					}
 					event.save().then(function () {
 						next();

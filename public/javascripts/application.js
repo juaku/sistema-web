@@ -91,11 +91,22 @@ function Application($scope, $http) {
 		$scope.eventsFb = data;
 	});
 
-	$scope.save = function(source) {
+	$scope.save = function(source) {		
+		var createForm = new FormData();
+		
 		$scope.newEvent.source = source;
-		$http.post('/events', $scope.newEvent).success(function(data) {
-			$scope.showEvents();
-	  });
+
+		for (key in $scope.newEvent) {
+			createForm.append(key, $scope.newEvent[key]);
+		}
+
+    $http.post('/events', createForm, {
+        withCredentials: true,
+        headers: {'Content-Type': undefined },
+        transformRequest: angular.identity
+    }).success(function(data) {
+				$scope.showEvents();
+		}).error();
 	}
 
 	$scope.join = function(eventId, joined) {

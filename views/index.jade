@@ -80,7 +80,8 @@ block content
                 option(value="parties") Fiestas
                 option(value="cultural") Cultural
                 option(value="diverse") Diverso
-              input(type="button", value="Guardar", ng-click="save('ne')")
+              input(type="file", name="file", onchange="angular.element(this).scope().newEvent.image = this.files[0]")
+              input(type="button", value="Guardar" ng-click="save('ne')")
         div#new-from-fb.method.hidden
           h2 Importar evento de Facebook
           div.options

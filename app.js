@@ -7,6 +7,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//Multer multipart/form-data
+var multer  = require('multer');
+
 //Stylus y Nib
 var stylus = require('stylus')
 var nib = require('nib');
@@ -114,6 +117,9 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 	port: '6379'
 }), cookie: { path: '/', maxAge: 1000*60*60*24*15 } // 15 Días
 }));
+
+// Usar Multer
+app.use(multer({ dest: './public/uploads/'}));
 
 // Inicializar Passport!  También use el middleware passport.session(), para apoyar
 // Sesiones de inicio de sesión persistentes (recomendado).
