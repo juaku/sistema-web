@@ -47,15 +47,15 @@ block content
           img(ng-src="{{event.cover}}")
         .event-data
           .event-date
-            span.event-day-week Jue
-            span.event-day-month 24
-            span.event-month Abr
+            span.event-day-week {{dateDetail(key,'ewd')}}
+            span.event-day-month {{dateDetail(key,'ewm')}}
+            span.event-month {{dateDetail(key,'em')}}
           .event-data-container
             .event-title
               h2 {{event.name}}
             .event-base-info
               .event-location.info {{event.location}}
-              .event-time.info {{event.time}}
+              .event-time.info {{dateDetail(key,'time')}}
               .event-address.info {{event.address}}
         .event-controls
           .event-types

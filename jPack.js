@@ -150,14 +150,14 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 					var relation = event.relation('admins');
 					relation.add(user);
 					event.set('type', results[0]);
-					var str = jEvent.date;
-					var resDate = str.split("/");
-					resDate[1] = resDate[1] -1; //Se le resta 1 porque Enero es 0
-					var str2 = jEvent.startTime;
-					var resTime = str2.split(":");
-					var date = new Date(Date.UTC(resDate[2], resDate[1], resDate[0], resTime[0], resTime[1],  0));
 
 					if(jEvent.source == 'ne') {
+						var str = jEvent.date;
+						var resDate = str.split("/");
+						resDate[1] = resDate[1] -1; //Se le resta 1 porque Enero es 0
+						var str2 = jEvent.startTime;
+						var resTime = str2.split(":");
+						var date = new Date(Date.UTC(resDate[2], resDate[1], resDate[0], resTime[0], resTime[1],  0));
 						event.set('name', jEvent.name);
 						event.set('place', jEvent.place);
 						event.set('date', date);
@@ -304,6 +304,7 @@ jPack.getAllEvents = function(req, next, error) {
 					if(fbEventId == undefined || fbEventId  == null) {
 						events[i].name = results[i].get('name');
 						events[i].location = results[i].get('location');
+						events[i].date = results[i].get('date').toUTCString();
 						events[i].address = results[i].get('address');
 						nextInfo(i);
 					} else {

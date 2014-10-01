@@ -121,6 +121,27 @@ function Application($scope, $http) {
 		}
 	}
 
+	$scope.dateDetail = function(k, d) {
+		if($scope.events[k].date!=undefined && $scope.events[k].date!= " ") {
+			var str = $scope.events[k].date;
+			var res = str.split(" ");
+			var aux = res[0].split(",");
+			if(d=='ewd') {
+				var dayWeek = aux[0];
+				return dayWeek;
+			} else if (d == 'ewm') {
+				var dayMonth = res[1];
+				return dayMonth;
+			} else if (d == 'em'){
+				var month = res[2];
+				return month;
+			} else {
+				var time = res[4];
+				return time;
+			}
+		}
+	};
+
 	/*
 	 * Framework socket.io
 	 */
