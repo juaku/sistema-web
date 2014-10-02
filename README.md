@@ -1,3 +1,2 @@
-Listas de ingreso
+Sistema web Juaku
 =================
-Proyecto para poder importar eventos de Facebook y crear agendas de usuarios.
