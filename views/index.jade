@@ -5,91 +5,41 @@ block content
     #title
       a(href="/?ref=logo", target="_self")
         h1 #{title}
-    #search-box
-      input(type="text", placeholder="#{__('Search events')}")
-    nav#select-block
-      div#select
-        div#current #{__('All events')}
-        div#options
-          ul
-            li #{__('All events')}
-            li #{__('My events')}
-            li #{__('Events map')}
-    nav#main-menu
-        ul
-          li 
-            a(href="#media") Media
-          li 
-            a(href="#new-event") #{__('New event')}
   main
     aside#controls
-      div.content
-        section#profile
-          img(src=user.profilePicture)
-          h1 #{user.firstName} #{user.lastName}
-          .profile-config
-        section#type-filter
-          ul
-            li.all #{__('All')}
-            li.con #{__('Concerts')}
-            li.par #{__('Parties')}
-            li.cul #{__('Cultural')}
-            li.div #{__('Diverse')}
-        section#time-finder
-          ul
-            li #{__('upcoming')}
-            li #{__('tomorrow')}
-            li #{__('today')}
-            li #{__('past')}
-    section#list
-      .event(class="{{event.type ? event.type.toLowerCase().substring(0,3) : 'none'}}", ng-repeat="(key,event) in events")
-        .event-image
-          img(ng-src="{{event.cover}}")
-        .event-data
-          .event-date
-            span.event-day-week {{dateDetail(key,'ewd')}}
-            span.event-day-month {{dateDetail(key,'ewm')}}
-            span.event-month {{dateDetail(key,'em')}}
-          .event-data-container
-            .event-title
-              h2 {{event.name}}
-            .event-base-info
-              .event-location.info {{event.location}}
-              .event-time.info {{dateDetail(key,'time')}}
-              .event-address.info {{event.address}}
-        .event-controls
-          .event-types
-            .type {{event.type}}
-          .event-join-button(ng-click="join(event.id, event.joined)") {{event.joined?'Dejar':'Unirse'}}
-    section#views
-      section#media.view
-      section#new-event.view.hidden
-        div#new-from-scratch.method.hidden
-          h2 Crear nuevo evento
-          div.options
-            p Ingresa los datos para crear un nuevo evento:
-            form
-              input(type="text", name="newEventName",  ng-model="newEvent.name", placeholder="Nombre")
-              input(type="text", name="newEventLocation", ng-model="newEvent.location", placeholder="Lugar")
-              input(type="text", name="newEventDate", ng-model="newEvent.date", placeholder="Fecha")
-              input(type="text", name="newEventTime", ng-model="newEvent.time", placeholder="Hora")
-              input(type="text", name="newEventAddress", ng-model="newEvent.address", placeholder="Dirección")
-              textarea(name="newEventAddress", ng-model="newEvent.description", placeholder="Descripción")
-              select(ng-model="newEvent.type")
-                option(value="concerts") Conciertos
-                option(value="parties") Fiestas
-                option(value="cultural") Cultural
-                option(value="diverse") Diverso
-              input(type="file", name="file", onchange="angular.element(this).scope().newEvent.image = this.files[0]")
-              input(type="button", value="Guardar" ng-click="save('ne')")
-        div#new-from-fb.method.hidden
-          h2 Importar evento de Facebook
-          div.options
-            p Selecciona el evento o eventos que deseas importar:
-            form
-              div#fb-events(ng-init="newEvent.fbEvents = []")
-                div.checkbox(ng-repeat="(key,event) in eventsFb")
-                  input(type="checkbox", name="fbEvent", ng-model="newEvent.fbEvents[key]", ng-true-value="{{event.id}}", id="fbEvent{{key}}")
-                  label(for="fbEvent{{key}}") {{event.name}}
-              input(type="button", value="Importar", ng-click="save('fbe')")
-
+      section#profile
+        img(src=user.profilePicture)
+        h2.profile-name
+          span.profile-firstname #{user.firstName}
+          br
+          span.profile-lastname #{user.lastName}
+      section#friends
+        div.friend
+    section#view
+      section#view-controls
+      section#list
+        div.post
+          div.image
+          div.info
+            div.post-data
+              div.post-author Rodrigo Yrigoyen Gonzales
+              div.time A las 14:51 p.m.
+            div.event-data
+              div.event-name @Kaos
+              div.friends 24 amigos
+        div.post
+          div.image
+          div.info
+            div.post-data
+              div.post-author Rodrigo Yrigoyen Gonzales
+              div.time
+            div.event-data
+              div.event-name
+              div.friends
+    aside#events
+      section#events-controls
+        div.search-box
+        div.promoted
+        div.events-list
+      footer
+  section#float-controls

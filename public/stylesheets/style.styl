@@ -5,12 +5,11 @@
  * ------- ---------
  */
 body
-	background-color: #EEE
+	background-color: #DDE0EA
 	font-family: Helvetica, Arial, sans-serif
 	font-size: 14px
 	margin: 0
 	padding: 0
-	min-width: 995px
 
 html
 body
@@ -31,6 +30,7 @@ input
  * Estilos específicos: /login
  * ------- -----------
  */
+ /*
 main#start
 	background-color: #333
 	margin: 0px
@@ -71,7 +71,7 @@ main#start section#access #methods #FB
 	padding: 10px 0
 	text-decoration: none
 	display: block
-	
+	*/
 /*
  * Estilos específicos: /index
  * ------- -----------
@@ -83,17 +83,11 @@ main#start section#access #methods #FB
 header
 	background-color: #FFF
 	width: 100%
-	min-width: 995px
-	height: 60px
-	top: 0
-	left: 0
-	z-index: 1
+	padding: 5px
+	box-shadow: 0 3px 0px rgba(0,0,0,0.1);
 	position: fixed
-	display: flex
-	align-items: center
-
-header #title
-	margin-left: 25px
+	z-index: 10
+	top: 0
 
 header #title a
 	background-image: url('/images/sprite.png?v=1005')
@@ -102,435 +96,112 @@ header #title a
 	width: 105px
 	height: 45px
 	display: block
+	margin: 0 auto
 
 header #title a h1
 	display: none
 
-header #search-box
-	margin-left: 31px
-
-header #search-box input
-	color: #555
-	width: 358px
-	font-size: 14px
-	padding: 5px
-	border: 1px solid #EEE
-	font-weight: normal	// IE
-	-webkit-appearance: none	// Safari
-	border-radius: 0px	// Safari
-
-header nav#select-block
-	width: 190px
-	display: flex
-	align-self: flex-end
-	
-header nav#select-block:before
-	content: ''
-	width: 20px
-	height: 30px
-	margin: 13px 0 0 10px
-	border: 1px solid #AAA
-	border-bottom: none
-	border-right: none
-
-header nav#select-block #select
-	background-color: #FFF
-	font-size: 14px
-	width: 155px
-	color: #333
-	border: 1px solid #EEE
-	position: absolute
-	top: 16px
-
-header nav#select-block #select:after
-	content: ''
-	position: absolute
-	left: 137px
-	top: 10px
-	border-top: 7px solid #333
-	border-bottom: 7px solid transparent
-	border-left: 5px solid transparent
-	border-right: 5px solid transparent
-
-header nav#select-block #select #current
-header nav#select-block #select #options
-	padding: 5px 25px 5px 10px
-
-header nav#select-block #select #options ul
-	margin: 0
-	padding: 0
-
-header nav#select-block #select #options li
-	list-style: none
-	padding: 5px 0
-
-header nav#main-menu
-	margin: 0 10px
-
-header nav#main-menu ul
-	margin: 0
-	padding: 0
-	display: flex
-	
-header nav#main-menu li
-	list-style: none
-	margin: 0 5px
-	
 /*
- * Cuerpo
+ * Principal
  */
+ 		
 main
-	margin: 60px 0 0 0
-	display: flex
-	flex: 0 1 auto
+	margin: 0 auto
+	padding-top: 55px
+	display: table
+	width: 870px
 
-/*
- * Cuerpo / Lado
- */
-main aside#controls
-	background-color: #EEE
-	text-align: right
+aside#controls
+section#view
+aside#events
+	display: table-cell
+	vertical-align: top
+
+aside#controls
+aside#events
 	position: fixed
-	left: 0
-	width: 150px
-	overflow-y: auto
-	overflow-x: hidden
-	text-align: left
-
-main aside#controls .content
-	width: 110px
-	margin: 0 0 0 20px
-	display: inline-block
-	text-align: right
 
 /*
- * Cuerpo / Lado / Perfil
+ * Controles
  */
-main aside#controls section#profile
-	margin-top: 15px
 
-main aside#controls section#profile img
+aside#controls
+	width: 200px
+	padding: 10px
+	text-align: right
+
+aside#controls section#profile
+	background-color: #FFF
+	padding: 5px
 	width: 100px
-	height: 100px
-	border: 5px solid #FFF
+	height: 170px
+	text-align: left
+	display: inline-block
 
-main aside#controls section#profile h1
+aside#controls section#profile img
+	width: 100px
+
+aside#controls section#profile h2.profile-name
+	margin: 3px 5px 0 2px
+	line-height: 12px
+
+aside#controls section#profile h2.profile-name .profile-firstname
+	font-size: 13px
+	font-weight: bold
+
+aside#controls section#profile h2.profile-name .profile-lastname
 	font-size: 12px
 	font-weight: normal
-	margin: 5px
 
-main aside#controls section#profile .profile-config
-	margin: 0 5px
-	color: #555
-	width: 20px
-	height: 20px
-	background-color: #AAA
+aside#controls section#friends
+	margin-top: 20px
+
+aside#controls section#friends .friend
+	background-color: rgba(255, 255, 255, 0.4)
+	width: 110px
+	height 170px
 	display: inline-block
-	position: relative
-
-main aside#controls section#profile .profile-config:after
-	content: ''
-	left: 5px
-	top: 7px
-	position: absolute
-	border-top: 7px solid #EEE
-	border-bottom: 7px solid transparent
-	border-left: 5px solid transparent
-	border-right: 5px solid transparent
-
-/*
- * Cuerpo / Lado / Filtro de tipo
- */
-main aside#controls section#type-filter
-	margin: 30px 5px
-	
-main aside#controls section#type-filter ul
-	margin: 0
-	padding: 0
-
-main aside#controls section#type-filter li
-	color: #555
-	list-style: none
-	margin: 10px 0
-	border-radius: 20px
-
-main aside#controls section#type-filter li:hover
-	color: #000
-
-main aside#controls section#type-filter li:after
-	content: ''
-	width: 20px
-	height: 20px
-	margin-left: 10px
-	display: inline-block
-	border-radius: 20px
-	box-shadow: 0 0 0 2px #FFF
-	vertical-align: middle
-
-main aside#controls section#type-filter li.all:after
-	background-color: #DDD
-
-main aside#controls section#type-filter li.con:after
-	background-color: #F05
-
-main aside#controls section#type-filter li.par:after
-	background-color: #70F
-
-main aside#controls section#type-filter li.cul:after
-	background-color: #0A9
-
-main aside#controls section#type-filter li.div:after
-	background-color: #F90
-
-main aside#controls section#type-filter li:hover:after
-	background-image: radial-gradient(rgba(255, 255, 255, 0.9) 35%, rgba(255, 255, 255, 0) 40%)
-
-/*
- * Cuerpo / Lado / Buscador por tiempo
- */
-main aside#controls section#time-finder
-	margin: 50px 5px 10px
-
-main aside#controls section#time-finder ul
-	margin: 0
-	padding: 0
-
-main aside#controls section#time-finder li
-	list-style: none
-	height: 20px
-	color: #999
-
-main aside#controls section#time-finder li:hover
-	color: #000
-
-/*
- * Cuerpo / Lista
- */
-
-main section#list
-	width: 370px
-	min-width: 370px
-	margin-left: 150px
-	padding: 15px 10px
-	border-left: 1px solid #FFF
-	border-right: 1px solid #AAA
-
-main section#list .event
-	background-color: #FFF
-	width: 370px
 	margin-bottom: 10px
-	padding-top: 10px
-	position: relative
-
-main section#list .event:after
-	content: ''
-	top: 15px
-	right: -10px
-	border-top: 1px solid #AAA
-	width: 10px
-	position: absolute
-
-main section#list .event .event-image
-	background-color: #EEE
-	width: 350px
-	height: 130px
-	margin: 0 10px 10px
-
-main section#list .event .event-image img
-	width: 100%
-
-main section#list .event .event-data
-	width: 350px
-	height: 40px
-	margin: 10px
-	display: flex
-
-main section#list .event.con
-	color: #F05
-
-main section#list .event.par
-	color: #70F
-
-main section#list .event.cul
-	color: #0A9
-
-main section#list .event.div
-	color: #F90
-
-main section#list .event .event-data .event-date
-	font-size: 10px
-	text-align: center
-	margin-right: 7px
-	line-height: 13px
-	text-transform: uppercase
-
-main section#list .event .event-data .event-date span
-	display: block
-
-main section#list .event .event-data .event-date span.event-day-month
-	font-size: 14px
-
-main section#list .event .event-data .event-data-container
-	flex: 1
-
-main section#list .event .event-data .event-title h2
-	font-family: 'HelveticaNeueLT Std Thin', Arial, sans-serif
-	font-size: 20px
-	font-weight: 100
-	margin: 0
-	overflow: hidden
-	white-space: nowrap
-	text-overflow: ellipsis
-
-main section#list .event .event-data .event-base-info
-	display: flex
-	align-items: baseline
-
-main section#list .event .event-data .event-base-info .info
-	margin-right: 5px
 	
-main section#list .event .event-data .event-location
-	color: #333
-	letter-spacing: -1px
-
-main section#list .event .event-data .event-time
-	color: #555
-	letter-spacing: -1px;
-
-main section#list .event .event-data .event-address
-	color: #777
-	font-size: 10px
-	overflow: hidden
-	white-space: nowrap
-	text-overflow: ellipsis
-	flex: 1
-
-main section#list .event .event-controls
-	border-top: 1px solid #EEE
-	border-bottom: 3px solid #DDD
-	height: 32px
-	padding: 0 10px
-	display: flex
-	align-items: center
-	justify-content: space-between
-	font-size: 12px
-	transition: border 200ms
-
-main section#list .event.con .event-controls:hover
-	border-bottom: 3px solid #F05
-
-main section#list .event.par .event-controls:hover
-	border-bottom: 3px solid #70F
-	
-main section#list .event.cul .event-controls:hover
-	border-bottom: 3px solid #0A9
-	
-main section#list .event.div .event-controls:hover
-	border-bottom: 3px solid #F90
-
-main section#list .event .event-controls .event-types
-	display: flex
-	color: #333
-
-main section#list .event .event-controls .event-types .type
-	margin-right: 10px
-	text-transform: capitalize
-
-main section#list .event .event-controls .event-types .type:before
-	content: ''
-	width: 10px
-	height: 10px
-	display: inline-block
-	border-radius: 5px
-	margin-right: 5px
-
-main section#list .event.con .event-controls .event-types .type:before
-	background-color: #F05
-	
-main section#list .event.par .event-controls .event-types .type:before
-	background-color: #70F
-
-main section#list .event.cul .event-controls .event-types .type:before
-	background-color: #0A9
-
-main section#list .event.div .event-controls .event-types .type:before
-	background-color: #F90
-
-main section#list .event .event-controls .event-join-button
-	font-size: 16px
-	letter-spacing: -1px
-
 /*
- * Cuerpo / Vistas
+ * Vista
  */
-main section#views
-	display: flex
-	flex: 1
+section#view
+	background-color: rgba(255, 255, 255, 0.5)
+	width: 400px
+	padding: 15px
+	outline: #FFF solid 1px
 
-main section#views .view
+section#view section#list .post
+	margin-bottom: 20px
+
+section#view section#list .post .image
 	background-color: #333
-	color: #FFF
-	margin: 0 20px
-	padding: 0 10px
-	flex: 1
+	width: 400px
+	height: 400px
 
-main section#views .view.hidden
-	display: none
+section#view section#list .post .info
+	background-color: #FFF
+	height: 50px
 
-main section#views .view .method .options
-	overflow: hidden
-	height: 500px
-	transition: height 500ms
-
-main section#views .view .method.hidden .options
-	height: 0
-
-main section#views .view h2
-	font-family: 'HelveticaNeueLT Std Thin', Arial, sans-serif
-	font-weight: 100
-	border-bottom: 1px solid #555
-	margin: 0
-	padding: 15px 0
-	cursor: pointer
-	
-main section#views .view input
-main section#views .view textarea
-	border: none
-	display: block
+/*
+ * Eventos
+ */
+aside#events
+	width: 200px
 	padding: 10px
-	background-color: #EEE
-	margin: 0px
-	width: 300px
-	border: 0
-	border-bottom: 1px solid #ccc;
 
-main section#views .view input[type='submit']
-	width: 320px
+aside#events section#events-controls
+	background: #FFF
+	width: 200px
+	height: 500px
 
-main section#views .view .checkbox
-	display: block
-	
-main section#views .view input[type='checkbox']
-	width: auto
-	display: inline-block
-	margin: 5px;
-
-main section#views .view textarea
-	font-family: Helvetica, Arial, sans-serif
-	height: 100px
-
-main section#views .view #new-from-fb #fb-events label
-	font-size: 12px;
-
-main section#views .view #new-from-fb #fb-events
-	margin-bottom: 10px
-
-// TODO: Ver si es necesario con Angular.js
-#type-filter,
-#profile,
-#time-finder,
-header nav #select,
-header nav#main-menu li,
-.event-controls {
-	cursor: pointer
-}
+/*
+ * Controles flotantes
+ */
+section#float-controls
+	background-color: rgba(0,0,0,0.9)
+	height: 50px
+	width: 100%
+	position: fixed
+	bottom: 0
