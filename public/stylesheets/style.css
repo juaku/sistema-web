@@ -80,7 +80,7 @@ main#start section#access #methods #FB
 header {
   background-color: #fff;
   width: 100%;
-  padding: 5px;
+  padding: 5px 0;
   -webkit-box-shadow: 0 3px 0 rgba(0,0,0,0.05);
   box-shadow: 0 3px 0 rgba(0,0,0,0.05);
   position: fixed;
@@ -108,7 +108,7 @@ main {
   margin: 0 auto;
   padding-top: 55px;
   display: table;
-  width: 870px;
+  width: 970px;
 }
 aside#controls,
 section#view,
@@ -141,7 +141,12 @@ aside#controls section#profile img {
 }
 aside#controls section#profile h2.profile-name {
   margin: 3px 5px 0 2px;
-  line-height: 12px;
+  font-size: 14px;
+  line-height: 14px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  font-weight: normal;
 }
 aside#controls section#profile h2.profile-name .profile-firstname {
   font-size: 13px;
@@ -177,31 +182,33 @@ aside#controls section#friends .friend:before {
  */
 section#view {
   background-color: rgba(255,255,255,0.5);
-  width: 400px;
+  width: 500px;
   padding: 15px;
   padding-bottom: 50px;
   outline: #fff solid 1px;
 }
 section#view section#list .post {
   margin-bottom: 20px;
-  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-section#view section#list .post .image {
+section#view section#list .post .image,
+section#view section#list .post .image img {
   background-color: #777;
-  width: 400px;
-  height: 400px;
+  width: 500px;
+  height: 500px;
+  overflow: hidden;
 }
 section#view section#list .post .info {
   background-color: #fff;
-  width: 380px;
+  width: 480px;
   height: 30px;
   padding: 10px;
 }
 section#view section#list .post:after {
   content: '';
   background-color: rgba(0,0,0,0.1);
-  width: 390px;
+  width: 490px;
   height: 3px;
   margin: 0 5px;
   display: block;
@@ -220,15 +227,15 @@ section#view section#list .post .info .author-image img {
   margin-right: 5px;
 }
 section#view section#list .post .info .post-data {
-  width: 225px;
+  width: 275px;
   padding-right: 5px;
 }
 section#view section#list .post .info .post-data .author-name {
   font-size: 14px;
 }
 section#view section#list .post .info .event-data {
+  width: 165px;
   text-align: right;
-  width: 115px;
 }
 section#view section#list .post .info .event-data .event-name {
   font-size: 16px;
@@ -256,7 +263,6 @@ aside#events {
 }
 aside#events section#events-controls {
   background: #fff;
-  width: 200px;
   padding: 5px 0;
 }
 aside#events section#events-controls .search-box,
@@ -310,7 +316,6 @@ aside#events section#events-controls .events-list:after {
   content: '';
   display: block;
   background: #eee;
-  width: 180px;
   height: 1px;
   margin-top: 15px;
 }
@@ -325,8 +330,7 @@ section#float-footer {
   width: 100%;
   height: 32px;
   color: rgba(255,255,255,0.9);
-  padding: 6px;
-  padding-bottom: 7px;
+  padding: 6px 0 7px 0;
   text-align: center;
   -webkit-box-shadow: 0 -3px 0 rgba(51,51,51,0.1);
   box-shadow: 0 -3px 0 rgba(51,51,51,0.1);
@@ -367,4 +371,155 @@ footer {
 }
 footer #brand {
   margin: 5px 0;
+}
+@media (max-width: 969px) {
+  main {
+    width: 870px;
+  }
+  section#view {
+    width: 400px;
+  }
+  section#view section#list .post .image,
+  section#view section#list .post .image img {
+    width: 400px;
+    height: 400px;
+  }
+  section#view section#list .post .info {
+    width: 380px;
+  }
+  section#view section#list .post:after {
+    width: 390px;
+  }
+  section#view section#list .post .info .post-data {
+    width: 225px;
+  }
+  section#view section#list .post .info .event-data {
+    width: 115px;
+  }
+}
+@media (max-width: 869px) {
+  main {
+    width: 720px;
+  }
+  section#view {
+    width: 300px;
+  }
+  section#view section#list .post .image,
+  section#view section#list .post .image img {
+    width: 300px;
+    height: 300px;
+  }
+  section#view section#list .post .info {
+    width: 280px;
+  }
+  section#view section#list .post:after {
+    width: 290px;
+  }
+  section#view section#list .post .info .post-data {
+    width: 175px;
+  }
+  section#view section#list .post .info .event-data {
+    width: 55px;
+  }
+  aside#controls {
+    width: 180px;
+  }
+  aside#events {
+    width: 180px;
+  }
+  aside#events section#events-controls .search-box input {
+    width: 140px;
+  }
+  section#view {
+    padding: 15px 10px;
+  }
+}
+@media (max-width: 719px) {
+  main {
+    width: 630px;
+  }
+  aside#controls {
+    width: 110px;
+    position: static;
+    display: inline-block;
+  }
+  aside#events {
+    width: 160px;
+    position: static;
+    display: inline-block;
+  }
+  section#view {
+    display: inline-block;
+  }
+  aside#events section#events-controls .search-box input {
+    width: 120px;
+  }
+}
+@media (max-width: 629px) {
+  main {
+    width: 460px;
+  }
+  aside#controls {
+    display: none;
+  }
+  section#view {
+    width: 270px;
+  }
+  section#view section#list .post .image,
+  section#view section#list .post .image img {
+    width: 270px;
+    height: 270px;
+  }
+  section#view section#list .post .info {
+    width: 250px;
+  }
+  section#view section#list .post:after {
+    width: 260px;
+  }
+  section#view section#list .post .info .post-data {
+    width: 145px;
+  }
+  section#view section#list .post .info .event-data {
+    width: 55px;
+  }
+  aside#events {
+    width: 150px;
+  }
+  aside#events section#events-controls .search-box input {
+    width: 110px;
+  }
+}
+@media (max-width: 459px) {
+  main {
+    width: 320px;
+  }
+  aside#events {
+    display: none;
+  }
+  section#view {
+    width: 300px;
+  }
+  section#view section#list .post .image,
+  section#view section#list .post .image img {
+    width: 300px;
+    height: 300px;
+  }
+  section#view section#list .post .info {
+    width: 280px;
+  }
+  section#view section#list .post:after {
+    width: 290px;
+  }
+  section#view section#list .post .info .post-data {
+    width: 175px;
+  }
+  section#view section#list .post .info .event-data {
+    width: 65px;
+  }
+  aside#events {
+    width: 150px;
+  }
+  aside#events section#events-controls .search-box input {
+    width: 110px;
+  }
 }
