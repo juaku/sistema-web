@@ -4,7 +4,7 @@
  */
 body {
   background-color: #dde0ea;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: Arial, sans-serif;
   font-size: 14px;
   margin: 0;
   padding: 0;
@@ -81,8 +81,8 @@ header {
   background-color: #fff;
   width: 100%;
   padding: 5px;
-  -webkit-box-shadow: 0 3px 0px rgba(0,0,0,0.1);
-  box-shadow: 0 3px 0px rgba(0,0,0,0.1);
+  -webkit-box-shadow: 0 3px 0 rgba(0,0,0,0.05);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.05);
   position: fixed;
   z-index: 10;
   top: 0;
@@ -156,10 +156,21 @@ aside#controls section#friends {
 }
 aside#controls section#friends .friend {
   background-color: rgba(255,255,255,0.4);
-  width: 110px;
-  height: 170px;
+  font-size: 12px;
+  color: #999;
+  width: 90px;
+  height: 150px;
   display: inline-block;
   margin-bottom: 10px;
+  text-align: center;
+  padding: 10px;
+}
+aside#controls section#friends .friend:before {
+  content: '+';
+  font-size: 50px;
+  display: block;
+  margin-top: 30px;
+  color: rgba(0,0,0,0.1);
 }
 /*
  * Vista
@@ -168,10 +179,13 @@ section#view {
   background-color: rgba(255,255,255,0.5);
   width: 400px;
   padding: 15px;
+  padding-bottom: 50px;
   outline: #fff solid 1px;
 }
 section#view section#list .post {
   margin-bottom: 20px;
+  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 section#view section#list .post .image {
   background-color: #333;
@@ -180,7 +194,58 @@ section#view section#list .post .image {
 }
 section#view section#list .post .info {
   background-color: #fff;
-  height: 50px;
+  width: 380px;
+  height: 30px;
+  padding: 10px;
+}
+section#view section#list .post:after {
+  content: '';
+  background-color: rgba(0,0,0,0.1);
+  width: 390px;
+  height: 3px;
+  margin: 0 5px;
+  display: block;
+  position: absolute;
+  z-index: -1;
+}
+section#view section#list .post .info .author-image,
+section#view section#list .post .info .post-data,
+section#view section#list .post .info .event-data {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 0px;
+}
+section#view section#list .post .info .author-image img {
+  width: 30px;
+  margin-right: 5px;
+}
+section#view section#list .post .info .post-data {
+  width: 225px;
+  padding-right: 5px;
+}
+section#view section#list .post .info .post-data .author-name {
+  font-size: 14px;
+}
+section#view section#list .post .info .event-data {
+  text-align: right;
+  width: 115px;
+}
+section#view section#list .post .info .event-data .event-name {
+  font-size: 16px;
+}
+section#view section#list .post .info .event-data .event-name.small {
+  font-size: 14px;
+}
+section#view section#list .post .info .pri {
+  line-height: 18px;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+section#view section#list .post .info .sub {
+  font-size: 11px;
+  color: #999;
 }
 /*
  * Eventos
@@ -192,15 +257,114 @@ aside#events {
 aside#events section#events-controls {
   background: #fff;
   width: 200px;
-  height: 500px;
+  padding: 5px 0;
+}
+aside#events section#events-controls .search-box,
+aside#events section#events-controls .promoted,
+aside#events section#events-controls .events-list,
+aside#events section#events-controls .show-more {
+  margin: 15px 10px;
+}
+aside#events section#events-controls .search-box {
+  margin-top: 10px;
+}
+aside#events section#events-controls .search-box input {
+  background: #eee;
+  color: #999;
+  width: 160px;
+  height: 10px;
+  font-size: 14px;
+  font-style: italic;
+  padding: 10px;
+  margin: 0;
+  border: none;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  outline: none;
+}
+aside#events section#events-controls .promoted .promoted-title {
+  font-size: 10px;
+  color: #ccc;
+  text-transform: uppercase;
+}
+aside#events section#events-controls .event {
+  margin: 10px 0;
+}
+aside#events section#events-controls .event .event-name {
+  font-size: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+aside#events section#events-controls .event .event-name.small {
+  font-size: 14px;
+}
+aside#events section#events-controls .event .event-people {
+  font-size: 11px;
+  color: #999;
+  margin-left: 15px;
+}
+aside#events section#events-controls .promoted:after,
+aside#events section#events-controls .events-list:after {
+  content: '';
+  display: block;
+  background: #eee;
+  width: 180px;
+  height: 1px;
+  margin-top: 15px;
+}
+aside#events section#events-controls .show-more {
+  text-align: center;
 }
 /*
  * Controles flotantes
  */
-section#float-controls {
-  background-color: rgba(0,0,0,0.9);
-  height: 50px;
+section#float-footer {
+  background-color: #333;
   width: 100%;
+  height: 32px;
+  color: rgba(255,255,255,0.9);
+  padding: 6px;
+  padding-bottom: 7px;
+  text-align: center;
+  -webkit-box-shadow: 0 -3px 0 rgba(51,51,51,0.1);
+  box-shadow: 0 -3px 0 rgba(51,51,51,0.1);
   position: fixed;
   bottom: 0;
+}
+section#float-footer #main-controls .button {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 5px;
+}
+section#float-footer #main-controls .button.control-switch {
+  width: 64px;
+  height: 32px;
+  background: rgba(255,255,255,0.7);
+  -webkit-border-radius: 16px;
+  border-radius: 16px;
+  padding: 0 5px;
+  position: relative;
+}
+section#float-footer #main-controls .button.control-switch .knob {
+  width: 24px;
+  height: 24px;
+  background: rgba(255,255,255,0.9);
+  -webkit-border-radius: 12px;
+  border-radius: 12px;
+  position: absolute;
+  top: 4px;
+  left: 45px;
+}
+/*
+ * Pie
+ */
+footer {
+  margin: 10px 5px;
+  font-size: 12px;
+  color: #999;
+}
+footer #brand {
+  margin: 5px 0;
 }

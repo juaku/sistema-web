@@ -14,32 +14,61 @@ block content
           br
           span.profile-lastname #{user.lastName}
       section#friends
-        div.friend
+        div.friend Actividad de amigo
     section#view
       section#view-controls
       section#list
         div.post
           div.image
           div.info
+            div.author-image
+              img(src=user.profilePicture)
             div.post-data
-              div.post-author Rodrigo Yrigoyen Gonzales
-              div.time A las 14:51 p.m.
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub A las 14:51 p.m.
             div.event-data
-              div.event-name @Kaos
-              div.friends 24 amigos
+              div.event-name.pri @Kaos
+              div.friends.sub 24 amigos
         div.post
           div.image
           div.info
+            div.author-image
+              img(src=user.profilePicture)
             div.post-data
-              div.post-author Rodrigo Yrigoyen Gonzales
-              div.time
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub A las 14:51 p.m.
             div.event-data
-              div.event-name
-              div.friends
+              div.event-name.pri @Kaos
+              div.friends.sub 24 amigos
     aside#events
       section#events-controls
         div.search-box
+          input(type="text", placeholder="#{__('Search events')}") 
         div.promoted
+          div.promoted-title #{__('Promoted')}
+          div.event.promoted-event
+            div.event-name.promoted-event-name @Aura
+            div.event-people.promoted-event-people 1280 #{__('people')}
+          div.event.promoted-event
+            div.event-name.promoted-event-name @Aura
+            div.event-people.promoted-event-people 1280 #{__('people')}
         div.events-list
-      footer
-  section#float-controls
+          div.event
+            div.event-name @Kaos
+            div.event-people 1920 #{__('people')}
+          div.event
+            div.event-name.small @JardinDeLaCervezaArequipeña
+            div.event-people 1280 #{__('people')}
+          div.event
+            div.event-name @Manutara
+            div.event-people 1024 #{__('people')}
+        div.show-more #{__('Show more')}
+      footer 
+        nav Términos y condiciones · Más
+        div#brand Juaku © 2014
+  section#float-footer
+    div#main-controls
+      div.button.hot #{__('Hot')}
+      div.button.control-switch
+        div.knob
+      div.button.recent #{__('Recent')}
