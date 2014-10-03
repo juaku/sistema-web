@@ -4,9 +4,16 @@ var Parse = require('./parseConnect').Parse;
 // Encriptador
 var crip = require('./crip');
 
-var jPack = jPack || {}
-
 var FB = require('fb');
+
+//Guardar imagen en el servidor
+var fs = require('fs');
+
+var http = require('http');
+
+var url = require('url');
+
+var jPack = jPack || {}
 
 /*
 * Clase User 
@@ -92,8 +99,34 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
 	var idProfile = session.passport.user.id;
 	FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
 		profilePic = response.data.url;
-		session.jUser.profilePicture = profilePic;
-		next();
+		var getImg = function(o, cb){
+			var port = o.port || 80;
+			var parsed = url.parse(o.url);
+			var options = {
+				host: parsed.hostname,
+				port: port,
+				path: parsed.path
+			};
+			http.get(options, function(res) {
+				res.setEncoding('binary');
+				var imagedata = '';
+				res.on('data', function(chunk){
+					imagedata+= chunk; 
+				});
+				res.on('end', function(){
+					fs.writeFile(o.dest, imagedata, 'binary', cb);
+				});
+			}).on('error', function(e) {
+					console.log("Got error: " + e.message);
+				});
+		}
+		getImg({
+			url: profilePic,
+			dest: "./public/images/profPic"+session.jUser.id+".png"
+		},function(err){
+			session.jUser.profilePicture = profilePic;
+			next();
+		})
 	});
 }
 
