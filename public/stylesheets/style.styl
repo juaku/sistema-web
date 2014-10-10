@@ -22,9 +22,6 @@ a
 
 a:hover
 	color: #000
-	
-input
-	border: 1px solid #CCC
 
 /*
  * Estilos específicos: /login
@@ -189,7 +186,7 @@ section#view
 	outline: #FFF solid 1px
 
 section#view section#list .post
-	margin-bottom: 20px
+	margin-bottom: 25px
 	box-shadow: 0 0 10px rgba(0,0,0,0.1)
 
 section#view section#list .post .image
@@ -333,6 +330,10 @@ section#float-footer
 	position: fixed
 	bottom: 0
 
+section#float-footer #main-controls
+	width: 530px
+	margin: 0 auto
+
 section#float-footer #main-controls .button
 	display: inline-block
 	vertical-align: middle
@@ -355,6 +356,24 @@ section#float-footer #main-controls .button.control-switch .knob
 	top: 4px
 	left: 45px
 
+section#float-footer #main-controls #camera
+section#float-footer #main-controls #send
+	background: #000
+	width: 30px
+	height: 30px
+	display: inline-block
+	vertical-align: middle
+	float: right
+
+section#float-footer #main-controls form
+	display: none
+
+/*
+ * New post
+ */
+canvas
+	width: 100%
+
 /*
  * Pie
  */
@@ -365,6 +384,10 @@ footer
 
 footer #brand
 	margin: 5px 0
+
+/*
+ * Responsive
+ */ 
 
 @media (max-width: 969px) 
 	main
@@ -383,6 +406,8 @@ footer #brand
 		width: 225px // -50
 	section#view section#list .post .info .event-data
 		width: 115px // -50
+	section#float-footer #main-controls
+		width: 430px // -100
 
 @media (max-width: 869px) 
 	main
@@ -409,6 +434,8 @@ footer #brand
 		width: 140px
 	section#view
 		padding: 15px 10px // Especial -5
+	section#float-footer #main-controls
+		width: 320px // -100
 
 @media (max-width: 719px)
 	main
@@ -425,30 +452,34 @@ footer #brand
 		display: inline-block
 	aside#events section#events-controls .search-box input
 		width: 120px
+	section#float-footer #main-controls
+		width: inherit
 
 @media (max-width: 629px)
 	main
 		width: 460px
 	aside#controls
 		display: none
+	aside#events
+		display: none
 	section#view
-		width: 270px
+		width: 440px
 	section#view section#list .post .image
 	section#view section#list .post .image img
-		width: 270px
-		height: 270px
+		width: 440px
+		height: 440px
 	section#view section#list .post .info
-		width: 250px // -100
+		width: 420px // -100
 	section#view section#list .post:after 
-		width: 260px // -100
+		width: 430px // -100
 	section#view section#list .post .info .post-data
-		width: 145px // -50
+		width: 245px // -50
 	section#view section#list .post .info .event-data
-		width: 55px // -50
-	aside#events
+		width: 135px // -50
+	/*aside#events
 		width: 150px
 	aside#events section#events-controls .search-box input
-		width: 110px
+		width: 110px*/
 
 @media (max-width: 459px)
 	main

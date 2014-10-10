@@ -14,10 +14,59 @@ block content
           br
           span.profile-lastname #{user.lastName}
       section#friends
-        div.friend Actividad de amigo
+        div.friend #{__('Friend activity')}
     section#view
       section#view-controls
       section#list
+        canvas(id="capturedPhoto" width="500" height="500")
+        div.post
+          div.image
+            img
+          div.info
+            div.author-image
+              img(src=user.profilePicture)
+            div.post-data
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub #{__('At')} 14:51 p.m.
+            div.event-data
+              div.event-name.pri @Kaos
+              div.friends.sub 24 #{__('friends')}
+        div.post
+          div.image
+            img
+          div.info
+            div.author-image
+              img(src=user.profilePicture)
+            div.post-data
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub A las 14:51 p.m.
+            div.event-data
+              div.event-name.pri @Kaos
+              div.friends.sub 24 amigos
+        div.post
+          div.image
+            img
+          div.info
+            div.author-image
+              img(src=user.profilePicture)
+            div.post-data
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub A las 14:51 p.m.
+            div.event-data
+              div.event-name.pri @Kaos
+              div.friends.sub 24 amigos
+        div.post
+          div.image
+            img
+          div.info
+            div.author-image
+              img(src=user.profilePicture)
+            div.post-data
+              div.author-name.pri Rodrigo Yrigoyen Gonzales
+              div.time.sub A las 14:51 p.m.
+            div.event-data
+              div.event-name.pri @Kaos
+              div.friends.sub 24 amigos
         div.post
           div.image
             img
@@ -86,3 +135,8 @@ block content
       div.button.control-switch
         div.knob
       div.button.recent #{__('Recent')}
+      div#camera
+      div#send(ng-click="send()")
+      form
+        //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
+        input(type="file" accept="image/*" onchange="picChange(event)")

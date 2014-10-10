@@ -21,9 +21,6 @@ a {
 a:hover {
   color: #000;
 }
-input {
-  border: 1px solid #ccc;
-}
 /*
  * Estilos específicos: /login
  * ------- -----------
@@ -188,7 +185,7 @@ section#view {
   outline: #fff solid 1px;
 }
 section#view section#list .post {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.1);
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
@@ -337,6 +334,10 @@ section#float-footer {
   position: fixed;
   bottom: 0;
 }
+section#float-footer #main-controls {
+  width: 530px;
+  margin: 0 auto;
+}
 section#float-footer #main-controls .button {
   display: inline-block;
   vertical-align: middle;
@@ -361,6 +362,24 @@ section#float-footer #main-controls .button.control-switch .knob {
   top: 4px;
   left: 45px;
 }
+section#float-footer #main-controls #camera,
+section#float-footer #main-controls #send {
+  background: #000;
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  float: right;
+}
+section#float-footer #main-controls form {
+  display: none;
+}
+/*
+ * New post
+ */
+canvas {
+  width: 100%;
+}
 /*
  * Pie
  */
@@ -372,6 +391,9 @@ footer {
 footer #brand {
   margin: 5px 0;
 }
+/*
+ * Responsive
+ */
 @media (max-width: 969px) {
   main {
     width: 870px;
@@ -395,6 +417,9 @@ footer #brand {
   }
   section#view section#list .post .info .event-data {
     width: 115px;
+  }
+  section#float-footer #main-controls {
+    width: 430px;
   }
 }
 @media (max-width: 869px) {
@@ -433,6 +458,9 @@ footer #brand {
   section#view {
     padding: 15px 10px;
   }
+  section#float-footer #main-controls {
+    width: 320px;
+  }
 }
 @media (max-width: 719px) {
   main {
@@ -454,6 +482,9 @@ footer #brand {
   aside#events section#events-controls .search-box input {
     width: 120px;
   }
+  section#float-footer #main-controls {
+    width: inherit;
+  }
 }
 @media (max-width: 629px) {
   main {
@@ -462,31 +493,28 @@ footer #brand {
   aside#controls {
     display: none;
   }
+  aside#events {
+    display: none;
+  }
   section#view {
-    width: 270px;
+    width: 440px;
   }
   section#view section#list .post .image,
   section#view section#list .post .image img {
-    width: 270px;
-    height: 270px;
+    width: 440px;
+    height: 440px;
   }
   section#view section#list .post .info {
-    width: 250px;
+    width: 420px;
   }
   section#view section#list .post:after {
-    width: 260px;
+    width: 430px;
   }
   section#view section#list .post .info .post-data {
-    width: 145px;
+    width: 245px;
   }
   section#view section#list .post .info .event-data {
-    width: 55px;
-  }
-  aside#events {
-    width: 150px;
-  }
-  aside#events section#events-controls .search-box input {
-    width: 110px;
+    width: 135px;
   }
 }
 @media (max-width: 459px) {
