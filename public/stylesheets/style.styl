@@ -189,8 +189,8 @@ section#view section#list .post
 	margin-bottom: 25px
 	box-shadow: 0 0 10px rgba(0,0,0,0.1)
 
-section#view section#list .post .image
-section#view section#list .post .image img
+section#view section#list .post .media
+section#view section#list .post .media img
 	background-color: #777
 	width: 500px // Photo Responsive 100
 	height: 500px // Photo Responsive 100
@@ -212,14 +212,14 @@ section#view section#list .post:after
 	position: absolute
 	z-index: -1
 
-section#view section#list .post .info .author-image
+section#view section#list .post .info .author-media
 section#view section#list .post .info .post-data
 section#view section#list .post .info .event-data
 	display: inline-block
 	vertical-align: top
 	font-size: 0px
 
-section#view section#list .post .info .author-image img
+section#view section#list .post .info .author-media img
 	width: 30px
 	margin-right: 5px
 
@@ -357,7 +357,7 @@ section#float-footer #main-controls .button.control-switch .knob
 	left: 45px
 
 section#float-footer #main-controls #camera
-section#float-footer #main-controls #send
+#sendPost
 	background: #000
 	width: 30px
 	height: 30px
@@ -365,14 +365,44 @@ section#float-footer #main-controls #send
 	vertical-align: middle
 	float: right
 
-section#float-footer #main-controls form
-	display: none
-
 /*
  * New post
  */
-canvas
+
+section#newPost
+	background: rgba(255,255,255,0.7)
 	width: 100%
+	height: 100%
+	padding-top: 70px;
+	top: 0
+	bottom: 0
+	position: fixed
+	display: none
+
+section#newPost #newPostWrapper
+	margin: 10px
+
+section#newPost #newPostControlls
+	width: 100%
+	max-width: 500px
+	margin: 0 auto
+	display: block
+
+section#newPost input#mediaLoader
+	display: none
+
+section#newPost canvas#newMediaPreview
+	width: 100%
+
+body.floatView
+	overflow: hidden
+
+body.floatView main
+body.floatView #float-footer
+	display: none
+
+body.floatView section#newPost
+	display: block
 
 /*
  * Pie
@@ -394,8 +424,8 @@ footer #brand
 		width: 870px // -100
 	section#view
 		width: 400px // -100
-	section#view section#list .post .image
-	section#view section#list .post .image img
+	section#view section#list .post .media
+	section#view section#list .post .media img
 		width: 400px // -100
 		height: 400px // -100
 	section#view section#list .post .info
@@ -414,8 +444,8 @@ footer #brand
 		width: 720px // -150
 	section#view
 		width: 300px // -100
-	section#view section#list .post .image
-	section#view section#list .post .image img
+	section#view section#list .post .media
+	section#view section#list .post .media img
 		width: 300px // -100
 		height: 300px // -100
 	section#view section#list .post .info
@@ -464,8 +494,8 @@ footer #brand
 		display: none
 	section#view
 		width: 440px
-	section#view section#list .post .image
-	section#view section#list .post .image img
+	section#view section#list .post .media
+	section#view section#list .post .media img
 		width: 440px
 		height: 440px
 	section#view section#list .post .info
@@ -488,8 +518,8 @@ footer #brand
 		display: none
 	section#view
 		width: 300px
-	section#view section#list .post .image
-	section#view section#list .post .image img
+	section#view section#list .post .media
+	section#view section#list .post .media img
 		width: 300px
 		height: 300px
 	section#view section#list .post .info

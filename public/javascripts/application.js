@@ -85,8 +85,9 @@
 
 $(document).ready(function() {
 	$('#camera').click(function(event) {
-		$('form input').click();
-	})
+		$('input#mediaLoader').click();
+		$('body').addClass('floatView');
+	});
 });
 
 /*
@@ -97,19 +98,27 @@ $(document).ready(function() {
 function Application($scope, $http) {
 	$scope.newPost = {};
 
-	$scope.send = function() {
+	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
 		for (key in $scope.newPost) {
 			createForm.append(key, $scope.newPost[key]);
 		}
-/*
-		$http.post('/events', createForm, {
+
+		console.log(createForm);
+
+		$http.post('/post', createForm, {
 			withCredentials: true,
 			headers: {'Content-Type': undefined },
 			transformRequest: angular.identity
 		}).success(function(data) {
-		}).error();*/
+		}).error();
+	*/
+
+		$scope.newPost.name = 'Rodrigo';
+
+		$http.post('/post', $scope.newPost).success(function(data) {
+		}).error();
 	}
 }
 
@@ -130,7 +139,8 @@ function picChange(evt) { /* No funciona para escritorio
 		photo.src = picURL;
 		windowURL.revokeObjectURL(picURL);
 	}*/
-	var canvas = document.getElementById('capturedPhoto');
+
+	var canvas = document.getElementById('newMediaPreview');
 	var ctx = canvas.getContext('2d');
 
 	EXIF.getData(evt.target.files[0], function() {
@@ -144,32 +154,49 @@ function picChange(evt) { /* No funciona para escritorio
 		reader.onload = function(event) {
 			var img = new Image();
 			img.onload = function() {
-				var nTam = 500;
+				var nTam = 1000;
+				canvas.width = nTam;
+				canvas.height = nTam;
 				var nWidth = nTam;
 				var nHeight = nTam;
 				if(img.width > img.height) {
-					nWidth = img.width * nTam / img.height; 
+					nWidth = img.width * nTam / img.height;
 				} else if(img.width < img.height) {
-					nHeight = img.height * nTam / img.width; 
+					nHeight = img.height * nTam / img.width;
 				}
-
-				var variation = {a: 0, width: nWidth, height: nHeight, desX: 0, desY: 0};
+				var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
 
 				switch(orientation) {
 					case 3:
-						variation = {a: 180, width: nWidth, height: nHeight, desX: -1, desY: -1};
+						variation = {a: 180, desX: -1, desY: -1, cntX: 1, cntY: 0, swt:false};
 						break;
 					case 6:
-						variation = {a: 90, width: nHeight, height: nWidth, desX: 0, desY: -1};
+						variation = {a: 90, desX: 0, desY: -1, cntX: -1, cntY: 0, swt:true};
 						break;
 					case 8:
-						variation = {a: -90, width: nHeight, height: nWidth, desX: -1, desY: 0};
+						variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
 						break;
 				}
-				canvas.width = variation.width;
-				canvas.height = variation.height;
+				variation.width = nWidth;
+				variation.height = nHeight;
+				if(variation.swt) {
+					variation.width = nHeight;
+					variation.height = nWidth;
+				}
+				var cntVar = 0;
+				if (variation.width > nTam) {
+					cntVar = parseInt((variation.width - nTam)/2);
+				} 
+				if (variation.height > nTam) {
+					cntVar = parseInt((variation.height - nTam)/2);
+				}
+				var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
+				var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
 				ctx.rotate(variation.a*Math.PI/180);
-				ctx.drawImage(img,nWidth*variation.desX,nHeight*variation.desY,nWidth,nHeight);
+				ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+				var newImg = canvas.toDataURL( 'image/jpeg' , 0.7 );
+				//document.write('<img src=' + newImg + '></img>');
+				angular.element($('input#mediaLoader')).scope().newPost.media = newImg;
 			}
 			img.src = event.target.result;
 		}

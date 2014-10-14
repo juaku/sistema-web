@@ -7,8 +7,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// Ya no se requiere
 //Multer multipart/form-data
-var multer  = require('multer');
+//var multer = require('multer');
 
 //Stylus y Nib
 var stylus = require('stylus')
@@ -92,6 +93,7 @@ var account = require('./routes/account');
 var login = require('./routes/login');
 var logout = require('./routes/logout');
 var events = require('./routes/events');
+var post = require('./routes/post');
 
 var app = express();
 
@@ -109,7 +111,7 @@ app.set('view engine', 'jade');
 
 app.use(favicon());
 app.use(logger('dev'));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '1mb'}));
 app.use(bodyParser.urlencoded());
 app.use(cookieParser());
 app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
@@ -118,8 +120,8 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 }), cookie: { path: '/', maxAge: 1000*60*60*24*15 } // 15 Días
 }));
 
-// Usar Multer
-app.use(multer({ dest: './public/uploads/'}));
+// Usar Multer - Ya no se require
+//app.use(multer({ dest: './public/uploads/'}));
 
 // Inicializar Passport!  También use el middleware passport.session(), para apoyar
 // Sesiones de inicio de sesión persistentes (recomendado).
@@ -153,6 +155,7 @@ app.use('/account', account);
 app.use('/login', login);
 app.use('/logout', logout);
 app.use('/events', events);
+app.use('/post', post);
 
 // GET /auth/facebook
 //   Use passport.authenticate() como una ruta middleware para autenticar la

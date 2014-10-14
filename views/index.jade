@@ -14,129 +14,142 @@ block content
           br
           span.profile-lastname #{user.lastName}
       section#friends
-        div.friend #{__('Friend activity')}
+        .friend #{__('Friend activity')}
     section#view
       section#view-controls
       section#list
-        canvas(id="capturedPhoto" width="500" height="500")
-        div.post
-          div.image
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub #{__('At')} 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 #{__('friends')}
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub #{__('At')} 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 #{__('friends')}
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
-        div.post
-          div.image
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
+        .post
+          .media
             img
-          div.info
-            div.author-image
+          .info
+            .author-media
               img(src=user.profilePicture)
-            div.post-data
-              div.author-name.pri Rodrigo Yrigoyen Gonzales
-              div.time.sub A las 14:51 p.m.
-            div.event-data
-              div.event-name.pri @Kaos
-              div.friends.sub 24 amigos
+            .post-data
+              .author-name.pri Rodrigo Yrigoyen Gonzales
+              .time.sub A las 14:51 p.m.
+            .event-data
+              .event-name.pri @Kaos
+              .friends.sub 24 amigos
     aside#events
       section#events-controls
-        div.search-box
+        .search-box
           input(type="text", placeholder="#{__('Search events')}") 
-        div.promoted
-          div.promoted-title #{__('Promoted')}
-          div.event.promoted-event
-            div.event-name.promoted-event-name @Aura
-            div.event-people.promoted-event-people 1280 #{__('people')}
-          div.event.promoted-event
-            div.event-name.promoted-event-name @Aura
-            div.event-people.promoted-event-people 1280 #{__('people')}
-        div.events-list
-          div.event
-            div.event-name @Kaos
-            div.event-people 1920 #{__('people')}
-          div.event
-            div.event-name.small @JardinDeLaCervezaArequipeña
-            div.event-people 1280 #{__('people')}
-          div.event
-            div.event-name @Manutara
-            div.event-people 1024 #{__('people')}
-        div.show-more #{__('Show more')}
+        .promoted
+          .promoted-title #{__('Promoted')}
+          .event.promoted-event
+            .event-name.promoted-event-name @Aura
+            .event-people.promoted-event-people 1280 #{__('people')}
+          .event.promoted-event
+            .event-name.promoted-event-name @Aura
+            .event-people.promoted-event-people 1280 #{__('people')}
+        .events-list
+          .event
+            .event-name @Kaos
+            .event-people 1920 #{__('people')}
+          .event
+            .event-name.small @JardinDeLaCervezaArequipeña
+            .event-people 1280 #{__('people')}
+          .event
+            .event-name @Manutara
+            .event-people 1024 #{__('people')}
+        .show-more #{__('Show more')}
       footer 
         nav Términos y condiciones · Más
-        div#brand Juaku © 2014
+        #brand Juaku © 2014
   section#float-footer
-    div#main-controls
-      div.button.hot #{__('Hot')}
-      div.button.control-switch
-        div.knob
-      div.button.recent #{__('Recent')}
-      div#camera
-      div#send(ng-click="send()")
-      form
-        //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
-        input(type="file" accept="image/*" onchange="picChange(event)")
+    #main-controls
+      .button.hot #{__('Hot')}
+      .button.control-switch
+        .knob
+      .button.recent #{__('Recent')}
+      #camera
+  section#newPost
+      #newPostWrapper
+        #newPostControlls
+          //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
+          input(type="file" id="mediaLoader" accept="image/*" onchange="picChange(event)")
+          canvas(id="newMediaPreview")
+          #recomendedEvents
+            ul
+              li @Aura
+              li @Kaos
+              li @Help
+          #createNewEvent
+            input(type="text" id="newEventName")
+          #loadMediaAgain
+          #cancelPost
+          #sendPost(ng-click="send()")
+
+
