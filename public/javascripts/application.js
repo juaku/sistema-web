@@ -85,8 +85,11 @@
 
 $(document).ready(function() {
 	$('#camera').click(function(event) {
-		$('input#mediaLoader').click();
-		$('body').addClass('floatView');
+		$('input#media-loader').click();
+		$('body').addClass('float-view');
+	});
+	$(window).on('load resize', function() {
+		$('#main-controls').width($('section#view #view-wrapper').width());
 	});
 });
 
@@ -95,8 +98,32 @@ $(document).ready(function() {
  * -----------------
  */
 
+// ES Locale
+if($('html').attr('lang') == 'es') {
+	angular.module("ngLocale", [], ["$provide", function($provide) {
+	var PLURAL_CATEGORY = {ZERO: "zero", ONE: "one", TWO: "two", FEW: "few", MANY: "many", OTHER: "other"};
+	$provide.value("$locale", {"DATETIME_FORMATS":{"MONTH":["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],"SHORTMONTH":["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"],"DAY":["domingo","lunes","martes","miércoles","jueves","viernes","sábado"],"SHORTDAY":["dom","lun","mar","mié","jue","vie","sáb"],"AMPMS":["a.m.","p.m."],"medium":"dd/MM/yyyy HH:mm:ss","short":"dd/MM/yy HH:mm","fullDate":"EEEE d 'de' MMMM 'de' y","longDate":"d 'de' MMMM 'de' y","mediumDate":"dd/MM/yyyy","shortDate":"dd/MM/yy","mediumTime":"HH:mm:ss","shortTime":"HH:mm"},"NUMBER_FORMATS":{"DECIMAL_SEP":",","GROUP_SEP":".","PATTERNS":[{"minInt":1,"minFrac":0,"macFrac":0,"posPre":"","posSuf":"","negPre":"-","negSuf":"","gSize":3,"lgSize":3,"maxFrac":3},{"minInt":1,"minFrac":2,"macFrac":0,"posPre":"\u00A4 ","posSuf":"","negPre":"\u00A4 -","negSuf":"","gSize":3,"lgSize":3,"maxFrac":2}],"CURRENCY_SYM":"€"},"pluralCat":function (n) {  if (n == 1) {    return PLURAL_CATEGORY.ONE;  }  return PLURAL_CATEGORY.OTHER;},"id":"es"});
+	}]);
+}
+
+// Controlador
 function Application($scope, $http) {
 	$scope.newPost = {};
+
+	$scope.posts = [];
+	// Crear 5 post vacios mientras carga los post originales
+	var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+	for (var i = 0; i < 5; i++) {
+		$scope.posts[i] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif}};
+	};
+	// Cargar los post originales
+	$http.get('/post').success(function(data) {
+		$scope.posts = data;
+		for (var i = 0; i < $scope.posts.length; i++) {
+			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
+			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+		};
+	});
 
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
@@ -114,11 +141,28 @@ function Application($scope, $http) {
 		}).success(function(data) {
 		}).error();
 	*/
-
-		$scope.newPost.name = 'Rodrigo';
-
+		console.log($scope.newPost);
 		$http.post('/post', $scope.newPost).success(function(data) {
 		}).error();
+	}
+
+	function getTimeElapsed(time) {
+		var timeElapsedMill = new Date().getTime() - Date.parse(time);
+		var timeElapsed = {};
+		if(timeElapsedMill < 1000*60) {
+			timeElapsed.type = 's';
+			timeElapsed.val = 1;
+		} else if(timeElapsedMill < 1000*60*60) {
+			timeElapsed.type = 'm';
+			timeElapsed.val = parseInt(timeElapsedMill/(1000*60));
+		} else if(timeElapsedMill < 1000*60*60*24) {
+			timeElapsed.type = 'h';
+			timeElapsed.val = parseInt(timeElapsedMill/(1000*60*60));
+		} else {
+			timeElapsed.type = 'd';
+			timeElapsed.val = time;
+		}
+		return timeElapsed;
 	}
 }
 
@@ -140,11 +184,11 @@ function picChange(evt) { /* No funciona para escritorio
 		windowURL.revokeObjectURL(picURL);
 	}*/
 
-	var canvas = document.getElementById('newMediaPreview');
+	var canvas = document.getElementById('new-media-preview');
 	var ctx = canvas.getContext('2d');
 
 	EXIF.getData(evt.target.files[0], function() {
-		console.log(EXIF.pretty(this));
+		//console.log(EXIF.pretty(this));
 		var orientation = this.exifdata.Orientation;
 		drawPreview(orientation)
 	});
@@ -196,7 +240,7 @@ function picChange(evt) { /* No funciona para escritorio
 				ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
 				var newImg = canvas.toDataURL( 'image/jpeg' , 0.7 );
 				//document.write('<img src=' + newImg + '></img>');
-				angular.element($('input#mediaLoader')).scope().newPost.media = newImg;
+				angular.element($('input#media-loader')).scope().newPost.media = newImg;
 			}
 			img.src = event.target.result;
 		}

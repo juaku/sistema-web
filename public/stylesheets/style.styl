@@ -81,10 +81,10 @@ header
 	background-color: #FFF
 	width: 100%
 	padding: 5px 0
-	box-shadow: 0 3px 0 rgba(0,0,0,0.05)
 	position: fixed
 	z-index: 10
 	top: 0
+	box-shadow: 0 3px 0 rgba(0,0,0,0.05)
 
 header #title a
 	background-image: url('/images/sprite.png?v=1005')
@@ -105,29 +105,33 @@ header #title a h1
 main
 	margin: 0 auto
 	padding-top: 55px
+	width: 100%
+	max-width: 970px
 	display: table
-	width: 970px // Photo Responsive 100
+	height: 100vh
 
-aside#controls
+aside
 section#view
-aside#events
 	display: table-cell
 	vertical-align: top
 
-aside#controls
-aside#events
+aside
+	width: 200px
+	padding: 10px
+
+aside #people-side
+aside #events-side
+	width: inherit
+	display: inline-block
 	position: fixed
 
 /*
  * Controles
  */
-
-aside#controls
-	width: 200px
-	padding: 10px
+section#people-side
 	text-align: right
 
-aside#controls section#profile
+section#people-controls section#profile
 	background-color: #FFF
 	padding: 5px
 	width: 100px
@@ -135,10 +139,12 @@ aside#controls section#profile
 	text-align: left
 	display: inline-block
 
-aside#controls section#profile img
+section#people-controls section#profile img
+	background-color: #EEE
 	width: 100px
+	height: 100px
 
-aside#controls section#profile h2.profile-name
+section#people-controls section#profile h2.profile-name
 	margin: 3px 5px 0 2px
 	font-size: 14px
 	line-height: 14px
@@ -146,18 +152,18 @@ aside#controls section#profile h2.profile-name
 	text-overflow: ellipsis
 	font-weight: normal
 
-aside#controls section#profile h2.profile-name .profile-firstname
+section#people-controls section#profile h2.profile-name .profile-firstname
 	font-size: 13px
 	font-weight: bold
 
-aside#controls section#profile h2.profile-name .profile-lastname
+section#people-controls section#profile h2.profile-name .profile-lastname
 	font-size: 12px
 	font-weight: normal
 
-aside#controls section#friends
+section#people-controls section#friends
 	margin-top: 20px
 
-aside#controls section#friends .friend
+section#people-controls section#friends .friend
 	background-color: rgba(255, 255, 255, 0.5)
 	font-size: 12px
 	color: #999
@@ -168,7 +174,7 @@ aside#controls section#friends .friend
 	text-align: center
 	padding: 10px
 
-aside#controls section#friends .friend:before
+section#people-controls section#friends .friend:before
 	content: '+'
 	font-size: 50px
 	display: block
@@ -180,97 +186,112 @@ aside#controls section#friends .friend:before
  */
 section#view
 	background-color: rgba(255, 255, 255, 0.5)
-	width: 500px // Photo Responsive 100
-	padding: 15px
 	padding-bottom: 50px
 	outline: #FFF solid 1px
+	max-width: 530px
+	height: 100%
 
-section#view section#list .post
+section#view #view-wrapper
+	padding: 15px
+
+section#view section#post-list .post
 	margin-bottom: 25px
 	box-shadow: 0 0 10px rgba(0,0,0,0.1)
+	position: relative
 
-section#view section#list .post .media
-section#view section#list .post .media img
-	background-color: #777
-	width: 500px // Photo Responsive 100
-	height: 500px // Photo Responsive 100
-	overflow: hidden
+section#view section#post-list .post .media
+	font-size: 0
+	position: relative // Muestra espacio de img
 
-section#view section#list .post .info
+section#view section#post-list .post .media img
+	width: 100%
+	max-width: 500px
+	max-height: 500px // Error: Si es que IMG no es cuadrada por algún motivo.
+	background-color: #CCC
+
+section#view section#post-list .post .media img.media // Muestra espacio de img
+	position: absolute
+	top: 0
+	left: 0
+
+section#view section#post-list .post .info
 	background-color: #FFF
-	width: 480px // Photo Responsive 100
 	height: 30px
 	padding: 10px
+	display: table
 
-section#view section#list .post:after 
+section#view section#post-list .post:after 
 	content: ''
+	width: 95%
+	margin: 0 2.5%
 	background-color: rgba(0,0,0,0.1)
-	width: 490px // Photo Responsive 100
 	height: 3px
-	margin: 0 5px
-	display: block
 	position: absolute
 	z-index: -1
 
-section#view section#list .post .info .author-media
-section#view section#list .post .info .post-data
-section#view section#list .post .info .event-data
-	display: inline-block
+section#view section#post-list .post .info .author-img
+section#view section#post-list .post .info .post-detail
+	display: table-cell
 	vertical-align: top
 	font-size: 0px
 
-section#view section#list .post .info .author-media img
+section#view section#post-list .post .info .author-img
+	width: 35px
+
+section#view section#post-list .post .info .author-img img
 	width: 30px
+	height: 30px
 	margin-right: 5px
+	background-color: #EEE
 
-section#view section#list .post .info .post-data
-	width: 275px // Photo Responsive 50
-	padding-right: 5px
+section#view section#post-list .post .info .post-detail
+	width: 100%
+	
+section#view section#post-list .post .info .post-detail .post-data
+	display: inline-block
+	width: 70%
 
-section#view section#list .post .info .post-data .author-name
+section#view section#post-list .post .info .post-detail .post-data .author-name
 	font-size: 14px
 
-section#view section#list .post .info .event-data
-	width: 165px // Photo Responsive 50
+section#view section#post-list .post .info .post-detail .event-data
+	display: inline-block
+	width: 30%
 	text-align: right
 
-section#view section#list .post .info .event-data .event-name
+section#view section#post-list .post .info .post-detail .event-data .event-name
 	font-size: 16px
-
-section#view section#list .post .info .event-data .event-name.small
-	font-size: 14px
 	
-section#view section#list .post .info .pri
+section#view section#post-list .post .info .post-detail .pri
 	line-height: 18px
 	text-overflow: ellipsis
 	white-space: nowrap
 	overflow: hidden
 
-section#view section#list .post .info .sub
+section#view section#post-list .post .info .post-detail .sub
 	font-size: 11px
 	color: #999
+
+section#view section#post-list .post .info .post-detail .sub:first-letter
+	text-transform: uppercase
 
 /*
  * Eventos
  */
-aside#events
-	width: 200px
-	padding: 10px
-
-aside#events section#events-controls
+aside section#events-controls
 	background: #FFF
 	padding: 5px 0
 
-aside#events section#events-controls .search-box
-aside#events section#events-controls .promoted
-aside#events section#events-controls .events-list
-aside#events section#events-controls .show-more
+aside section#events-controls .search-box
+aside section#events-controls .promoted
+aside section#events-controls .events-list
+aside section#events-controls .show-more
 	margin: 15px 10px
 
-aside#events section#events-controls .search-box
+aside section#events-controls .search-box
 	margin-top: 10px
 
-aside#events section#events-controls .search-box input
+aside section#events-controls .search-box input
 	background: #EEE
 	color: #999
 	width: 160px
@@ -283,63 +304,63 @@ aside#events section#events-controls .search-box input
 	border-radius: 20px
 	outline: none
 
-aside#events section#events-controls .promoted .promoted-title
+aside section#events-controls .promoted .promoted-title
 	font-size: 10px
 	color: #CCC
 	text-transform: uppercase
 
-aside#events section#events-controls .event
+aside section#events-controls .event
 	margin: 10px 0
 
-aside#events section#events-controls .event .event-name
+aside section#events-controls .event .event-name
 	font-size: 16px
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 
-aside#events section#events-controls .event .event-name.small
+aside section#events-controls .event .event-name.small
 	font-size: 14px
 
-aside#events section#events-controls .event .event-people
+aside section#events-controls .event .event-people
 	font-size: 11px
 	color: #999
 	margin-left: 15px
 
-aside#events section#events-controls .promoted:after
-aside#events section#events-controls .events-list:after
+aside section#events-controls .promoted:after
+aside section#events-controls .events-list:after
 	content: ''
 	display: block
 	background: #EEE
 	height: 1px
 	margin-top: 15px
 
-aside#events section#events-controls .show-more
+aside section#events-controls .show-more
 	text-align: center
 
 /*
  * Controles flotantes
  */
-section#float-footer
+section#float-controls
 	background-color: #333
 	width: 100%
 	height: 32px
 	color: rgba(255,255,255,0.9)
 	padding: 6px 0 7px 0
 	text-align: center
-	box-shadow: 0 -3px 0 rgba(51,51,51,0.1)
 	position: fixed
 	bottom: 0
+	//box-shadow: 0 -3px 0 rgba(51,51,51,0.1)
 
-section#float-footer #main-controls
+section#float-controls #main-controls
 	width: 530px
 	margin: 0 auto
 
-section#float-footer #main-controls .button
+section#float-controls #main-controls .button
 	display: inline-block
 	vertical-align: middle
 	margin: 0 5px
 
-section#float-footer #main-controls .button.control-switch
+section#float-controls #main-controls .button.control-switch
 	width: 64px
 	height: 32px
 	background: rgba(255,255,255,0.7)
@@ -347,7 +368,7 @@ section#float-footer #main-controls .button.control-switch
 	padding: 0 5px
 	position: relative
 
-section#float-footer #main-controls .button.control-switch .knob
+section#float-controls #main-controls .button.control-switch .knob
 	width: 24px
 	height: 24px
 	background: rgba(255,255,255,0.9)
@@ -356,8 +377,8 @@ section#float-footer #main-controls .button.control-switch .knob
 	top: 4px
 	left: 45px
 
-section#float-footer #main-controls #camera
-#sendPost
+section#float-controls #main-controls #camera
+#send-post
 	background: #000
 	width: 30px
 	height: 30px
@@ -369,39 +390,23 @@ section#float-footer #main-controls #camera
  * New post
  */
 
-section#newPost
-	background: rgba(255,255,255,0.7)
-	width: 100%
-	height: 100%
-	padding-top: 70px;
-	top: 0
-	bottom: 0
-	position: fixed
+section#new-post
 	display: none
 
-section#newPost #newPostWrapper
-	margin: 10px
-
-section#newPost #newPostControlls
-	width: 100%
-	max-width: 500px
-	margin: 0 auto
-	display: block
-
-section#newPost input#mediaLoader
+section#new-post input#media-loader
 	display: none
 
-section#newPost canvas#newMediaPreview
+section#new-post canvas#new-media-preview
 	width: 100%
 
-body.floatView
-	overflow: hidden
-
-body.floatView main
-body.floatView #float-footer
+body.float-view main #controls
+body.float-view main #events
+body.float-view main #view-controls
+body.float-view main #post-list
+body.float-view #float-controls
 	display: none
 
-body.floatView section#newPost
+body.float-view section#new-post
 	display: block
 
 /*
@@ -419,22 +424,61 @@ footer #brand
  * Responsive
  */ 
 
+@media (max-width: 779px) 
+	main
+		min-width: 650px
+	aside#first
+		width: 110px
+
+@media (max-width: 669px) 
+	main
+		min-width: 290px
+
+	aside#first,
+	aside#second
+		display: none
+
+	section#view
+		display: block
+		margin: 0 auto
+
+@media (max-width: 329px)
+	main
+		padding-top: 45px
+
+	header #title a
+		background-size: 80px
+		width: 80px
+		height: 35px
+
+	section#view section#post-list .post
+		margin-bottom: 15px
+
+	section#view #view-wrapper
+		padding: 10px
+
+	section#view section#post-list .post .info .post-detail .post-data .author-name
+	section#view section#post-list .post .info .post-detail .event-data .event-name
+		font-size: 14px
+		letter-spacing: -0.5px
+
+/*
 @media (max-width: 969px) 
 	main
 		width: 870px // -100
 	section#view
 		width: 400px // -100
-	section#view section#list .post .media
-	section#view section#list .post .media img
+	section#view section#post-list .post .media
+	section#view section#post-list .post .media img
 		width: 400px // -100
 		height: 400px // -100
-	section#view section#list .post .info
+	section#view section#post-list .post .info
 		width: 380px // -100
-	section#view section#list .post:after 
+	section#view section#post-list .post:after 
 		width: 390px // -100
-	section#view section#list .post .info .post-data
+	section#view section#post-list .post .info .post-data
 		width: 225px // -50
-	section#view section#list .post .info .event-data
+	section#view section#post-list .post .info .event-data
 		width: 115px // -50
 	section#float-footer #main-controls
 		width: 430px // -100
@@ -444,17 +488,17 @@ footer #brand
 		width: 720px // -150
 	section#view
 		width: 300px // -100
-	section#view section#list .post .media
-	section#view section#list .post .media img
+	section#view section#post-list .post .media
+	section#view section#post-list .post .media img
 		width: 300px // -100
 		height: 300px // -100
-	section#view section#list .post .info
+	section#view section#post-list .post .info
 		width: 280px // -100
-	section#view section#list .post:after 
+	section#view section#post-list .post:after 
 		width: 290px // -100
-	section#view section#list .post .info .post-data
+	section#view section#post-list .post .info .post-data
 		width: 175px // -50
-	section#view section#list .post .info .event-data
+	section#view section#post-list .post .info .event-data
 		width: 55px // -50
 	aside#controls
 		width: 180px // Especial -20
@@ -485,6 +529,32 @@ footer #brand
 	section#float-footer #main-controls
 		width: inherit
 
+/* Anchio 100% Necesesita js
+@media (max-width: 629px)
+	main
+		width: 100%
+	aside#controls
+		display: none
+	aside#events
+		display: none
+	section#view
+		width: initial
+		display: block
+		max-width: 500px
+		margin: 0 auto
+	section#view section#post-list .post .media
+	section#view section#post-list .post .media img
+		width: 100%
+	section#view section#post-list .post .info
+		width: initial // -100
+	section#view section#post-list .post:after 
+		width: 230px // -100
+	section#view section#post-list .post .info .post-data
+		width: 45px // -50
+	section#view section#post-list .post .info .event-data
+		width: 35px // -50
+*/
+/*
 @media (max-width: 629px)
 	main
 		width: 460px
@@ -494,44 +564,52 @@ footer #brand
 		display: none
 	section#view
 		width: 440px
-	section#view section#list .post .media
-	section#view section#list .post .media img
+	section#view section#post-list .post .media
+	section#view section#post-list .post .media img
 		width: 440px
 		height: 440px
-	section#view section#list .post .info
+	section#view section#post-list .post .info
 		width: 420px // -100
-	section#view section#list .post:after 
+	section#view section#post-list .post:after 
 		width: 430px // -100
-	section#view section#list .post .info .post-data
+	section#view section#post-list .post .info .post-data
 		width: 245px // -50
-	section#view section#list .post .info .event-data
+	section#view section#post-list .post .info .event-data
 		width: 135px // -50
 	/*aside#events
 		width: 150px
 	aside#events section#events-controls .search-box input
 		width: 110px*/
-
+	/*
 @media (max-width: 459px)
 	main
 		width: 320px
+		padding-top: 40px
+	header #title a
+		width: 70px
+		height: 30px
+		background-size: 70px
 	aside#events
 		display: none
 	section#view
 		width: 300px
-	section#view section#list .post .media
-	section#view section#list .post .media img
+	section#view section#post-list .post .media
+	section#view section#post-list .post .media img
 		width: 300px
 		height: 300px
-	section#view section#list .post .info
+	section#view section#post-list .post .info
 		width: 280px // -100
-	section#view section#list .post:after 
+	section#view section#post-list .post:after 
 		width: 290px // -100
-	section#view section#list .post .info .post-data
+	section#view section#post-list .post .info .post-data
 		width: 175px // -50
-	section#view section#list .post .info .event-data
+	section#view section#post-list .post .info .event-data
 		width: 65px // -50
 	aside#events
 		width: 150px
 	aside#events section#events-controls .search-box input
 		width: 110px
-		
+	section#new-post
+		padding-top: 45px
+*/
+/// NEW MAQ

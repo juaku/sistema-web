@@ -21,5 +21,11 @@
 	"Recent": "Recent",
 	"friends": "friends",
 	"Friend activity": "Friend activity",
-	"At": "At"
+	"At": "At",
+	"Less than a minute ago": "Less than a minute ago",
+	"minutes": "minutes",
+	"hours": "hours",
+	"at": "at",
+	"min": "min",
+	"h": "h"
 }

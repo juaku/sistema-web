@@ -6,7 +6,7 @@ var crip = require('./crip');
 
 var FB = require('fb');
 
-//Guardar imagen en el servidor
+// Guardar imagen en el servidor
 var fs = require('fs');
 
 var http = require('http');
@@ -246,6 +246,87 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 }
 
 /*
+ * @descrip Inicia la secuencia de guradado de nuevo post
+ * @param {object} newPost, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.newPost = function(newPost, next, error) {
+	console.log('J0 - ' + this.parseSessionToken);
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		console.log('J1');
+		var Event = Parse.Object.extend("Event");
+		var query = new Parse.Query(Event);
+		query.equalTo("name", newPost.eventName);
+		query.find().then(function(results) {
+			if(results.length > 0) {
+				console.log('J2');
+				savePost(newPost.media, user, results[0], function() {
+					next();
+				}, function(e) {
+					error(e);
+				});
+			} else {
+				console.log('J3');
+				var event = new Event();
+				event.set('name', newPost.eventName);
+				event.save().then(function(newEvent) {
+					savePost(newPost.media, user, newEvent, function() {
+						console.log('J4');
+						next();
+					}, function(e) {
+						error(e);
+					});
+				}, function(e) {
+					error(e);
+				});
+			}
+		}, function(e) {
+			error(e);
+		});
+	});
+}
+
+/*
+ * @descrip Guarda el post y establece las relaciones
+ * @par {string} data, {object} user, {object} event, {function} next, {function} error.
+ * @return null
+ */ 
+function savePost(data, user, event, next, error) {
+	var mediaName = parseInt(Math.random(255,2)*10000);
+	var mediaExt = 'jpg';
+	saveMedia(data, mediaName, mediaExt, function() {
+		var Post = Parse.Object.extend("Post");
+		post = new Post();
+		console.log(mediaName + mediaExt);
+		post.set('media', mediaName + '.' + mediaExt);
+		post.set('author', user);
+		post.set('event', event);
+		post.save().then(function(newPost) {
+			next();
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @decrip Convierte y guarda un objeto a disco
+ * @param {string} data, {string} name, {string} ext, {function} next, {function} error.
+ * @return null
+ */
+function saveMedia(data, name, ext, next, error) {
+	var img = data;
+	// Strip off the data: url prefix to get just the base64-encoded bytes
+	var data = img.replace(/^data:image\/\w+;base64,/, "");
+	var buf = new Buffer(data, 'base64');
+	// TODO: Verificación de archivo
+	fs.writeFile('./public/uploads/'+ name +'.'+ ext, buf);
+	next();
+}
+
+/*
  * @descrip Actualiza la asistencia de un usuario al evento
  * @param {boolean} join, {string} parseSessionToken, {string} eventId,
  * {function} next, {function} error.
@@ -309,6 +390,51 @@ jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, e
 			error();
 		}
 		next(response, index);
+	});
+}
+
+
+/* @descrip Método para obtener los 15 primeros post de la BD
+ * @param {function} next, {function} error
+ * @return null
+ */
+
+jPack.getAllPosts = function(req, next, error) {
+	var Post = Parse.Object.extend('Post');
+	var query = new Parse.Query(Post);
+	var posts = [];
+	query.descending('createdAt');
+	query.include('author');
+	query.include('event');
+	query.find().then(function(results) {
+		var c = results.length;
+		for(var i in results) {
+			posts[i] = {};
+			posts[i].media = results[i].get('media');
+			posts[i].event = results[i].get('event').get('name');
+			posts[i].time = results[i].createdAt;
+			getFBInfo(i,crip.deco(results[i].get('author').get('username')))
+		
+		}
+		function getFBInfo(i, fbUserId) {
+			FB.api('/'+fbUserId+'/',  function(profile) {
+				posts[i].author = {};
+				posts[i].author.firstName = profile.first_name;
+				posts[i].author.lastName = profile.last_name;
+				FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+					posts[i].author.picture= picture.data.url;
+					triggerNext();
+				});
+			});
+		}
+		function triggerNext() {
+			c--;
+			if(c===0) {
+				next(posts);
+			}
+		}
+	}, function(e) {
+		error(e);
 	});
 }
 
