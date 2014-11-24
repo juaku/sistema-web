@@ -90,8 +90,14 @@ $(document).ready(function() {
 	});
 	$(window).on('load resize', function() {
 		$('#main-controls').width($('section#view #view-wrapper').width());
+		resizePostTitle();
 	});
 });
+
+function resizePostTitle() {
+	$('#post-list .post-detail .post-title').width(0);
+	$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
+}
 
 /*
  * Framework Angular
@@ -112,8 +118,9 @@ function Application($scope, $http) {
 
 	$scope.posts = [];
 	// Crear 5 post vacios mientras carga los post originales
+	var numTmpPost = 5;
 	var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
-	for (var i = 0; i < 5; i++) {
+	for (var i = 0; i < numTmpPost; i++) {
 		$scope.posts[i] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif}};
 	};
 	// Cargar los post originales
@@ -164,8 +171,34 @@ function Application($scope, $http) {
 		}
 		return timeElapsed;
 	}
+
 }
 
+// Directivas
+angular.module('Juaku', [])
+.directive('evalTamEventPost', function() {
+return function(scope, element, attrs) {
+	if (scope.$last) {
+		postsLoaded();
+	}
+};
+});
+
+function postsLoaded() {
+	$('.like-svg').on('click', function() {
+		$(this).parent().toggleClass('selected');
+	});
+	resizePostTitle();
+}
+
+function reduceString(str) {
+	var newString = str;
+	var lastIndex = str.lastIndexOf(' ');
+	if(str.substring(0, lastIndex) != '') {
+		newString = str.substring(0, lastIndex);
+	}
+	return newString;
+}
 
 function picChange(evt) { /* No funciona para escritorio
 	var fileInput = evt.target.files;

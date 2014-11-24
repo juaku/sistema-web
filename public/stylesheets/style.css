@@ -215,11 +215,20 @@ section#view section#post-list .post .media img.media {
   top: 0;
   left: 0;
 }
-section#view section#post-list .post .info {
+section#view section#post-list .post .bottom {
   background-color: #fff;
+  width: 100%;
   height: 30px;
-  padding: 10px;
   display: table;
+}
+section#view section#post-list .post .bottom .info {
+  display: table;
+  width: 100%;
+  vertical-align: top;
+}
+section#view section#post-list .post .bottom .info .info-wrapper {
+  padding: 10px;
+  padding-right: 5px;
 }
 section#view section#post-list .post:after {
   content: '';
@@ -230,52 +239,113 @@ section#view section#post-list .post:after {
   position: absolute;
   z-index: -1;
 }
-section#view section#post-list .post .info .author-img,
-section#view section#post-list .post .info .post-detail {
+section#view section#post-list .post .bottom .author-img,
+section#view section#post-list .post .bottom .post-detail {
   display: table-cell;
   vertical-align: top;
   font-size: 0px;
 }
-section#view section#post-list .post .info .author-img {
-  width: 35px;
-}
-section#view section#post-list .post .info .author-img img {
+section#view section#post-list .post .bottom .author-img img {
   width: 30px;
   height: 30px;
   margin-right: 5px;
   background-color: #eee;
 }
-section#view section#post-list .post .info .post-detail {
+section#view section#post-list .post .bottom .post-detail {
   width: 100%;
 }
-section#view section#post-list .post .info .post-detail .post-data {
-  display: inline-block;
-  width: 70%;
-}
-section#view section#post-list .post .info .post-detail .post-data .author-name {
+/*
+section#view section#post-list .post .bottom .post-detail .post-data
+	display: inline-block
+	//width: 60%
+	//max-width: 80%
+	float: left
+
+section#view section#post-list .post .bottom .post-detail .post-data .author-name
+	font-size: 14px
+
+section#view section#post-list .post .bottom .post-detail .post-data .author-name .author-lastName
+	display: none
+
+section#view section#post-list .post .bottom .post-detail .event-data
+	display: inline-block
+	//width: 40%
+	text-align: right
+	float: right
+	max-width: 70%
+
+section#view section#post-list .post .bottom .post-detail .event-data .event-name
+	font-size: 16px
+
+section#view section#post-list .post .bottom .post-detail .pri
+	line-height: 18px
+	text-overflow: ellipsis
+	white-space: nowrap
+	overflow: hidden
+
+section#view section#post-list .post .bottom .post-detail .sub
+	font-size: 11px
+	color: #999
+
+section#view section#post-list .post .bottom .post-detail .sub:first-letter
+	text-transform: uppercase
+*/
+section#view section#post-list .post .bottom .post-detail .post-title {
   font-size: 14px;
-}
-section#view section#post-list .post .info .post-detail .event-data {
-  display: inline-block;
-  width: 30%;
-  text-align: right;
-}
-section#view section#post-list .post .info .post-detail .event-data .event-name {
-  font-size: 16px;
-}
-section#view section#post-list .post .info .post-detail .pri {
-  line-height: 18px;
+  width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
+  line-height: 16px;
 }
-section#view section#post-list .post .info .post-detail .sub {
+section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName {
+  display: none;
+}
+section#view section#post-list .post .bottom .post-detail .post-title .event-posted {
+  font-family: Tahoma, sans-serif;
+  color: #777;
+  max-width: 70%;
+  font-size: 14px;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info {
   font-size: 11px;
-  color: #999;
+  color: #ccc;
+  margin-top: 1px;
 }
-section#view section#post-list .post .info .post-detail .sub:first-letter {
+section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter {
   text-transform: uppercase;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info .time {
+  display: inline-block;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info .separator {
+  display: inline-block;
+  margin: 0 5px;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info .friends {
+  display: inline-block;
+}
+section#view section#post-list .post .bottom .like object {
+  width: 50px;
+  height: 50px;
+}
+section#view section#post-list .post .bottom .like {
+  width: 50px;
+  height: 50px;
+  background-color: #fafafa;
+  border-left: 1px solid #eee;
+  display: table-cell;
+  vertical-align: bottom;
+  font-size: 0;
+}
+section#view section#post-list .post .bottom .like .like-svg {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+}
+section#view section#post-list .post .bottom .like .selected .like-svg #inner {
+  fill: #c05;
 }
 /*
  * Eventos
@@ -465,8 +535,8 @@ footer #brand {
   section#view #view-wrapper {
     padding: 10px;
   }
-  section#view section#post-list .post .info .post-detail .post-data .author-name,
-  section#view section#post-list .post .info .post-detail .event-data .event-name {
+  section#view section#post-list .post .bottom .post-detail .post-title .author-name,
+  section#view section#post-list .post .bottom .post-detail .post-title .event-name {
     font-size: 14px;
     letter-spacing: -0.5px;
   }
