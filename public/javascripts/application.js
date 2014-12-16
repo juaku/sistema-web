@@ -19,7 +19,7 @@
 
 // 	$scope.save = function(source) {		
 // 		var createForm = new FormData();
-		
+
 // 		$scope.newEvent.source = source;
 
 // 		for (key in $scope.newEvent) {
@@ -78,6 +78,8 @@
 // 	*/
 // }
 
+//window.location.href = 'http://juaku-dev.cloudapp.net:3000/logout';
+
 /*
  * Código de maquetación
  * ---------------------
@@ -114,6 +116,11 @@ if($('html').attr('lang') == 'es') {
 
 // Controlador
 function Application($scope, $http) {
+
+	/*
+	 * Post
+	 */
+
 	$scope.newPost = {};
 
 	$scope.posts = [];
@@ -125,7 +132,8 @@ function Application($scope, $http) {
 	};
 	// Cargar los post originales
 	$http.get('/post').success(function(data) {
-		$scope.posts = data;
+		$scope.posts = data.posts;
+		$scope.events = data.events;
 		for (var i = 0; i < $scope.posts.length; i++) {
 			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
@@ -185,6 +193,21 @@ function Application($scope, $http) {
 		return timeElapsed;
 	}
 
+	/*
+	 * Events
+	 */
+
+	$scope.events = [];
+
+	// Cargar eventos
+/*	$http.get('/event').success(function(data) {
+		$scope.events = data;
+		console.log($scope.events);
+		/*for (var i = 0; i < $scope.posts.length; i++) {
+			$scope.events[i].media = 'uploads/' + $scope.posts[i].media;
+			$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+		};*/
+	/*});*/
 }
 
 // Directivas
@@ -230,13 +253,15 @@ function picChange(evt) { /* No funciona para escritorio
 		windowURL.revokeObjectURL(picURL);
 	}*/
 
+	getGeo();
+
 	var canvas = document.getElementById('new-media-preview');
 	var ctx = canvas.getContext('2d');
 
 	EXIF.getData(evt.target.files[0], function() {
 		//console.log(EXIF.pretty(this));
 		var orientation = this.exifdata.Orientation;
-		drawPreview(orientation)
+		drawPreview(orientation);
 	});
 
 	function drawPreview(orientation) {
@@ -249,12 +274,14 @@ function picChange(evt) { /* No funciona para escritorio
 				canvas.height = nTam;
 				var nWidth = nTam;
 				var nHeight = nTam;
+				var variation;
 				if(img.width > img.height) {
 					nWidth = img.width * nTam / img.height;
+					variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
 				} else if(img.width < img.height) {
 					nHeight = img.height * nTam / img.width;
+					variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
 				}
-				var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
 
 				switch(orientation) {
 					case 3:
@@ -267,6 +294,7 @@ function picChange(evt) { /* No funciona para escritorio
 						variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
 						break;
 				}
+				
 				variation.width = nWidth;
 				variation.height = nHeight;
 				if(variation.swt) {
@@ -291,5 +319,50 @@ function picChange(evt) { /* No funciona para escritorio
 			img.src = event.target.result;
 		}
 		reader.readAsDataURL(evt.target.files[0]);
+	}
+}
+
+	function getGeo() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(getPosition, getGeoError);
+		} else {
+			showGeoError("Geolocation is not supported by this browser.");
+		}
+	}
+
+	function getGeoError(error) {
+		var errorMsg = "";
+		switch(error.code) {
+			case error.PERMISSION_DENIED:
+				errorMsg = "User denied the request for Geolocation."
+				break;
+			case error.POSITION_UNAVAILABLE:
+				errorMsg = "Location information is unavailable."
+				break;
+			case error.TIMEOUT:
+				errorMsg = "The request to get user location timed out."
+				break;
+			case error.UNKNOWN_ERROR:
+				errorMsg = "An unknown error occurred."
+				break;
+		}
+		showGeoError(errorMsg);
+	}
+
+	function showGeoError(errorMsg) {
+		console.log(errorMsg);
+	}
+
+	function getPosition(position) {
+		var coords = {};
+		coords.accuracy = position.coords.accuracy;
+		coords.altitude = position.coords.altitude;
+		coords.altitudeAccuracy = position.coords.altitudeAccuracy;
+		coords.heading = position.coords.heading;
+		coords.latitude = position.coords.latitude;
+		coords.longitude = position.coords.longitude;
+		coords.speed = position.coords.speed;
+		angular.element($('input#media-loader')).scope().newPost.coords = coords;
+		$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + coords.latitude + ',' + coords.longitude);
 	}
 }

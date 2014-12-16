@@ -16,7 +16,16 @@ var http = require('http');
 
 var url = require('url');
 
-var jPack = jPack || {}
+var CronJob = require('cron').CronJob;
+
+// Herramientas Geo - (Evaluar si es necesaria)
+//var geolib = require('geolib');
+
+var jPack = jPack || {};
+
+// Variable contador de publicaciones
+var postCount = 0;
+var postUpdate = 50;
 
 /*
 * Clase User 
@@ -51,7 +60,7 @@ jPack.user.prototype.prueba = function() {
 /*
 * SingUp 
 * @descrip esta clase es la encargada de registrarte, y para mayor
-* seguridad, encripta tu username y password.
+* seguridad, encripta el username y password.
 * @param {string} session, {function} next, {function} error  
 * @return null
 */
@@ -85,6 +94,7 @@ jPack.user.prototype.signUp = function(session, next, error) {
 	});
 }
 
+// TODO: Obsoleto
 jPack.user.prototype.getFbEvents = function(next, error) {
 	FB.api('me/events/created',{ access_token: this.accessToken }, function(results) {
 		if(!results || results.error) {
@@ -261,6 +271,7 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
  */
 jPack.user.prototype.newPost = function(newPost, next, error) {
 	console.log('J0 - ' + this.parseSessionToken);
+	console.log(newPost.coords);
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		console.log('J1');
 		var Event = Parse.Object.extend("Event");
@@ -269,7 +280,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 		query.find().then(function(results) {
 			if(results.length > 0) {
 				console.log('J2');
-				savePost(newPost.media, user, results[0], function() {
+				savePost(newPost, user, results[0], function() {
 					next();
 				}, function(e) {
 					error(e);
@@ -279,7 +290,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 				var event = new Event();
 				event.set('name', newPost.eventName);
 				event.save().then(function(newEvent) {
-					savePost(newPost.media, user, newEvent, function() {
+					savePost(newPost, user, newEvent, function() {
 						console.log('J4');
 						next();
 					}, function(e) {
@@ -368,14 +379,22 @@ jPack.user.prototype.getFriendsUsingApp = function(session, next) {
 function savePost(data, user, event, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
-	saveMedia(data, mediaName, mediaExt, function() {
+	saveMedia(data.media, mediaName, mediaExt, function() {
 		var Post = Parse.Object.extend("Post");
 		post = new Post();
 		console.log(mediaName + mediaExt);
 		post.set('media', mediaName + '.' + mediaExt);
 		post.set('author', user);
 		post.set('event', event);
+		console.log(data.coords);
+		post.set('coords', data.coords);
+		var point = new Parse.GeoPoint({latitude: data.coords.latitude, longitude: data.coords.longitude});
+		post.set("location", point);
 		post.save().then(function(newPost) {
+			postCount++;
+			if(postCount >= postUpdate) {
+				updateEventList();
+			}
 			next();
 		}, function(e) {
 			error(e);
@@ -383,6 +402,18 @@ function savePost(data, user, event, next, error) {
 	}, function(e) {
 		error(e);
 	});
+}
+
+/*
+ * @descrip Actualiza la lista de eventos más utilizados
+ * @return null
+ */
+
+function updateEventList() {
+	var Post = Parse.Object.extend('Post');
+	var query = new Parse.Query(Post);
+	var posts = [];
+	var events = [];
 }
 
 /*
@@ -477,7 +508,15 @@ jPack.getAllPosts = function(req, next, error) {
 	var Post = Parse.Object.extend('Post');
 	var query = new Parse.Query(Post);
 	var posts = [];
-	query.descending('createdAt');
+	var events = [];
+	//query.descending('createdAt');
+	/*var now = new Date();
+	var timeAgo = new Date();
+	timeAgo.setHours(now.getHours() - 24);
+	var timeAgoStr = timeAgo.toISOString();
+	query.greaterThan("updatedAt", timeAgoStr);*/
+	var point = new Parse.GeoPoint({latitude: -16.395169612966846, longitude: -71.53515145189272});
+	query.near('location', point);
 	query.include('author');
 	query.include('event');
 	query.find().then(function(results) {
@@ -487,9 +526,30 @@ jPack.getAllPosts = function(req, next, error) {
 			posts[i].media = results[i].get('media');
 			posts[i].event = results[i].get('event').get('name');
 			posts[i].time = results[i].createdAt;
-			getFBInfo(i,crip.deco(results[i].get('author').get('username')))
-		
+			//
+			posts[i].location = {};
+			posts[i].location.latitude = results[i].get('location').latitude;
+			posts[i].location.longitude = results[i].get('location').longitude;
+			//
+			addMoment(results[i].get('event').get('name'));
+			getFBInfo(i,crip.deco(results[i].get('author').get('username')));
 		}
+
+		function addMoment(name) {
+			var index = -1;
+			for(var i in events) {
+				if(events[i].name == name) {
+					index = i;
+					break;
+				}
+			}
+			if(index >= 0) {
+				events[index].count++;
+			} else {
+				events[events.length] = {name: name, count: 1};
+			}
+		}
+
 		function getFBInfo(i, fbUserId) {
 			FB.api('/'+fbUserId+'/',  function(profile) {
 				posts[i].author = {};
@@ -504,7 +564,8 @@ jPack.getAllPosts = function(req, next, error) {
 		function triggerNext() {
 			c--;
 			if(c===0) {
-				next(posts);
+				var response = {posts: posts, events: events};
+				next(response);
 			}
 		}
 	}, function(e) {
@@ -513,17 +574,56 @@ jPack.getAllPosts = function(req, next, error) {
 }
 
 /*
- * @descrip Método para obtener todos los eventos de la DB y la asistencia del
- * usuario actual en {boolean}
+ * @descrip Método para obtener todos los eventos de la DB
  * @param {object} req, {function} next, {function} error
  * @return null
  */
 jPack.getAllEvents = function(req, next, error) {
-	var Events = Parse.Object.extend("Events");
-	var query = new Parse.Query(Events);
+	/*
+	var Event = Parse.Object.extend("Event");
+	var query = new Parse.Query(Event);
+	var events = [];
+	query.equalTo("event");
+	query.find().then(function(count) {
+		console.log(count);
+		next(count);
+	});
+*/
+/*
+	var Event = Parse.Object.extend("Event");
+	var query = new Parse.Query(Event);
 	var events = [];
 	query.descending("createdAt");
 	query.find().then(function(results) {
+		var Post = Parse.Object.extend("Post");
+		var counter = 0;
+		for(var i = 0; i < results.length; i++) {
+			events[i] = {};
+			events[i].name = results[i].get('name');
+		}
+		//getEventCount();
+		//next(events);
+		var queries = [];
+		for(var i = 0; i < events.length; i++) {
+			queries[i] = new Parse.Query(Post);
+			queries[i].equalTo("event", results[i]);
+		}
+		var mainQuery = Parse.Query.or.apply(this, queries);
+		mainQuery.find().then(function(results) {
+			for(var i = 0; i < results.length; i++) {
+				//console.log(results.length);
+			}
+			//events[i].count = count;
+			//counter++;
+			//if(counter == results.length) {
+			//	next(events);
+			//}
+			next(events);
+		}, function(e) {
+			error(e);
+		});
+		*/
+		/*
 		var jUser = new jPack.user(req.session.jUser);
 		jUser.getAttendance(function(response) {
 			var EventType = Parse.Object.extend("EventType");
@@ -567,10 +667,14 @@ jPack.getAllEvents = function(req, next, error) {
 		}, function(e) {
 			error(e);
 		});
+		*/
+
+/*		
 	}, function(e) {
 		error(e);
 	});
-
+*/
+/*
 	function getEventType(typeObject, types) {
 		var type = undefined;
 		for(var i in types) {
@@ -587,7 +691,7 @@ jPack.getAllEvents = function(req, next, error) {
 				return true;
 		}
 		return false;
-	}
+	}*/
 }
 
 jPack.agenda = function () {
@@ -598,5 +702,18 @@ jPack.stadistics = function (registeredUsers, createdEvents) {
 	this.registeredUsers = registeredUsers;
 	this.createdEvents = createdEvents;
 }
+
+/*
+ * @descrip Función para revisar la carga de la aplicación
+ */
+
+var job = new CronJob('*/30 * * * * *', function() {
+	//console.log(postCount);
+}, function () {
+	// This function is executed when the job stops
+},
+	true /* Start the job right now *//*,
+	timeZone /* Time zone of this job. */
+);
 
 module.exports = jPack;

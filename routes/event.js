@@ -13,24 +13,8 @@ var Parse = require('../parseConnect').Parse;
 
 var request = require('request');
 
-router.post('/', ensureAuthenticated, function(req, res) {
-	//Crea eventos y los alamacena en la BD de Parse
-	if(req.body!=undefined && req.body!='') {
-		req.session.jUser = new jPack.user(req.session.jUser);
-		var jUser = req.session.jUser;
-		jUser.createEvent(req, function(response) {
-			res.status(201).end();
-		}, function(error) {
-			res.status(400).end();
-			console.log(error);
-		});
-	} else {
-		res.status(400).end();
-	}
-});
-
 router.get('/', ensureAuthenticated, function(req, res) {
-	if(req.query['source']=='fb') {
+	/*if(req.query['source']=='fb') {
 		// Devuelve todos los eventos de FB del usuario
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
@@ -44,6 +28,28 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		}, function(error) {
 			res.status(400).end();
 		});
+	}*/
+	jPack.getAllEvents(req, function(result) {
+		res.json(result);
+	}, function(error) {
+		console.log(error);
+		res.status(400).end();
+	});
+});
+
+router.post('/', ensureAuthenticated, function(req, res) {
+	//Crea eventos y los alamacena en la BD de Parse
+	if(req.body!=undefined && req.body!='') {
+		req.session.jUser = new jPack.user(req.session.jUser);
+		var jUser = req.session.jUser;
+		jUser.createEvent(req, function(response) {
+			res.status(201).end();
+		}, function(error) {
+			res.status(400).end();
+			console.log(error);
+		});
+	} else {
+		res.status(400).end();
 	}
 });
 
