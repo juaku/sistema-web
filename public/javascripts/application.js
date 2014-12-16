@@ -365,4 +365,4 @@ function picChange(evt) { /* No funciona para escritorio
 		angular.element($('input#media-loader')).scope().newPost.coords = coords;
 		$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + coords.latitude + ',' + coords.longitude);
 	}
-}
+
