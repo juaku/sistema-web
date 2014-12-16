@@ -92,7 +92,7 @@ var access = require('./routes/access');
 var account = require('./routes/account');
 var login = require('./routes/login');
 var logout = require('./routes/logout');
-var events = require('./routes/events');
+var event = require('./routes/event');
 var post = require('./routes/post');
 
 var app = express();
@@ -139,7 +139,7 @@ app.locals.title = 'Juaku';
 //DEV: Restringir el uso a usuarios que no sean clientes del servidor
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
-		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128') {
+		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128' || req.ip.substring(0, 11) == '190.113.211') {
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )
@@ -154,7 +154,7 @@ app.use('/access', access);
 app.use('/account', account);
 app.use('/login', login);
 app.use('/logout', logout);
-app.use('/events', events);
+app.use('/event', event);
 app.use('/post', post);
 
 // GET /auth/facebook
