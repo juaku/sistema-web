@@ -15,8 +15,8 @@ var url = require('url');
 
 var CronJob = require('cron').CronJob;
 
-// Herramientas Geo
-var geolib = require('geolib');
+// Herramientas Geo - (Evaluar si es necesaria)
+//var geolib = require('geolib');
 
 var jPack = jPack || {};
 
