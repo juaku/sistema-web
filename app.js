@@ -94,6 +94,7 @@ var login = require('./routes/login');
 var logout = require('./routes/logout');
 var events = require('./routes/events');
 var post = require('./routes/post');
+var user = require('./routes/user');
 
 var app = express();
 
@@ -156,6 +157,7 @@ app.use('/login', login);
 app.use('/logout', logout);
 app.use('/events', events);
 app.use('/post', post);
+app.use('/user', user);
 
 // GET /auth/facebook
 //   Use passport.authenticate() como una ruta middleware para autenticar la

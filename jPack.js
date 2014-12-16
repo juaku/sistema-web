@@ -6,6 +6,9 @@ var crip = require('./crip');
 
 var FB = require('fb');
 
+// Genera hash de userId
+var crypto = require('crypto');
+
 // Guardar imagen en el servidor
 var fs = require('fs');
 
@@ -56,14 +59,20 @@ jPack.user.prototype.signUp = function(session, next, error) {
 	var user = new Parse.User();
 	user.set("username", crip.enco(this.id));
 	user.set("password", crip.enco(this.id));
-
 	var authData = {"facebook":{
 		"id": this.id,
 		"access_token": this.accessToken,
 		"expiration_date": new Date(this.expires).toISOString(),
 	}};
-
 	user.set("authData", authData);
+	//hasheando userId
+	text = this.id;
+	key = '2903724R3c3D7j5G6y4R';
+	var hash = crypto.createHmac('sha256', key);
+	hash.update(text);
+	var value = hash.digest('hex');
+	user.set("userId", value);
+	//fin hash
 	user.signUp(null, {
 		success: function(user) {
 			session.jUser.parseSessionToken = user.getSessionToken();
@@ -108,7 +117,7 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
 				path: parsed.path
 			};
 			http.get(options, function(res) {
-				res.setEncoding('binary');
+				res.setEncoding('binary');   
 				var imagedata = '';
 				res.on('data', function(chunk){
 					imagedata+= chunk; 
@@ -283,6 +292,71 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 		}, function(e) {
 			error(e);
 		});
+	});
+}
+
+/*
+ * @descrip Realiza la relación de seguidores, de acuerdo a quien quieras seguir 
+ * @param {object} peopleToFollow, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		var query = new Parse.Query(User);
+		var relation = user.relation("following");
+		var query = new Parse.Query(User);
+		text = peopleToFollow.id.toString();
+		key = '2903724R3c3D7j5G6y4R';
+		var hash = crypto.createHmac('sha256', key);
+		hash.update(text);
+		var value = hash.digest('hex');
+
+		query.equalTo("userId", value);
+		query.find().then(function(results) {
+			for (var i = 0; i < results.length; i++) {
+				relation.add(results[i]);
+			} 
+			user.save();
+		});
+	});
+}
+
+/*
+ * @descrip Obtiene los amigos de facebook que están usando juaku 
+ * @param {object} req, {function} next, {function} error.
+ * @return {array} usingIds
+ */
+jPack.user.prototype.showFriendsUsingApp = function(req, next, error) {
+	var idProfile = req.session.passport.user.id;
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		req.session.jUser.getFriendsUsingApp(req.session, function(response) {
+			if (response && !response.error) {
+				var usingIds = [];
+				for (var i = 0; i < response.length; i++) {
+					usingIds[usingIds.length] = response[i];
+				}
+			}
+			next(usingIds);
+		})
+	});
+}
+
+jPack.user.prototype.getFriendsUsingApp = function(session, next) {
+	var idProfile = session.passport.user.id;
+	var friendsUsing = [];
+	var friendCount=0;
+	FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: this.accessToken}, function(response) {
+		if (response && !response.error) {
+			for(var i = 0; i<response.data.length; i++) {
+				if(response.data[i].installed == true && response.data[i].id != idProfile) {
+					friendsUsing[friendCount] = response.data[i];
+					friendCount++;					
+				}
+			}
+			next(friendsUsing);
+		}
 	});
 }
 

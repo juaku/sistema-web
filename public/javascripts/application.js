@@ -132,6 +132,19 @@ function Application($scope, $http) {
 		};
 	});
 
+	// Obtiene los amigos de facebook que están usando juaku para luego poder elegir a quien seguir
+	$http.get('/user').success(function(data) {
+		$scope.usuario = data;
+	});
+
+	// Envía un objeto con los datos de las personas a seguir mediante un post 
+	$scope.setFollowRelation = function(newFollower) {
+		$scope.newFollower = newFollower;
+		console.log($scope.newFollower);
+		$http.post('/user', $scope.newFollower).success(function(data) {
+		}).error();
+	}
+
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
