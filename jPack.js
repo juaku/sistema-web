@@ -317,13 +317,16 @@ jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error
 		var query = new Parse.Query(User);
 		var relation = user.relation("following");
 		var query = new Parse.Query(User);
-		text = peopleToFollow.id.toString();
-		key = '2903724R3c3D7j5G6y4R';
-		var hash = crypto.createHmac('sha256', key);
-		hash.update(text);
-		var value = hash.digest('hex');
-
-		query.equalTo("userId", value);
+		var arrayPeopleToFollow = []
+		for(var i = 0; i<peopleToFollow.length; i++) {
+			text = peopleToFollow[i].id.toString();
+			key = '2903724R3c3D7j5G6y4R';
+			var hash = crypto.createHmac('sha256', key);
+			hash.update(text);
+			var value = hash.digest('hex');
+			arrayPeopleToFollow[arrayPeopleToFollow.length] = value;
+		}
+		query.containedIn("userId", arrayPeopleToFollow);
 		query.find().then(function(results) {
 			for (var i = 0; i < results.length; i++) {
 				relation.add(results[i]);

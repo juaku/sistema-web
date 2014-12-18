@@ -146,11 +146,17 @@ function Application($scope, $http) {
 	});
 
 	// Envía un objeto con los datos de las personas a seguir mediante un post 
-	$scope.setFollowRelation = function(newFollower) {
-		$scope.newFollower = newFollower;
-		console.log($scope.newFollower);
-		$http.post('/user', $scope.newFollower).success(function(data) {
+	$scope.setFollowRelation = function() {
+		$scope.newFollow = peopleToFollow;
+		console.log($scope.newFollow);
+		$http.post('/user', $scope.newFollow).success(function(data) {
 		}).error();
+	}
+
+	// Se almacena en un arreglo a las personas que deseas seguir para luego hacer la relación mediante seFollowRelation
+	var peopleToFollow = [];
+	$scope.addListToFollow = function(userToFollow) {
+		peopleToFollow[peopleToFollow.length] = userToFollow;
 	}
 
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
