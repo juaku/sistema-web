@@ -502,11 +502,10 @@ jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, e
 }
 
 
-/* @descrip Método para obtener los 15 primeros post de la BD
+/* @descrip Método para obtener los 15 primeros post de la BD y número de amigos que van a un evento
  * @param {function} next, {function} error
  * @return null
  */
-
 jPack.getAllPosts = function(req, next, error) {
 	var Post = Parse.Object.extend('Post');
 	var query = new Parse.Query(Post);
@@ -567,9 +566,90 @@ jPack.getAllPosts = function(req, next, error) {
 		function triggerNext() {
 			c--;
 			if(c===0) {
-				var response = {posts: posts, events: events};
-				next(response);
+				getNumberOfFriendsAttendingEvent();
 			}
+		}
+		function getNumberOfFriendsAttendingEvent() {
+			var attendingEvents = [];
+			var arrayOfUserIds = [];
+			Parse.User.become(this.parseSessionToken).then(function (user) {
+				var User = Parse.Object.extend("User");
+				var userQuery = new Parse.Query(User);
+
+				userQuery.notEqualTo("objectId", user.id);
+				var Post = Parse.Object.extend("Post");
+				var postQuery = new Parse.Query(Post);
+				postQuery.include("author");
+				postQuery.include("event");
+
+				postQuery.matchesQuery('author', userQuery);
+				postQuery.find().then(function(results) {
+					var c = results.length;
+					for(var i in results) {
+						attendingEvents[i] = {};
+						var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
+						arrayOfUserIds[i] = results[i].get('author').get('userId');
+						if(!aux) {
+							triggerNext();
+						}
+					}
+
+					function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
+						var index = -1;
+						for(var j in attendingEvents) {
+							if(attendingEvents[j].name == name) {
+								index = j;
+								break;
+							}
+						}
+						if(index >= 0) {
+							var flag = 0;
+							var currentAuthor = results[i].get('author').get('userId');
+							for(var k=0; k<=attendingEvents.length; k++) {
+								if(currentAuthor == arrayOfUserIds[k]) { 
+									return 0;
+								} else {
+									attendingEvents[index].count++;
+									FB.api('/'+fbUserId+'/',  function(profile) {
+										var n = 1;
+										var aux = 1;
+										do {
+											if(attendingEvents[index].going[n] != "") {
+												attendingEvents[index].going[n] = {};
+												attendingEvents[index].going[n].userId = userId;
+												attendingEvents[index].going[n].firstName = profile.first_name;
+												attendingEvents[index].going[n].lastName = profile.last_name;
+												triggerNext();
+												aux = 0;
+											}
+											n++;
+										} while(aux);
+									});
+									return 1;
+								}
+							}
+						} else {
+							attendingEvents[i] = {name: name, count: 1};
+							FB.api('/'+fbUserId+'/',  function(profile) {
+								attendingEvents[i].going = [];
+								attendingEvents[i].going[0] = {};
+								attendingEvents[i].going[0].userId = userId;
+								attendingEvents[i].going[0].firstName = profile.first_name;
+								attendingEvents[i].going[0].lastName = profile.last_name;
+								triggerNext();
+							});
+							return 1;
+						}
+					}
+					function triggerNext() {
+						c--;
+						if(c===0) {
+							var response = {posts: posts, events: events, attendingEvents: attendingEvents};
+							next(response);
+						}
+					}
+				});
+			});
 		}
 	}, function(e) {
 		error(e);
