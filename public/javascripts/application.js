@@ -165,6 +165,7 @@ function Application($scope, $http) {
 	$http.get('/post').success(function(data) {
 		$scope.posts = data.posts;
 		$scope.events = data.events;
+		$scope.attendingEvents = data.attendingEvents;
 		for (var i = 0; i < $scope.posts.length; i++) {
 			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
