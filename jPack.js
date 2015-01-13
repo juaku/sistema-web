@@ -308,7 +308,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 
 /*
  * @descrip Realiza la relación de seguidores, de acuerdo a quien quieras seguir 
- * @param {object} peopleToFollow, {function} next, {function} error.
+ * @param {array of objects} peopleToFollow, {function} next, {function} error.
  * @return null
  */
 jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error) {
@@ -697,6 +697,8 @@ jPack.getAllEvents = function(req, next, error) {
 	}*/
 }
 
+
+// TODO: Evaluar remoción
 jPack.agenda = function () {
 
 }

@@ -118,9 +118,40 @@ if($('html').attr('lang') == 'es') {
 function Application($scope, $http) {
 
 	/*
-	 * Post
+	 * User
 	 */
 
+	$scope.user = {};
+
+	$scope.user.data = {};
+	$scope.user.peopleToFollow = [];
+
+	getGeo( function() {
+	}, function(errorMsg) {
+		console.log(errorMsg);
+	});
+
+	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
+	$http.get('/user').success(function(data) {
+		$scope.user.fbFriends = data;
+	});
+
+	// Envía un objeto con los datos de las personas a seguir mediante un post 
+	$scope.setFollowRelation = function() {
+		$scope.user.peopleToFollow = peopleToFollow;
+		$http.post('/user', $scope.user).success(function(data) {
+		}).error();
+	}
+
+	// Se almacena en un arreglo a las personas que deseas seguir para luego hacer la relación mediante seFollowRelation
+	var peopleToFollow = [];
+	$scope.addListToFollow = function(userToFollow) {
+		peopleToFollow[peopleToFollow.length] = userToFollow;
+	}
+
+	/*
+	 * Post
+	 */
 	$scope.newPost = {};
 
 	$scope.posts = [];
@@ -140,25 +171,6 @@ function Application($scope, $http) {
 		};
 	});
 
-	// Obtiene los amigos de facebook que están usando juaku para luego poder elegir a quien seguir
-	$http.get('/user').success(function(data) {
-		$scope.usuario = data;
-	});
-
-	// Envía un objeto con los datos de las personas a seguir mediante un post 
-	$scope.setFollowRelation = function() {
-		$scope.newFollow = peopleToFollow;
-		console.log($scope.newFollow);
-		$http.post('/user', $scope.newFollow).success(function(data) {
-		}).error();
-	}
-
-	// Se almacena en un arreglo a las personas que deseas seguir para luego hacer la relación mediante seFollowRelation
-	var peopleToFollow = [];
-	$scope.addListToFollow = function(userToFollow) {
-		peopleToFollow[peopleToFollow.length] = userToFollow;
-	}
-
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
@@ -175,7 +187,6 @@ function Application($scope, $http) {
 		}).success(function(data) {
 		}).error();
 	*/
-		console.log($scope.newPost);
 		$http.post('/post', $scope.newPost).success(function(data) {
 		}).error();
 	}
@@ -199,6 +210,137 @@ function Application($scope, $http) {
 		return timeElapsed;
 	}
 
+	$scope.picChange = function(evt) { /* No funciona para escritorio
+		var fileInput = evt.target.files;
+		if(fileInput.length>0){
+			var windowURL = window.URL || window.webkitURL;
+			var picURL = windowURL.createObjectURL(fileInput[0]);
+			console.log(picURL);
+			var photoCanvas = document.getElementById("capturedPhoto");
+			var ctx = photoCanvas.getContext("2d");
+			var photo = new Image();
+			photo.onload = function(){
+				//draw photo into canvas when ready
+				ctx.drawImage(photo, 0, 0, 500, 500);
+			};
+			photo.src = picURL;
+			windowURL.revokeObjectURL(picURL);
+		}*/
+
+
+		var canvas = document.getElementById('new-media-preview');
+		var ctx = canvas.getContext('2d');
+
+		EXIF.getData(evt.target.files[0], function() {
+			//console.log(EXIF.pretty(this));
+			var orientation = this.exifdata.Orientation;
+			var reader = new FileReader();
+			reader.onload = function(event) {
+				var img = new Image();
+				img.onload = function() {
+					var nTam = 1000;
+					canvas.width = nTam;
+					canvas.height = nTam;
+					var nWidth = nTam;
+					var nHeight = nTam;
+					var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
+					if(img.width > img.height) {
+						nWidth = img.width * nTam / img.height;
+					} else if(img.width < img.height) {
+						nHeight = img.height * nTam / img.width;
+						variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
+					}
+
+					switch(orientation) {
+						case 3:
+							variation = {a: 180, desX: -1, desY: -1, cntX: 1, cntY: 0, swt:false};
+							break;
+						case 6:
+							variation = {a: 90, desX: 0, desY: -1, cntX: -1, cntY: 0, swt:true};
+							break;
+						case 8:
+							variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
+							break;
+					}
+					
+					variation.width = nWidth;
+					variation.height = nHeight;
+					if(variation.swt) {
+						variation.width = nHeight;
+						variation.height = nWidth;
+					}
+					var cntVar = 0;
+					if (variation.width > nTam) {
+						cntVar = parseInt((variation.width - nTam)/2);
+					} 
+					if (variation.height > nTam) {
+						cntVar = parseInt((variation.height - nTam)/2);
+					}
+					var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
+					var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
+					ctx.rotate(variation.a*Math.PI/180);
+					ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+					var newImg = canvas.toDataURL( 'image/jpeg' , 0.7 );
+					//document.write('<img src=' + newImg + '></img>');
+					//angular.element($('input#media-loader')).scope().newPost.media = newImg;
+
+					getGeo( function() {
+						$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newPost.coords.latitude + ',' + $scope.newPost.coords.longitude);
+					}, function(errorMsg) {
+						console.log(errorMsg);
+					});
+
+					$scope.newPost.media = newImg;
+				}
+				img.src = event.target.result;
+			}
+			reader.readAsDataURL(evt.target.files[0]);
+		});
+	}
+
+	/*
+	 * Geo
+	 */
+	function getGeo(next, error) {
+		if (navigator.geolocation) {
+			var position = 0;
+			navigator.geolocation.getCurrentPosition(function(position) {
+				var coords = {};
+				coords.accuracy = position.coords.accuracy;
+				coords.altitude = position.coords.altitude;
+				coords.altitudeAccuracy = position.coords.altitudeAccuracy;
+				coords.heading = position.coords.heading;
+				coords.latitude = position.coords.latitude;
+				coords.longitude = position.coords.longitude;
+				coords.speed = position.coords.speed;
+				//angular.element($('input#media-loader')).scope().newPost.coords = coords;
+				$scope.user.data.coords = coords;
+				$scope.newPost.coords = coords;
+				next(); 
+			}, function(errorObj) {
+				var errorMsg = "";
+				switch(errorObj.code) {
+					case errorObj.PERMISSION_DENIED:
+						errorMsg = "User denied the request for Geolocation."
+						break;
+					case errorObj.POSITION_UNAVAILABLE:
+						errorMsg = "Location information is unavailable."
+						break;
+					case errorObj.TIMEOUT:
+						errorMsg = "The request to get user location timed out."
+						break;
+					case errorObj.UNKNOWN_ERROR:
+						errorMsg = "An unknown error occurred."
+						break;
+				}
+				error(errorMsg);
+			});
+		} else {
+			error("Geolocation is not supported by this browser.");
+		}
+	}
+
+	// TODO: Evaluar remoción
 	/*
 	 * Events
 	 */
@@ -214,7 +356,8 @@ function Application($scope, $http) {
 			$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 		};*/
 	/*});*/
-}
+
+} // Fin Controlador - function Application($scope, $http)
 
 // Directivas
 angular.module('Juaku', [])
@@ -241,134 +384,3 @@ function reduceString(str) {
 	}
 	return newString;
 }
-
-function picChange(evt) { /* No funciona para escritorio
-	var fileInput = evt.target.files;
-	if(fileInput.length>0){
-		var windowURL = window.URL || window.webkitURL;
-		var picURL = windowURL.createObjectURL(fileInput[0]);
-		console.log(picURL);
-		var photoCanvas = document.getElementById("capturedPhoto");
-		var ctx = photoCanvas.getContext("2d");
-		var photo = new Image();
-		photo.onload = function(){
-			//draw photo into canvas when ready
-			ctx.drawImage(photo, 0, 0, 500, 500);
-		};
-		photo.src = picURL;
-		windowURL.revokeObjectURL(picURL);
-	}*/
-
-	getGeo();
-
-	var canvas = document.getElementById('new-media-preview');
-	var ctx = canvas.getContext('2d');
-
-	EXIF.getData(evt.target.files[0], function() {
-		//console.log(EXIF.pretty(this));
-		var orientation = this.exifdata.Orientation;
-		drawPreview(orientation);
-	});
-
-	function drawPreview(orientation) {
-		var reader = new FileReader();
-		reader.onload = function(event) {
-			var img = new Image();
-			img.onload = function() {
-				var nTam = 1000;
-				canvas.width = nTam;
-				canvas.height = nTam;
-				var nWidth = nTam;
-				var nHeight = nTam;
-				var variation;
-				if(img.width > img.height) {
-					nWidth = img.width * nTam / img.height;
-					variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
-				} else if(img.width < img.height) {
-					nHeight = img.height * nTam / img.width;
-					variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
-				}
-
-				switch(orientation) {
-					case 3:
-						variation = {a: 180, desX: -1, desY: -1, cntX: 1, cntY: 0, swt:false};
-						break;
-					case 6:
-						variation = {a: 90, desX: 0, desY: -1, cntX: -1, cntY: 0, swt:true};
-						break;
-					case 8:
-						variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
-						break;
-				}
-				
-				variation.width = nWidth;
-				variation.height = nHeight;
-				if(variation.swt) {
-					variation.width = nHeight;
-					variation.height = nWidth;
-				}
-				var cntVar = 0;
-				if (variation.width > nTam) {
-					cntVar = parseInt((variation.width - nTam)/2);
-				} 
-				if (variation.height > nTam) {
-					cntVar = parseInt((variation.height - nTam)/2);
-				}
-				var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
-				var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
-				ctx.rotate(variation.a*Math.PI/180);
-				ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
-				var newImg = canvas.toDataURL( 'image/jpeg' , 0.7 );
-				//document.write('<img src=' + newImg + '></img>');
-				angular.element($('input#media-loader')).scope().newPost.media = newImg;
-			}
-			img.src = event.target.result;
-		}
-		reader.readAsDataURL(evt.target.files[0]);
-	}
-}
-
-	function getGeo() {
-		if (navigator.geolocation) {
-			navigator.geolocation.getCurrentPosition(getPosition, getGeoError);
-		} else {
-			showGeoError("Geolocation is not supported by this browser.");
-		}
-	}
-
-	function getGeoError(error) {
-		var errorMsg = "";
-		switch(error.code) {
-			case error.PERMISSION_DENIED:
-				errorMsg = "User denied the request for Geolocation."
-				break;
-			case error.POSITION_UNAVAILABLE:
-				errorMsg = "Location information is unavailable."
-				break;
-			case error.TIMEOUT:
-				errorMsg = "The request to get user location timed out."
-				break;
-			case error.UNKNOWN_ERROR:
-				errorMsg = "An unknown error occurred."
-				break;
-		}
-		showGeoError(errorMsg);
-	}
-
-	function showGeoError(errorMsg) {
-		console.log(errorMsg);
-	}
-
-	function getPosition(position) {
-		var coords = {};
-		coords.accuracy = position.coords.accuracy;
-		coords.altitude = position.coords.altitude;
-		coords.altitudeAccuracy = position.coords.altitudeAccuracy;
-		coords.heading = position.coords.heading;
-		coords.latitude = position.coords.latitude;
-		coords.longitude = position.coords.longitude;
-		coords.speed = position.coords.speed;
-		angular.element($('input#media-loader')).scope().newPost.coords = coords;
-		$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + coords.latitude + ',' + coords.longitude);
-	}
-
