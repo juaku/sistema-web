@@ -20,7 +20,7 @@ router.post('/', ensureAuthenticated, function(req, res) {
 	if(req.body!=undefined && req.body!='') {
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
-		jUser.setNewFollowRelation(req.body, function() {
+		jUser.setGenericData(req, function() {
 			res.status(201).end();
 		}, function(error) {
 			res.status(400).end();

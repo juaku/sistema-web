@@ -375,6 +375,17 @@ jPack.user.prototype.getFriendsUsingApp = function(session, next) {
 }
 
 /*
+ * @descrip Establece la información de genérica del usuario.
+ * @par {obj} data, {function} next, {function} error.
+ * @return null
+ */ 
+jPack.user.prototype.setGenericData = function(req, next, error) {
+	this.coords = req.body.data.coords;
+	req.session.jUser.coords = this.coords
+	next();
+}
+
+/*
  * @descrip Guarda el post y establece las relaciones
  * @par {string} data, {object} user, {object} event, {function} next, {function} error.
  * @return null
@@ -517,13 +528,34 @@ jPack.getAllPosts = function(req, next, error) {
 	timeAgo.setHours(now.getHours() - 24);
 	var timeAgoStr = timeAgo.toISOString();
 	query.greaterThan("updatedAt", timeAgoStr);*/
-	var point = new Parse.GeoPoint({latitude: -16.395169612966846, longitude: -71.53515145189272});
-	query.near('location', point);
+	var point = {};
+	if(req.session.jUser.coords != undefined) {
+		point.latitude = req.session.jUser.coords.latitude;
+		point.longitude = req.session.jUser.coords.longitude;
+	} else { // Arequipa
+		point.latitude = -16.3989; 
+		point.longitude = -71.535;
+	}
+	var userGeoPoint = new Parse.GeoPoint({latitude: point.latitude, longitude: point.longitude});
+	query.near('location', userGeoPoint);
+
+	/*var nowDate = new Date();
+	var queryDate = new Date(nowDate - 1000 * 60 * 60 * 24 * 7);
+	query.greaterThan("createdAt", queryDate);*/
+	
 	query.include('author');
 	query.include('event');
+	var queryLimit = 20;
+	var queryNumber = req.params.postQueryCount!=undefined?req.params.postQueryCount:0;
+	query.limit(queryLimit);
+	query.skip(queryLimit * queryNumber);
 	query.find().then(function(results) {
+		if(results.length == 0) {
+			next(results);
+		}
 		var c = results.length;
 		for(var i in results) {
+			console.log(results[i].get('media'));
 			posts[i] = {};
 			posts[i].media = results[i].get('media');
 			posts[i].event = results[i].get('event').get('name');
@@ -566,7 +598,9 @@ jPack.getAllPosts = function(req, next, error) {
 		function triggerNext() {
 			c--;
 			if(c===0) {
-				getNumberOfFriendsAttendingEvent();
+				//getNumberOfFriendsAttendingEvent();
+				var response = {posts: posts, events: events};//, attendingEvents: attendingEvents};
+				next(response);
 			}
 		}
 		function getNumberOfFriendsAttendingEvent() {

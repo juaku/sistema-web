@@ -91,12 +91,15 @@ $(document).ready(function() {
 		$('body').addClass('float-view');
 	});
 	$(window).on('load resize', function() {
-		$('#main-controls').width($('section#view #view-wrapper').width());
-		resizePostTitle();
+		resizeTask();
 	});
+	setInterval(function() {
+		$("#post-list div.media").toggleClass('animate');
+	}, 500);
 });
 
-function resizePostTitle() {
+function resizeTask() {
+	$('#main-controls').width($('section#view #view-wrapper').width());
 	$('#post-list .post-detail .post-title').width(0);
 	$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
 }
@@ -126,10 +129,93 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	$scope.user.peopleToFollow = [];
 
-	getGeo( function() {
+
+	getGeo(function() {
+		$http.post('/user', $scope.user).success(function(data) {
+			getPosts();
+		}).error();
 	}, function(errorMsg) {
+			getPosts();
 		console.log(errorMsg);
 	});
+
+	$(window).scroll(function() {
+		if($(window).scrollTop() + $(window).height() > $(document).height() - $(window).height()*2) {
+			getPosts();
+		}
+	});
+
+	var gettingPosts = false;
+	var firstPostsLoad = true;
+	var postQueryCount = 0;
+	var postLoadStep = 5;
+	var postShown = 0;
+	var tmpLoadingPostsNumber;
+	var tmpPosts = [];
+	$scope.posts = [];
+
+	createEmptyPosts(5);
+
+	// Cargar los post originales
+	function getPosts() {
+		if(!gettingPosts) {
+			gettingPosts = true;
+			var tmpPostsNumber = tmpPosts.length;
+			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
+				postsQuery(function(data) {
+					for (var i = 0; i < data.length; i++) {
+						tmpPosts[i + tmpPostsNumber] = data[i];
+					};
+					showPosts();
+				}, function() {
+				});
+			} else {
+				$scope.$apply(function() {
+					showPosts();
+				});
+			}
+		}
+	}
+
+	function postsQuery(next, error) {
+		$http.get('/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data) {
+			if(data.posts != undefined) {
+				postQueryCount++;
+				$scope.events = data.events;
+				next(data.posts);
+			} else {
+				error();
+			}
+		}).error(function(e) {
+			error(e);
+		});
+	}
+
+	function showPosts() {
+		var numberPostsNow = $scope.posts.length - tmpLoadingPostsNumber;
+		postShown += postLoadStep;
+		//console.log(numberPostsNow + "-" + postShown + " " + (tmpPosts.length-postShown));
+		//TODO: No se mostrá los n>5 últimos posts.
+		for(var i = numberPostsNow; i < postShown; i++) {
+			$scope.posts[i] = tmpPosts[i];
+			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
+			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+		}
+		createEmptyPosts(1);
+		console.log($scope.posts.length);
+		gettingPosts = false;
+	}
+
+	// Crear n post vacios mientras carga los post originales
+	function createEmptyPosts(numTmpPost) {
+		tmpLoadingPostsNumber = numTmpPost;
+		var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+		var lastPostPosition = $scope.posts.length;
+		for (var i = 0; i < numTmpPost; i++) {
+			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif}};
+		};
+		//console.log($scope.posts.length + ',' + tmpPosts.length);
+	}
 
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
 	$http.get('/user').success(function(data) {
@@ -153,24 +239,6 @@ function Application($scope, $http) {
 	 * Post
 	 */
 	$scope.newPost = {};
-
-	$scope.posts = [];
-	// Crear 5 post vacios mientras carga los post originales
-	var numTmpPost = 5;
-	var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
-	for (var i = 0; i < numTmpPost; i++) {
-		$scope.posts[i] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif}};
-	};
-	// Cargar los post originales
-	$http.get('/post').success(function(data) {
-		$scope.posts = data.posts;
-		$scope.events = data.events;
-		$scope.attendingEvents = data.attendingEvents;
-		for (var i = 0; i < $scope.posts.length; i++) {
-			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
-			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
-		};
-	});
 
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
@@ -239,7 +307,7 @@ function Application($scope, $http) {
 			reader.onload = function(event) {
 				var img = new Image();
 				img.onload = function() {
-					var nTam = 1000;
+					var nTam = 640;
 					canvas.width = nTam;
 					canvas.height = nTam;
 					var nWidth = nTam;
@@ -281,8 +349,9 @@ function Application($scope, $http) {
 					var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
 					ctx.rotate(variation.a*Math.PI/180);
 					ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
-					var newImg = canvas.toDataURL( 'image/jpeg' , 0.7 );
-					//document.write('<img src=' + newImg + '></img>');
+					var imgQuality = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?0.5:0.75;
+					var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
+					//document.write('<img src=' + canvas.toDataURL( 'image/jpeg' , 0.7 ) + '></img>');
 					//angular.element($('input#media-loader')).scope().newPost.media = newImg;
 
 					getGeo( function() {
@@ -362,19 +431,34 @@ function Application($scope, $http) {
 
 // Directivas
 angular.module('Juaku', [])
-.directive('evalTamEventPost', function() {
-return function(scope, element, attrs) {
-	if (scope.$last) {
-		postsLoaded();
-	}
-};
+.directive('lastPostLoaded', function($timeout) { // Detectar la última carga de Posts
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			if(scope.$last) {
+				$timeout(function() {
+					postsLoaded();
+				});
+			}
+		}
+	};
+})
+.directive('imageOnLoad', function() { // Aparecer las imagenes cuando carguen
+	return {
+		restrict: 'A',
+		link: function(scope, element, attrs) {
+			element.bind('load', function() {
+				$(element).css('opacity', 1);
+			});
+		}
+	};
 });
 
 function postsLoaded() {
 	$('.like-svg').on('click', function() {
 		$(this).parent().toggleClass('selected');
 	});
-	resizePostTitle();
+	resizeTask();
 }
 
 function reduceString(str) {

@@ -1,5 +1,11 @@
 extends layout
 
+block head
+    script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js")
+    script(src="/socket.io/socket.io.js")
+    script(src="/javascripts/exif.js")
+    script(src="/javascripts/application.js")
+
 block content
   header
     #title
@@ -22,7 +28,7 @@ block content
       section#view-wrapper
         section#new-post
           //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
-          input(type="file" id="media-loader" accept="image/*" onchange="picChange(event)")
+          input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
           canvas(id="new-media-preview")
           #recomendedEvents
             ul
@@ -38,11 +44,11 @@ block content
           #send-post(ng-click="send()")
         section#view-controls
         section#post-list
-          .post(ng-repeat="post in posts")
+          .post(ng-repeat="post in posts" last-post-loaded)
             .media
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
-              img(ng-src='{{ post.media }}').media
-              img(ng-src='http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x200&markers=color:red|{{ post.location.latitude }},{{ post.location.longitude }}')
+              img(ng-src='{{ post.media }}' image-on-load).media
+              //img(ng-src='http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x200&markers=color:red|{{ post.location.latitude }},{{ post.location.longitude }}')
             .bottom
               .info
                 .info-wrapper
@@ -53,7 +59,7 @@ block content
                       span.author-name
                         span.author-firstName {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      span.event-posted(ng-if="post.event" eval-tam-event-post)
+                      span.event-posted(ng-if="post.event")
                         span.at-simbol @
                         span.event-name {{ post.event }}
                     .sub-info
@@ -66,8 +72,7 @@ block content
               .like
                 object
                   svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-                    polygon(fill="#FFFFFF" points="7.5,28.7 7.5,17 17.5,11.3 25,15.6 32.5,11.3 42.5,17 42.5,28.7 25,38.7 ")#border
-                    polygon(fill="#BBBBBB" points="9.5,27.5 9.5,18.2 17.5,13.6 25,17.9 32.5,13.6 40.5,18.2 40.5,27.5 25,36.4 ")#inner
+                    path(fill="#CCC" d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
     aside#second
       section#events-side
         section#events-controls
@@ -78,12 +83,11 @@ block content
             .event.promoted-event
               .event-name.promoted-event-name @Aura
               .event-people.promoted-event-people 1280 #{__('people')}
-            .event.promoted-event
-              .event-name.promoted-event-name @Aura
-              .event-people.promoted-event-people 1280 #{__('people')}
           .events-list
-            .event(ng-repeat="event in events")
-              .event-name @{{ event.name }}
+            .event(ng-repeat="event in events | limitTo: 7")
+              .event-name
+                span.at-simbol @
+                span.event-name {{ event.name }}
               .event-people {{ event.count }} #{__('people')}
           .show-more #{__('Show more')}
         footer 

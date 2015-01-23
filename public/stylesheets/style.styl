@@ -84,13 +84,13 @@ header
 	position: fixed
 	z-index: 10
 	top: 0
-	box-shadow: 0 3px 0 rgba(0,0,0,0.05)
+	box-shadow: 0 2px 0 rgba(0,0,0,0.05) // NEWLOGO
 
 header #title a
 	background-image: url('/images/sprite.png?v=1005')
 	background-repeat: no-repeat
-	background-size: 105px
-	width: 105px
+	background-size: 110px
+	width: 110px
 	height: 45px
 	display: block
 	margin: 0 auto
@@ -185,34 +185,40 @@ section#people-controls section#friends .friend:before
  * Vista
  */
 section#view
-	background-color: rgba(255, 255, 255, 0.5)
+	background-color: rgba(255, 255, 255, 0) // NEWLOGO
 	padding-bottom: 50px
-	outline: #FFF solid 1px
+	//outline: #FFF solid 1px // NEWLOGO
 	max-width: 530px
 	height: 100%
 
 section#view #view-wrapper
-	padding: 15px
+	padding: 10px 0 // NEWLOGO
 
 section#view section#post-list .post
-	margin-bottom: 25px
-	box-shadow: 0 0 10px rgba(0,0,0,0.1)
+	margin-bottom: 15px // NEWLOGO
+	box-shadow: 0 0 10px rgba(0,0,0,0.05)
 	position: relative
 
-section#view section#post-list .post .media
+section#view section#post-list .post div.media
 	font-size: 0
 	position: relative // Muestra espacio de img
+	background-color: rgba(255,255,255,0.3)
+	transition: background-color 500ms
 
-section#view section#post-list .post .media img
+section#view section#post-list .post div.animate
+	background-color: rgba(255,255,255,1)
+
+section#view section#post-list .post div.media img
 	width: 100%
-	max-width: 500px
-	max-height: 500px // Error: Si es que IMG no es cuadrada por algún motivo.
-	background-color: #CCC
+	//max-width: 500px // NEWLOGO
+	//max-height: 500px // Error: Si es que IMG no es cuadrada por algún motivo. // NEWLOGO
 
-section#view section#post-list .post .media img.media // Muestra espacio de img
+section#view section#post-list .post div.media img.media // Muestra espacio de img
 	position: absolute
 	top: 0
 	left: 0
+	opacity: 0
+	transition: opacity 1000ms
 
 section#view section#post-list .post .bottom
 	background-color: #FFF
@@ -227,15 +233,15 @@ section#view section#post-list .post .bottom .info
 	vertical-align: top
 	
 section#view section#post-list .post .bottom .info .info-wrapper
-	padding: 10px
+	padding: 5px
 	padding-right: 5px
 
 section#view section#post-list .post:after 
 	content: ''
-	width: 95%
-	margin: 0 2.5%
-	background-color: rgba(0,0,0,0.1)
-	height: 3px
+	width: 97% // NEWLOGO
+	margin: 0 1.5% // NEWLOGO
+	background-color: rgba(0,0,0,0.05)  // NEWLOGO
+	height: 2px // NEWLOGO
 	position: absolute
 	z-index: -1
 
@@ -249,8 +255,8 @@ section#view section#post-list .post .bottom .post-detail
 //	width: 35px 
 
 section#view section#post-list .post .bottom .author-img img
-	width: 30px
-	height: 30px
+	width: 40px
+	height: 40px
 	margin-right: 5px
 	background-color: #EEE
 
@@ -295,12 +301,14 @@ section#view section#post-list .post .bottom .post-detail .sub:first-letter
 */
 
 section#view section#post-list .post .bottom .post-detail .post-title
-	font-size: 14px
+	font-size: 16px
+	color: #333
 	width: 0
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
-	line-height: 16px
+	line-height: 20px
+	//margin-top: 2px
 	
 //section#view section#post-list .post .bottom .post-detail .post-title .author-name
 //	display: inline-block
@@ -309,19 +317,20 @@ section#view section#post-list .post .bottom .post-detail .post-title .author-na
 	display: none
 
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted
-	font-family: Tahoma, sans-serif
+	//font-family: Tahoma, Arial, sans-serif
 	//display: inline-block
-	color: #777
+	color: #F05
 	max-width: 70%
-	font-size: 14px
+	//letter-spacing: -0.5px
 
-//section#view section#post-list .post .bottom .post-detail .post-title .event-posted .at-simbol
-//	margin-left: 1px
+section#view section#post-list .post .bottom .post-detail .post-title .event-posted .at-simbol
+	font-family: Verdana, Arial, sans-serif
+	letter-spacing: -1px
 	
 section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 11px
-	color: #CCC
-	margin-top: 1px
+	color: #999
+	//margin-top: 3px
 
 section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter
 	text-transform: uppercase
@@ -336,13 +345,13 @@ section#view section#post-list .post .bottom .post-detail .sub-info .separator
 section#view section#post-list .post .bottom .post-detail .sub-info .friends
 	display: inline-block
 
-section#view section#post-list .post .bottom .like object
+section#view section#post-list .post .bottom .like object // Para que no se corte el texto
 	width: 50px
 	height: 50px
 
 section#view section#post-list .post .bottom .like
-	width: 50px
-	height: 50px
+	width: 50px // Firefox
+	//height: 50px
 	background-color: #FAFAFA
 	border-left: 1px solid #EEE
 	display: table-cell
@@ -355,7 +364,7 @@ section#view section#post-list .post .bottom .like .like-svg
 	cursor: pointer
 
 section#view section#post-list .post .bottom .like .selected .like-svg #inner
-	fill: #CC0055
+	fill: #F05
 
 /*
  * Eventos
@@ -392,14 +401,18 @@ aside section#events-controls .promoted .promoted-title
 	text-transform: uppercase
 
 aside section#events-controls .event
-	margin: 10px 0
+	margin: 5px 0
 
 aside section#events-controls .event .event-name
-	font-family: Tahoma, sans-serif
-	font-size: 16px
+	//font-family: Tahoma, Arial, sans-serif
+	font-size: 15px
+	color: #F05
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
+
+aside section#events-controls .event .event-name .at-simbol
+	font-family: Verdana, Arial, sans-serif
 
 aside section#events-controls .event .event-name.small
 	font-size: 14px
@@ -424,7 +437,8 @@ aside section#events-controls .show-more
  * Controles flotantes
  */
 section#float-controls
-	background-color: #333
+	background-color: #707077
+	transition: background-color 250ms linear
 	width: 100%
 	height: 32px
 	color: rgba(255,255,255,0.9)
@@ -462,7 +476,7 @@ section#float-controls #main-controls .button.control-switch .knob
 
 section#float-controls #main-controls #camera
 #send-post
-	background: #000
+	background: rgba(0,0,0,0.3)
 	width: 30px
 	height: 30px
 	display: inline-block
@@ -527,25 +541,33 @@ footer #brand
 	section#view
 		display: block
 		margin: 0 auto
+	
+	section#view #view-wrapper // NEWLOGO
+		padding: 0 
+	
+	section#float-controls
+		background-color: #30303A
 
 @media (max-width: 329px)
 	main
 		padding-top: 45px
 
 	header #title a
-		background-size: 80px
-		width: 80px
+		background-size: 85px
+		width: 85px
 		height: 35px
 
-	section#view section#post-list .post
-		margin-bottom: 15px
+	/*section#view section#post-list .post // NEWLOGO
+		margin-bottom: 15px*/
 
 	section#view #view-wrapper
-		padding: 10px
+		padding: 0 // NEWLOGO
 
-	section#view section#post-list .post .bottom .post-detail .post-title .author-name
-	section#view section#post-list .post .bottom .post-detail .post-title .event-name
-		font-size: 14px
+	section#view section#post-list .post .bottom .post-detail .post-title
+		//font-size: 16px
+		letter-spacing: -0.5px
+	
+	section#view section#post-list .post .bottom .post-detail .sub-info
 		letter-spacing: -0.5px
 
 /*

@@ -11,10 +11,15 @@ var Parse = require('../parseConnect').Parse;
 
 var request = require('request');
 
-router.get('/', ensureAuthenticated, function(req, res) {
+router.get('/:postQueryCount?', ensureAuthenticated, function(req, res) {
 	jPack.getAllPosts(req, function(result) {
-		res.json(result);
+		if(result.length == 0) {
+			res.status(204).end();
+		} else {
+			res.json(result);
+		}
 	}, function(error) {
+		console.log(error);
 		res.status(400).end();
 	});
 });
@@ -28,8 +33,8 @@ router.post('/', ensureAuthenticated, function(req, res) {
 		jUser.newPost(req.body, function() {
 			res.status(201).end();
 		}, function(error) {
-			res.status(400).end();
 			console.log(error);
+			res.status(400).end();
 		});
 	}
 });
