@@ -455,10 +455,11 @@ angular.module('Juaku', [])
 });
 
 function postsLoaded() {
+	resizeTask();
+	$('.like-svg').off();
 	$('.like-svg').on('click', function() {
 		$(this).parent().toggleClass('selected');
 	});
-	resizeTask();
 }
 
 function reduceString(str) {

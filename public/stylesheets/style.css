@@ -222,11 +222,11 @@ section#view section#post-list .post div.media img.media {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
-  -webkit-transition: opacity 1000ms;
-  -moz-transition: opacity 1000ms;
-  -o-transition: opacity 1000ms;
-  -ms-transition: opacity 1000ms;
-  transition: opacity 1000ms;
+  -webkit-transition: opacity 500ms;
+  -moz-transition: opacity 500ms;
+  -o-transition: opacity 500ms;
+  -ms-transition: opacity 500ms;
+  transition: opacity 500ms;
 }
 section#view section#post-list .post .bottom {
   background-color: #fff;
