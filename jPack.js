@@ -332,6 +332,7 @@ jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error
 				relation.add(results[i]);
 			} 
 			user.save();
+			next();
 		});
 	});
 }
@@ -342,7 +343,7 @@ jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error
  * @return {array} usingIds
  */
 jPack.user.prototype.showFriendsUsingApp = function(req, next, error) {
-	var idProfile = req.session.passport.user.id;
+	//var idProfile = req.session.passport.user.id;
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
 		req.session.jUser.getFriendsUsingApp(req.session, function(response) {
@@ -381,8 +382,11 @@ jPack.user.prototype.getFriendsUsingApp = function(session, next) {
  */ 
 jPack.user.prototype.setGenericData = function(req, next, error) {
 	this.coords = req.body.data.coords;
-	req.session.jUser.coords = this.coords
-	next();
+	req.session.jUser.coords = this.coords;
+	this.setNewFollowRelation(req.body.peopleToFollow, function(){
+		next();
+	},function(){
+	});
 }
 
 /*
@@ -518,16 +522,11 @@ jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, e
  * @return null
  */
 jPack.getAllPosts = function(req, next, error) {
-	var Post = Parse.Object.extend('Post');
-	var query = new Parse.Query(Post);
 	var posts = [];
 	var events = [];
-	//query.descending('createdAt');
-	/*var now = new Date();
-	var timeAgo = new Date();
-	timeAgo.setHours(now.getHours() - 24);
-	var timeAgoStr = timeAgo.toISOString();
-	query.greaterThan("updatedAt", timeAgoStr);*/
+	
+	var Post = Parse.Object.extend('Post');
+	
 	var point = {};
 	if(req.session.jUser.coords != undefined) {
 		point.latitude = req.session.jUser.coords.latitude;
@@ -537,157 +536,214 @@ jPack.getAllPosts = function(req, next, error) {
 		point.longitude = -71.535;
 	}
 	var userGeoPoint = new Parse.GeoPoint({latitude: point.latitude, longitude: point.longitude});
-	query.near('location', userGeoPoint);
 
-	/*var nowDate = new Date();
-	var queryDate = new Date(nowDate - 1000 * 60 * 60 * 24 * 7);
-	query.greaterThan("createdAt", queryDate);*/
-	
-	query.include('author');
-	query.include('event');
-	var queryLimit = 20;
-	var queryNumber = req.params.postQueryCount!=undefined?req.params.postQueryCount:0;
-	query.limit(queryLimit);
-	query.skip(queryLimit * queryNumber);
-	query.find().then(function(results) {
-		if(results.length == 0) {
-			next(results);
-		}
-		var c = results.length;
-		for(var i in results) {
-			console.log(results[i].get('media'));
-			posts[i] = {};
-			posts[i].media = results[i].get('media');
-			posts[i].event = results[i].get('event').get('name');
-			posts[i].time = results[i].createdAt;
-			//
-			posts[i].location = {};
-			posts[i].location.latitude = results[i].get('location').latitude;
-			posts[i].location.longitude = results[i].get('location').longitude;
-			//
-			addMoment(results[i].get('event').get('name'));
-			getFBInfo(i,crip.deco(results[i].get('author').get('username')));
-		}
+	var resultsLimit = 20;
+	var queryNumber = 0;
+	var queryTimeLimitStep = 24*20;
 
-		function addMoment(name) {
-			var index = -1;
-			for(var i in events) {
-				if(events[i].name == name) {
-					index = i;
-					break;
-				}
-			}
-			if(index >= 0) {
-				events[index].count++;
-			} else {
-				events[events.length] = {name: name, count: 1};
-			}
-		}
+	if(req.params.postQueryCount!=undefined) {
+		queryNumber = parseInt(req.params.postQueryCount);
+	} else {
+		req.session.queryTimeLimit = queryTimeLimitStep;
+	}
 
-		function getFBInfo(i, fbUserId) {
-			FB.api('/'+fbUserId+'/',  function(profile) {
-				posts[i].author = {};
-				posts[i].author.firstName = profile.first_name;
-				posts[i].author.lastName = profile.last_name;
-				FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-					posts[i].author.picture= picture.data.url;
-					triggerNext();
-				});
-			});
-		}
-		function triggerNext() {
-			c--;
-			if(c===0) {
-				//getNumberOfFriendsAttendingEvent();
-				var response = {posts: posts, events: events};//, attendingEvents: attendingEvents};
-				next(response);
-			}
-		}
-		function getNumberOfFriendsAttendingEvent() {
-			var attendingEvents = [];
-			var arrayOfUserIds = [];
-			Parse.User.become(this.parseSessionToken).then(function (user) {
-				var User = Parse.Object.extend("User");
-				var userQuery = new Parse.Query(User);
+	//console.log('Query Number: ' + queryNumber);
 
-				userQuery.notEqualTo("objectId", user.id);
-				var Post = Parse.Object.extend("Post");
-				var postQuery = new Parse.Query(Post);
-				postQuery.include("author");
-				postQuery.include("event");
-
-				postQuery.matchesQuery('author', userQuery);
-				postQuery.find().then(function(results) {
-					var c = results.length;
-					for(var i in results) {
-						attendingEvents[i] = {};
-						var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
-						arrayOfUserIds[i] = results[i].get('author').get('userId');
-						if(!aux) {
-							triggerNext();
-						}
-					}
-
-					function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
-						var index = -1;
-						for(var j in attendingEvents) {
-							if(attendingEvents[j].name == name) {
-								index = j;
-								break;
-							}
-						}
-						if(index >= 0) {
-							var flag = 0;
-							var currentAuthor = results[i].get('author').get('userId');
-							for(var k=0; k<=attendingEvents.length; k++) {
-								if(currentAuthor == arrayOfUserIds[k]) { 
-									return 0;
-								} else {
-									attendingEvents[index].count++;
-									FB.api('/'+fbUserId+'/',  function(profile) {
-										var n = 1;
-										var aux = 1;
-										do {
-											if(attendingEvents[index].going[n] != "") {
-												attendingEvents[index].going[n] = {};
-												attendingEvents[index].going[n].userId = userId;
-												attendingEvents[index].going[n].firstName = profile.first_name;
-												attendingEvents[index].going[n].lastName = profile.last_name;
-												triggerNext();
-												aux = 0;
-											}
-											n++;
-										} while(aux);
-									});
-									return 1;
-								}
-							}
-						} else {
-							attendingEvents[i] = {name: name, count: 1};
-							FB.api('/'+fbUserId+'/',  function(profile) {
-								attendingEvents[i].going = [];
-								attendingEvents[i].going[0] = {};
-								attendingEvents[i].going[0].userId = userId;
-								attendingEvents[i].going[0].firstName = profile.first_name;
-								attendingEvents[i].going[0].lastName = profile.last_name;
-								triggerNext();
-							});
-							return 1;
-						}
-					}
-					function triggerNext() {
-						c--;
-						if(c===0) {
-							var response = {posts: posts, events: events, attendingEvents: attendingEvents};
-							next(response);
-						}
-					}
-				});
-			});
-		}
-	}, function(e) {
+	countResults(0, findQuery, reCount, function(e) {
 		error(e);
 	});
+
+	function countResults(tries, next, reCount, error) {
+		var query = getQuery();
+
+		query.count().then(function(count) {
+			//console.log('Count: ' +  count + ' Required: ' + resultsLimit * (queryNumber+1));
+			if(count < resultsLimit * (queryNumber+1)) {
+				req.session.queryTimeLimit = req.session.queryTimeLimit + queryTimeLimitStep;
+				if (tries > 20) {
+					console.log('Tiempo Agotado'); // TODO: Manejo de errores.
+					next(count);
+				} else {
+					//console.log('Tries: ' + tries);
+					reCount(++tries);
+				};
+			} else {
+				next(count);
+			}
+		}, function(e) {
+			error(e);
+		});
+	}
+
+	function findQuery(count) {
+		var query = getQuery();
+		query.find().then(function(results) {
+			console.log('Find Results: ' + results.length);
+			if(results.length == 0) {
+				next(results);
+			}
+			var c = results.length;
+			for(var i in results) {
+				//console.log(results[i].get('media'));
+				posts[i] = {};
+				posts[i].media = results[i].get('media');
+				posts[i].event = results[i].get('event').get('name');
+				posts[i].time = results[i].createdAt;
+				//
+				posts[i].location = {};
+				posts[i].location.latitude = results[i].get('location').latitude;
+				posts[i].location.longitude = results[i].get('location').longitude;
+				//
+				addMoment(results[i].get('event').get('name'));
+				getFBInfo(i,crip.deco(results[i].get('author').get('username')));
+			}
+
+			function addMoment(name) {
+				var index = -1;
+				for(var i in events) {
+					if(events[i].name == name) {
+						index = i;
+						break;
+					}
+				}
+				if(index >= 0) {
+					events[index].count++;
+				} else {
+					events[events.length] = {name: name, count: 1};
+				}
+			}
+
+			function getFBInfo(i, fbUserId) {
+				FB.api('/'+fbUserId+'/',  function(profile) {
+					posts[i].author = {};
+					posts[i].author.firstName = profile.first_name;
+					posts[i].author.lastName = profile.last_name;
+					FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+						posts[i].author.picture= picture.data.url;
+						triggerNext();
+					});
+				});
+			}
+			function triggerNext() {
+				c--;
+				if(c===0) {
+					//getNumberOfFriendsAttendingEvent();
+					var response = {posts: posts, events: events};//, attendingEvents: attendingEvents};
+					next(response);
+				}
+			}
+
+	/*
+			function getNumberOfFriendsAttendingEvent() {
+				var attendingEvents = [];
+				var arrayOfUserIds = [];
+				Parse.User.become(this.parseSessionToken).then(function (user) {
+					var User = Parse.Object.extend("User");
+					var userQuery = new Parse.Query(User);
+
+					userQuery.notEqualTo("objectId", user.id);
+					var Post = Parse.Object.extend("Post");
+					var postQuery = new Parse.Query(Post);
+					postQuery.include("author");
+					postQuery.include("event");
+
+					postQuery.matchesQuery('author', userQuery);
+					postQuery.find().then(function(results) {
+						var c = results.length;
+						for(var i in results) {
+							attendingEvents[i] = {};
+							var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
+							arrayOfUserIds[i] = results[i].get('author').get('userId');
+							if(!aux) {
+								triggerNext();
+							}
+						}
+
+						function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
+							var index = -1;
+							for(var j in attendingEvents) {
+								if(attendingEvents[j].name == name) {
+									index = j;
+									break;
+								}
+							}
+							if(index >= 0) {
+								var flag = 0;
+								var currentAuthor = results[i].get('author').get('userId');
+								for(var k=0; k<=attendingEvents.length; k++) {
+									if(currentAuthor == arrayOfUserIds[k]) { 
+										return 0;
+									} else {
+										attendingEvents[index].count++;
+										FB.api('/'+fbUserId+'/',  function(profile) {
+											var n = 1;
+											var aux = 1;
+											do {
+												if(attendingEvents[index].going[n] != "") {
+													attendingEvents[index].going[n] = {};
+													attendingEvents[index].going[n].userId = userId;
+													attendingEvents[index].going[n].firstName = profile.first_name;
+													attendingEvents[index].going[n].lastName = profile.last_name;
+													triggerNext();
+													aux = 0;
+												}
+												n++;
+											} while(aux);
+										});
+										return 1;
+									}
+								}
+							} else {
+								attendingEvents[i] = {name: name, count: 1};
+								FB.api('/'+fbUserId+'/',  function(profile) {
+									attendingEvents[i].going = [];
+									attendingEvents[i].going[0] = {};
+									attendingEvents[i].going[0].userId = userId;
+									attendingEvents[i].going[0].firstName = profile.first_name;
+									attendingEvents[i].going[0].lastName = profile.last_name;
+									triggerNext();
+								});
+								return 1;
+							}
+						}
+						function triggerNext() {
+							c--;
+							if(c===0) {
+								var response = {posts: posts, events: events, attendingEvents: attendingEvents};
+								next(response);
+							}
+						}
+					});
+				});
+			}*/
+			}, function(e) {
+			error(e);
+		});
+	}
+
+	function reCount(tries) {
+		countResults(tries, findQuery, reCount, error);
+	}
+
+	function getQuery() {
+		var query = new Parse.Query(Post);
+		var nowDate = new Date();
+		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
+		//console.log('Días atras: ' + req.session.queryTimeLimit/24);
+		
+		query.greaterThan('createdAt', queryDate);
+		query.descending('createdAt');
+		//query.withinKilometers('location', userGeoPoint, 1);
+		query.near('location', userGeoPoint);
+		
+		query.include('author');
+		query.include('event');
+		query.limit(resultsLimit);
+		//console.log('Skip Number: ' + (resultsLimit * queryNumber));
+		query.skip(resultsLimit * queryNumber);
+
+		return query;		
+	}
 }
 
 /*

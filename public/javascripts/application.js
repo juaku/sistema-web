@@ -93,13 +93,13 @@ $(document).ready(function() {
 	$(window).on('load resize', function() {
 		resizeTask();
 	});
-	setInterval(function() {
+	/*setInterval(function() {
 		$("#post-list div.media").toggleClass('animate');
-	}, 500);
+	}, 500);*/
 });
 
 function resizeTask() {
-	$('#main-controls').width($('section#view #view-wrapper').width());
+	$('#main-controls').width($('section#view #view-wrapper').width()); // TODO: Corregir comportamiento
 	$('#post-list .post-detail .post-title').width(0);
 	$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
 }
@@ -118,6 +118,8 @@ if($('html').attr('lang') == 'es') {
 }
 
 // Controlador
+
+var loadedImgs = 0;
 function Application($scope, $http) {
 
 	/*
@@ -130,20 +132,13 @@ function Application($scope, $http) {
 	$scope.user.peopleToFollow = [];
 
 
-	getGeo(function() {
+	/*getGeo(function() {
 		$http.post('/user', $scope.user).success(function(data) {
-			getPosts();
 		}).error();
 	}, function(errorMsg) {
 			getPosts();
 		console.log(errorMsg);
-	});
-
-	$(window).scroll(function() {
-		if($(window).scrollTop() + $(window).height() > $(document).height() - $(window).height()*2) {
-			getPosts();
-		}
-	});
+	});*/
 
 	var gettingPosts = false;
 	var firstPostsLoad = true;
@@ -152,21 +147,49 @@ function Application($scope, $http) {
 	var postShown = 0;
 	var tmpLoadingPostsNumber;
 	var tmpPosts = [];
+	var getPostTries = 0;
+	var getPostTriesLimit = 30;
 	$scope.posts = [];
 
 	createEmptyPosts(5);
+	
+	getPosts();
+	
+	$(window).scroll(function() {
+			tryGetPosts();
+	});
+
+	var getPostsInterval = setInterval(tryGetPosts, 500);
+	
+	function tryGetPosts() {
+		if($(window).scrollTop() + $(window).height() > $(document).height() - $(window).height()*2) {
+			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
+			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
+				getPostTries = 0;
+				getPosts();
+			} else {
+				getPostTries++;
+			}
+		}
+	}
+
 
 	// Cargar los post originales
 	function getPosts() {
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
+			//
 			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
 				postsQuery(function(data) {
-					for (var i = 0; i < data.length; i++) {
-						tmpPosts[i + tmpPostsNumber] = data[i];
-					};
-					showPosts();
+					if(data!=undefined) {
+						for (var i = 0; i < data.length; i++) {
+							tmpPosts[i + tmpPostsNumber] = data[i];
+						};
+						showPosts();
+					} else {
+						gettingPosts = false;
+					}
 				}, function() {
 				});
 			} else {
@@ -178,13 +201,17 @@ function Application($scope, $http) {
 	}
 
 	function postsQuery(next, error) {
-		$http.get('/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data) {
-			if(data.posts != undefined) {
-				postQueryCount++;
-				$scope.events = data.events;
-				next(data.posts);
+		$http.get('/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+			if(status == 204) {
+				clearInterval(getPostsInterval);
 			} else {
-				error();
+				if(data.posts != undefined) {
+					postQueryCount++;
+					$scope.events = data.events;
+					next(data.posts);
+				} else {
+					next();
+				}
 			}
 		}).error(function(e) {
 			error(e);
@@ -194,21 +221,23 @@ function Application($scope, $http) {
 	function showPosts() {
 		var numberPostsNow = $scope.posts.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
-		//console.log(numberPostsNow + "-" + postShown + " " + (tmpPosts.length-postShown));
 		//TODO: No se mostrá los n>5 últimos posts.
 		for(var i = numberPostsNow; i < postShown; i++) {
-			$scope.posts[i] = tmpPosts[i];
-			$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
-			$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+			if(tmpPosts[i] != undefined) {
+				$scope.posts[i] = tmpPosts[i];
+				$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
+				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+			}
 		}
+		//console.log($scope.posts.length);
 		createEmptyPosts(1);
-		console.log($scope.posts.length);
 		gettingPosts = false;
 	}
 
 	// Crear n post vacios mientras carga los post originales
 	function createEmptyPosts(numTmpPost) {
-		tmpLoadingPostsNumber = numTmpPost;
+		tmpLoadingPostsNumber = numTmpPost;;
+		loadedImgs -= numTmpPost;
 		var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 		var lastPostPosition = $scope.posts.length;
 		for (var i = 0; i < numTmpPost; i++) {
@@ -219,7 +248,8 @@ function Application($scope, $http) {
 
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
 	$http.get('/user').success(function(data) {
-		$scope.user.fbFriends = data;
+		//$scope.user.fbFriends = data;
+		$scope.usuarios = data;
 	});
 
 	// Envía un objeto con los datos de las personas a seguir mediante un post 
@@ -233,6 +263,7 @@ function Application($scope, $http) {
 	var peopleToFollow = [];
 	$scope.addListToFollow = function(userToFollow) {
 		peopleToFollow[peopleToFollow.length] = userToFollow;
+		console.log(userToFollow);
 	}
 
 	/*
@@ -374,7 +405,12 @@ function Application($scope, $http) {
 	function getGeo(next, error) {
 		if (navigator.geolocation) {
 			var position = 0;
+      /*navigator.geolocation.getCurrentPosition( function (position) {
+        alert(position.coords.latitude);
+        alert(position.coords.longitude);
+      });*/
 			navigator.geolocation.getCurrentPosition(function(position) {
+				alert('Bien!');
 				var coords = {};
 				coords.accuracy = position.coords.accuracy;
 				coords.altitude = position.coords.altitude;
@@ -403,6 +439,7 @@ function Application($scope, $http) {
 						errorMsg = "An unknown error occurred."
 						break;
 				}
+				alert('Mal! ' + errorMsg);
 				error(errorMsg);
 			});
 		} else {
@@ -448,6 +485,7 @@ angular.module('Juaku', [])
 		restrict: 'A',
 		link: function(scope, element, attrs) {
 			element.bind('load', function() {
+				loadedImgs++;
 				$(element).css('opacity', 1);
 			});
 		}

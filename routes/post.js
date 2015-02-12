@@ -12,6 +12,7 @@ var Parse = require('../parseConnect').Parse;
 var request = require('request');
 
 router.get('/:postQueryCount?', ensureAuthenticated, function(req, res) {
+	console.log('POST GET!')
 	jPack.getAllPosts(req, function(result) {
 		if(result.length == 0) {
 			res.status(204).end();

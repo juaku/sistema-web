@@ -44,6 +44,9 @@ block content
           #send-post(ng-click="send()")
         section#view-controls
         section#post-list
+          //p.post(ng-repeat="usuario in usuarios")
+          //  span.amigo-firstName(ng-click="addListToFollow(usuario)") {{ usuario.name }}
+          //input(type='submit', value='Submit' ng-click="setFollowRelation()") 
           .post(ng-repeat="post in posts" last-post-loaded)
             .media
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
