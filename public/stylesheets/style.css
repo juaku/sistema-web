@@ -208,6 +208,18 @@ section#view section#post-list .post div.media {
   -o-transition: background-color 500ms;
   -ms-transition: background-color 500ms;
   transition: background-color 500ms;
+  -webkit-animation: load 1s linear infinite;
+  -moz-animation: load 1s linear infinite;
+  -o-animation: load 1s linear infinite;
+  -ms-animation: load 1s linear infinite;
+  animation: load 1s linear infinite;
+}
+section#view section#post-list .post div.media.loaded {
+  -webkit-animation: none;
+  -moz-animation: none;
+  -o-animation: none;
+  -ms-animation: none;
+  animation: none;
 }
 section#view section#post-list .post div.animate {
   background-color: #fff;
@@ -721,3 +733,47 @@ footer #brand {
 	section#new-post
 		padding-top: 45px
 */
+@-moz-keyframes load {
+  0% {
+    background: rgba(255,255,255,0);
+  }
+  50% {
+    background: #fff;
+  }
+  100% {
+    background: rgba(255,255,255,0);
+  }
+}
+@-webkit-keyframes load {
+  0% {
+    background: rgba(255,255,255,0);
+  }
+  50% {
+    background: #fff;
+  }
+  100% {
+    background: rgba(255,255,255,0);
+  }
+}
+@-o-keyframes load {
+  0% {
+    background: rgba(255,255,255,0);
+  }
+  50% {
+    background: #fff;
+  }
+  100% {
+    background: rgba(255,255,255,0);
+  }
+}
+@keyframes load {
+  0% {
+    background: rgba(255,255,255,0);
+  }
+  50% {
+    background: #fff;
+  }
+  100% {
+    background: rgba(255,255,255,0);
+  }
+}

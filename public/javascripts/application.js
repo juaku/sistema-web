@@ -104,6 +104,7 @@ function resizeTask() {
 	$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
 }
 
+
 /*
  * Framework Angular
  * -----------------
@@ -120,6 +121,7 @@ if($('html').attr('lang') == 'es') {
 // Controlador
 
 var loadedImgs = 0;
+var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
 function Application($scope, $http) {
 
 	/*
@@ -132,13 +134,15 @@ function Application($scope, $http) {
 	$scope.user.peopleToFollow = [];
 
 
-	/*getGeo(function() {
+	getGeo(function() {
 		$http.post('/user', $scope.user).success(function(data) {
+			getPosts();
 		}).error();
 	}, function(errorMsg) {
-			getPosts();
+		//getPosts();
 		console.log(errorMsg);
-	});*/
+	});
+
 
 	var gettingPosts = false;
 	var firstPostsLoad = true;
@@ -153,11 +157,12 @@ function Application($scope, $http) {
 
 	createEmptyPosts(5);
 	
-	getPosts();
-	
+	//getPosts();
+
+	/* TODO: Ver si es que es necesario
 	$(window).scroll(function() {
 			tryGetPosts();
-	});
+	});*/
 
 	var getPostsInterval = setInterval(tryGetPosts, 500);
 	
@@ -172,7 +177,6 @@ function Application($scope, $http) {
 			}
 		}
 	}
-
 
 	// Cargar los post originales
 	function getPosts() {
@@ -227,6 +231,7 @@ function Application($scope, $http) {
 				$scope.posts[i] = tmpPosts[i];
 				$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+				$scope.posts[i].class = 'real';
 			}
 		}
 		//console.log($scope.posts.length);
@@ -241,7 +246,7 @@ function Application($scope, $http) {
 		var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 		var lastPostPosition = $scope.posts.length;
 		for (var i = 0; i < numTmpPost; i++) {
-			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif}};
+			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif},"class":"blank"};
 		};
 		//console.log($scope.posts.length + ',' + tmpPosts.length);
 	}
@@ -380,7 +385,7 @@ function Application($scope, $http) {
 					var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
 					ctx.rotate(variation.a*Math.PI/180);
 					ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
-					var imgQuality = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?0.5:0.75;
+					var imgQuality = mobile?0.5:0.75;
 					var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
 					//document.write('<img src=' + canvas.toDataURL( 'image/jpeg' , 0.7 ) + '></img>');
 					//angular.element($('input#media-loader')).scope().newPost.media = newImg;
@@ -410,7 +415,6 @@ function Application($scope, $http) {
         alert(position.coords.longitude);
       });*/
 			navigator.geolocation.getCurrentPosition(function(position) {
-				alert('Bien!');
 				var coords = {};
 				coords.accuracy = position.coords.accuracy;
 				coords.altitude = position.coords.altitude;
@@ -486,6 +490,12 @@ angular.module('Juaku', [])
 		link: function(scope, element, attrs) {
 			element.bind('load', function() {
 				loadedImgs++;
+				if(mobile) {
+					$(element).css('transition-duration', '0s');
+				}
+				if(!$(element).hasClass('blank')) {
+					$(element).parent().addClass('loaded');
+				}
 				$(element).css('opacity', 1);
 			});
 		}

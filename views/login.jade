@@ -12,10 +12,12 @@ block append head
         return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
       }
       $('.pop-up').click(function(event) {
-        event.preventDefault();
-        url = $(this).attr('href');
-        popupwindow(url, 'Acceso Juaku', 530, 300);
-        return false;
+        if(!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )) {
+          event.preventDefault();
+          url = $(this).attr('href');
+          popupwindow(url, 'Acceso Juaku', 530, 300);
+          return false;
+        }
       });
     });
 

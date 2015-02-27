@@ -184,6 +184,7 @@ section#people-controls section#friends .friend:before
 /*
  * Vista
  */
+
 section#view
 	background-color: rgba(255, 255, 255, 0) // NEWLOGO
 	padding-bottom: 50px
@@ -207,6 +208,18 @@ section#view section#post-list .post div.media
 	//background-image: url('/images/load.gif')
 	//background-repeat: no-repeat
 	//background-position: 50% 50%
+	animation: load 1s linear infinite
+
+section#view section#post-list .post div.media.loaded
+	animation: none
+
+@keyframes load
+	0%
+		background: rgba(255,255,255,0)
+	50%
+		background: rgba(255,255,255,1)
+	100%
+		background: rgba(255,255,255,0.0)
 
 section#view section#post-list .post div.animate
 	background-color: rgba(255,255,255,1)
