@@ -3,7 +3,8 @@
  * ------- ---------
  */
 body {
-  background-color: #eaeaee;
+  background-color: #f3f3f5;
+  color: #333;
   font-family: Arial, sans-serif;
   font-size: 14px;
   margin: 0;
@@ -81,8 +82,6 @@ header {
   position: fixed;
   z-index: 10;
   top: 0;
-  -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.05);
-  box-shadow: 0 2px 0 rgba(0,0,0,0.05);
 }
 header #title a {
   background-image: url("/images/sprite.png?v=1005");
@@ -102,12 +101,29 @@ header #title a h1 {
  * Principal
  */
 main {
-  margin: 0 auto;
-  padding-top: 55px;
   width: 100%;
-  max-width: 970px;
+  top: 55px;
+  bottom: 0px;
+  position: absolute;
+  overflow: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+/*
+@css {
+	main#blurred-back {
+		//-webkit-filter: blur(5px);
+		//-webkit-filter: blur(1px) brightness(1.1) contrast(3.2) hue-rotate(60deg) invert(0.1) saturate(10) sepia(0.1);
+		-webkit-filter:	blur(5px) brightness(1.1) contrast(3.2) saturate(0);
+		z-index: -1;
+		//overflow: hidden
+	}
+}*/
+main #wrapper {
+  width: 100%;
+  max-width: 940px;
+  margin: 0 auto;
   display: table;
-  height: 100vh;
 }
 aside,
 section#view {
@@ -162,6 +178,7 @@ section#people-controls section#profile h2.profile-name .profile-lastname {
 }
 section#people-controls section#friends {
   margin-top: 20px;
+  display: inline-block;
 }
 section#people-controls section#friends .friend {
   background-color: rgba(255,255,255,0.5);
@@ -189,15 +206,14 @@ section#view {
   padding-bottom: 50px;
   max-width: 530px;
   height: 100%;
-}
-section#view #view-wrapper {
   padding: 10px 0;
+  position: relative;
+  z-index: 1;
 }
+/*section#view #view-wrapper
+	padding: 10px 0 // NEWLOGO*/
 section#view section#post-list .post {
   margin-bottom: 15px;
-  -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-  position: relative;
 }
 section#view section#post-list .post div.media {
   font-size: 0;
@@ -221,9 +237,8 @@ section#view section#post-list .post div.media.loaded {
   -ms-animation: none;
   animation: none;
 }
-section#view section#post-list .post div.animate {
-  background-color: #fff;
-}
+/*section#view section#post-list .post div.animate
+	background-color: rgba(255,255,255,1)*/
 section#view section#post-list .post div.media img {
   width: 100%;
 }
@@ -234,17 +249,18 @@ section#view section#post-list .post div.media img.media {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
-  -webkit-transition: opacity 500ms;
-  -moz-transition: opacity 500ms;
-  -o-transition: opacity 500ms;
-  -ms-transition: opacity 500ms;
-  transition: opacity 500ms;
+  -webkit-transition: opacity 1000ms;
+  -moz-transition: opacity 1000ms;
+  -o-transition: opacity 1000ms;
+  -ms-transition: opacity 1000ms;
+  transition: opacity 1000ms;
 }
 section#view section#post-list .post .bottom {
   background-color: #fff;
   width: 100%;
   height: 30px;
   display: table;
+  font-size: 0px;
 }
 section#view section#post-list .post .bottom .info {
   display: table;
@@ -252,23 +268,24 @@ section#view section#post-list .post .bottom .info {
   vertical-align: top;
 }
 section#view section#post-list .post .bottom .info .info-wrapper {
+  display: table;
   padding: 5px;
   padding-right: 5px;
 }
-section#view section#post-list .post:after {
-  content: '';
-  width: 97%;
-  margin: 0 1.5%;
-  background-color: rgba(0,0,0,0.05);
-  height: 2px;
-  position: absolute;
-  z-index: -1;
-}
+/*section#view section#post-list .post:after  //RE-FLAT
+	content: ''
+	width: 97% // NEWLOGO
+	margin: 0 1.5% // NEWLOGO
+	background-color: rgba(0,0,0,0.05)  // NEWLOGO
+	height: 2px // NEWLOGO
+	position: absolute
+	z-index: -1*/
 section#view section#post-list .post .bottom .author-img,
 section#view section#post-list .post .bottom .post-detail {
-  display: table-cell;
   vertical-align: top;
-  font-size: 0px;
+}
+section#view section#post-list .post .bottom .author-img {
+  display: table-cell;
 }
 section#view section#post-list .post .bottom .author-img img {
   width: 40px;
@@ -277,6 +294,8 @@ section#view section#post-list .post .bottom .author-img img {
   background-color: #eee;
 }
 section#view section#post-list .post .bottom .post-detail {
+  display: table;
+  table-layout: fixed;
   width: 100%;
 }
 /*
@@ -316,14 +335,13 @@ section#view section#post-list .post .bottom .post-detail .sub:first-letter
 	text-transform: uppercase
 */
 section#view section#post-list .post .bottom .post-detail .post-title {
-  font-size: 16px;
+  font-size: 17px;
   color: #333;
-  width: 0;
   overflow: hidden;
   white-space: nowrap;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  line-height: 20px;
+  line-height: 22px;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName {
   display: none;
@@ -337,7 +355,7 @@ section#view section#post-list .post .bottom .post-detail .post-title .event-pos
   letter-spacing: -1px;
 }
 section#view section#post-list .post .bottom .post-detail .sub-info {
-  font-size: 11px;
+  font-size: 12px;
   color: #999;
 }
 section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter {
@@ -360,7 +378,6 @@ section#view section#post-list .post .bottom .like object {
 section#view section#post-list .post .bottom .like {
   width: 50px;
   background-color: #fafafa;
-  border-left: 1px solid #eee;
   display: table-cell;
   vertical-align: bottom;
   font-size: 0;
@@ -390,7 +407,7 @@ aside section#events-controls .search-box {
   margin-top: 10px;
 }
 aside section#events-controls .search-box input {
-  background: #eee;
+  background: #f5f5f5;
   color: #999;
   width: 160px;
   height: 10px;
@@ -434,8 +451,8 @@ aside section#events-controls .promoted:after,
 aside section#events-controls .events-list:after {
   content: '';
   display: block;
-  background: #eee;
-  height: 1px;
+  background: #fafafa;
+  height: 5px;
   margin-top: 15px;
 }
 aside section#events-controls .show-more {
@@ -445,49 +462,105 @@ aside section#events-controls .show-more {
  * Controles flotantes
  */
 section#float-controls {
-  background-color: #707077;
+  background-color: #e0e0e5;
   -webkit-transition: background-color 250ms linear;
   -moz-transition: background-color 250ms linear;
   -o-transition: background-color 250ms linear;
   -ms-transition: background-color 250ms linear;
   transition: background-color 250ms linear;
   width: 100%;
-  height: 32px;
   color: rgba(255,255,255,0.9);
-  padding: 6px 0 7px 0;
+  display: none;
   text-align: center;
   position: fixed;
   bottom: 0;
+  z-index: 10;
 }
-section#float-controls #main-controls {
-  width: 530px;
+section#float-controls .button {
+  display: table-cell;
+  padding: 8px 15px;
+  vertical-align: middle;
+  width: 33%;
+}
+section#float-controls .button.center {
+  width: 34%;
+  background: rgba(0,0,0,0.07);
+}
+section#float-controls .button .btn-ico {
   margin: 0 auto;
 }
-section#float-controls #main-controls .button {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 5px;
-}
-section#float-controls #main-controls .button.control-switch {
-  width: 64px;
-  height: 32px;
-  background: rgba(255,255,255,0.7);
-  -webkit-border-radius: 16px;
-  border-radius: 16px;
-  padding: 0 5px;
-  position: relative;
-}
-section#float-controls #main-controls .button.control-switch .knob {
-  width: 24px;
+section#float-controls .button #users {
+  background: url("/images/b1.png");
+  width: 20px;
   height: 24px;
-  background: rgba(255,255,255,0.9);
-  -webkit-border-radius: 12px;
-  border-radius: 12px;
-  position: absolute;
-  top: 4px;
-  left: 45px;
+  background-repeat: no-repeat;
+  -webkit-background-size: 100% 100%;
+  -moz-background-size: 100% 100%;
+  background-size: 100% 100%;
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
 }
-section#float-controls #main-controls #camera,
+section#float-controls .button #camera {
+  background: #fff;
+  width: 28px;
+  height: 28px;
+  -webkit-box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2);
+  box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2);
+  -webkit-border-radius: 30px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+section#float-controls .button #events {
+  background: url("/images/a.png");
+  width: 26px;
+  height: 26px;
+  background-repeat: no-repeat;
+  -webkit-background-size: 100% 100%;
+  -moz-background-size: 100% 100%;
+  background-size: 100% 100%;
+  opacity: 0.2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+}
+/*
+section#float-controls #main-controls
+	width: 290px
+	margin: 0 auto
+	
+section#float-controls #main-controls .button
+	display: inline-block
+	vertical-align: middle
+	margin: 0 5px
+
+section#float-controls #main-controls .button.control-switch
+	//width: 64px
+	width: 36px
+	//height: 32px
+	height: 36px
+	background: rgba(255,255,255,0.7)
+	//border-radius: 16px
+	border-radius: 25px
+	//padding: 0 5px
+	position: relative
+
+section#float-controls #main-controls .button.control-switch .knob
+	//width: 24px
+	width: 32px
+	//height: 24px
+	height: 32px
+	//background: rgba(255,255,255,0.9)
+	background: #F05
+	//border-radius: 12px
+	border-radius: 20px
+	position: absolute
+	//top: 4px
+	top: 2px
+	//left: 45px
+	left: 2px
+
+section#float-controls #main-controls #camera
+*/
 #send-post {
   background: rgba(0,0,0,0.3);
   width: 30px;
@@ -499,10 +572,11 @@ section#float-controls #main-controls #camera,
 /*
  * New post
  */
-section#new-post {
-  display: none;
+input#media-loader {
+  visibility: hidden;
+  position: absolute;
 }
-section#new-post input#media-loader {
+section#new-post {
   display: none;
 }
 section#new-post canvas#new-media-preview {
@@ -527,7 +601,7 @@ section#new-post #positionMap img {
 footer {
   margin: 10px 5px;
   font-size: 12px;
-  color: #999;
+  color: #aaa;
 }
 footer #brand {
   margin: 5px 0;
@@ -546,25 +620,40 @@ footer #brand {
 @media (max-width: 669px) {
   main {
     min-width: 290px;
+    bottom: 44px;
   }
   aside#first,
   aside#second {
     display: none;
   }
+  main #wrapper {
+    width: 100%;
+    max-width: inherit;
+  }
+  aside {
+    padding: 10px 0;
+  }
+  aside #people-side,
+  aside #events-side {
+    position: inherit;
+  }
   section#view {
     display: block;
     margin: 0 auto;
   }
-  section#view #view-wrapper {
+  section#view {
     padding: 0;
   }
   section#float-controls {
-    background-color: #30303a;
+    display: table;
   }
 }
 @media (max-width: 329px) {
   main {
-    padding-top: 45px;
+    top: 44px;
+  }
+  header {
+    padding: 4px 0 5px 0;
   }
   header #title a {
     -webkit-background-size: 85px;
@@ -573,15 +662,14 @@ footer #brand {
     width: 85px;
     height: 35px;
   }
-  section#view #view-wrapper {
-    padding: 0;
-  }
-  section#view section#post-list .post .bottom .post-detail .post-title {
-    letter-spacing: -0.5px;
-  }
-  section#view section#post-list .post .bottom .post-detail .sub-info {
-    letter-spacing: -0.5px;
-  }
+}
+/*section#view #view-wrapper
+		padding: 0 // NEWLOGO*/
+section#view section#post-list .post .bottom .post-detail .post-title {
+  letter-spacing: -0.5px;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info {
+  letter-spacing: -0.5px;
 }
 /*
 @media (max-width: 969px) 

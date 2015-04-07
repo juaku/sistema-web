@@ -17,6 +17,9 @@ block append head
           url = $(this).attr('href');
           popupwindow(url, 'Acceso Juaku', 530, 300);
           return false;
+        } else {
+         event.preventDefault();
+         document.location = $(this).attr('href');
         }
       });
     });

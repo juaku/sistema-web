@@ -121,6 +121,12 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 }), cookie: { path: '/', maxAge: 1000*60*60*24*15 } // 15 Días
 }));
 
+//NO CACHE
+/*app.use(function(req, res, next) {
+  req.headers['if-none-match'] = 'no-match-for-this';
+  next();    
+});*/
+
 // Usar Multer - Ya no se require
 //app.use(multer({ dest: './public/uploads/'}));
 

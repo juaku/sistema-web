@@ -84,24 +84,76 @@
  * Código de maquetación
  * ---------------------
  */
-
 $(document).ready(function() {
+	$('main').scrollLeft($('#first').width());
+
 	$('#camera').click(function(event) {
 		$('input#media-loader').click();
 		$('body').addClass('float-view');
 	});
+
 	$(window).on('load resize', function() {
 		resizeTask();
 	});
+
+	//TODO: Borrar
+	/*$('input#media-loader').click(function(event) {
+		alert('Click input#media-loader');
+	});*/
+
+	/*$('header').on('click', function() {
+		document.location = '/logout';
+	})*/
 	/*setInterval(function() {
 		$("#post-list div.media").toggleClass('animate');
 	}, 500);*/
+	
+	/*$('body').on("swipeleft", function() {
+		$('main').animate({scrollLeft: $('main').scrollLeft() + $('#view').width()}, 250);
+	});
+
+	$('body').on("swiperight", function() {
+		$('main').animate({scrollLeft: $('main').scrollLeft() - $('#view').width()}, 250);
+	});*/
+
+	// Botones
+	var mainScrollStatus = 0;
+	$('#users').on('click', function() {
+		mainScrollStatus = $('main').scrollTop();
+		$('#first').css({'display':'block'});
+		$('#view').css({'display':'none'});
+		$('#second').css({'display':'none'});
+	});
+
+	$('#events').on('click', function() {
+		mainScrollStatus = $('main').scrollTop();
+		$('#first').css({'display':'none'});
+		$('#view').css({'display':'none'});
+		$('#second').css({'display':'block'});
+	});
+
+	$('#camera').on('click', function() {
+		$('#first').css({'display':'none'});
+		$('#view').css({'display':'block'});
+		$('#second').css({'display':'none'});
+		$('main').scrollTop(mainScrollStatus);
+	});
+
+	/*$('#main').scroll(function(event) {
+		$('#blurred-back').scrollTop($(this).scrollTop());
+	});*/
+
+	/*setInterval(function() {
+		//$('#blurred-back').scrollTop($('#main').offset().top);
+		$('#blurred-back').scrollTop($('#main').find('#wrapper').offset().top*-1);
+		//console.log($('#main').find('#wrapper').offset().top);
+	}, 1);*/
 });
 
 function resizeTask() {
-	$('#main-controls').width($('section#view #view-wrapper').width()); // TODO: Corregir comportamiento
-	$('#post-list .post-detail .post-title').width(0);
-	$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
+	//$('#main-controls').width($('section#view').width()); // TODO: Corregir comportamiento
+	//$('#post-list .post-detail .post-title').width(0);
+	//$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
 }
 
 
@@ -147,7 +199,7 @@ function Application($scope, $http) {
 	var gettingPosts = false;
 	var firstPostsLoad = true;
 	var postQueryCount = 0;
-	var postLoadStep = 5;
+	var postLoadStep = 10;
 	var postShown = 0;
 	var tmpLoadingPostsNumber;
 	var tmpPosts = [];
@@ -166,8 +218,8 @@ function Application($scope, $http) {
 
 	var getPostsInterval = setInterval(tryGetPosts, 500);
 	
-	function tryGetPosts() {
-		if($(window).scrollTop() + $(window).height() > $(document).height() - $(window).height()*2) {
+	function tryGetPosts() { // TODO: En main con pos abs no carga a menos que haya scroll sólo en android
+		if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
 			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
 				getPostTries = 0;
@@ -332,7 +384,6 @@ function Application($scope, $http) {
 			windowURL.revokeObjectURL(picURL);
 		}*/
 
-
 		var canvas = document.getElementById('new-media-preview');
 		var ctx = canvas.getContext('2d');
 
@@ -490,9 +541,10 @@ angular.module('Juaku', [])
 		link: function(scope, element, attrs) {
 			element.bind('load', function() {
 				loadedImgs++;
+				/* TODO: No necesario usando hack transform: translate3d(0,0,0)
 				if(mobile) {
 					$(element).css('transition-duration', '0s');
-				}
+				}*/
 				if(!$(element).hasClass('blank')) {
 					$(element).parent().addClass('loaded');
 				}
