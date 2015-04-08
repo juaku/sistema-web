@@ -139,6 +139,7 @@ aside #events-side {
   width: inherit;
   display: inline-block;
   position: fixed;
+  top: 65px;
 }
 /*
  * Controles
@@ -219,11 +220,6 @@ section#view section#post-list .post div.media {
   font-size: 0;
   position: relative;
   background-color: rgba(255,255,255,0.3);
-  -webkit-transition: background-color 500ms;
-  -moz-transition: background-color 500ms;
-  -o-transition: background-color 500ms;
-  -ms-transition: background-color 500ms;
-  transition: background-color 500ms;
   -webkit-animation: load 1s linear infinite;
   -moz-animation: load 1s linear infinite;
   -o-animation: load 1s linear infinite;
@@ -255,22 +251,30 @@ section#view section#post-list .post div.media img.media {
   -ms-transition: opacity 1000ms;
   transition: opacity 1000ms;
 }
+section#view section#post-list .post div.media img.media.raw {
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -ms-transition: none;
+  transition: none;
+}
 section#view section#post-list .post .bottom {
   background-color: #fff;
   width: 100%;
   height: 30px;
   display: table;
   font-size: 0px;
+  table-layout: fixed;
 }
 section#view section#post-list .post .bottom .info {
-  display: table;
-  width: 100%;
+  display: table-cell;
   vertical-align: top;
+  padding: 5px;
 }
 section#view section#post-list .post .bottom .info .info-wrapper {
   display: table;
-  padding: 5px;
-  padding-right: 5px;
+  width: 100%;
+  table-layout: fixed;
 }
 /*section#view section#post-list .post:after  //RE-FLAT
 	content: ''
@@ -286,6 +290,7 @@ section#view section#post-list .post .bottom .post-detail {
 }
 section#view section#post-list .post .bottom .author-img {
   display: table-cell;
+  width: 45px;
 }
 section#view section#post-list .post .bottom .author-img img {
   width: 40px;

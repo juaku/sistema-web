@@ -81,6 +81,23 @@
 //window.location.href = 'http://juaku-dev.cloudapp.net:3000/logout';
 
 /*
+ * Detección de dispositivo
+ * ------------------------
+ *
+ * Para poder descartar al Andorid Web Browser que tiene problemas con 
+ * la animación de carga de imagenes.
+ */
+var navU = navigator.userAgent;
+// Android Mobile // No aparece Android en tableta WOO
+var isAndroidMobile = (navU.indexOf('Android') > -1 || navU.indexOf('Linux') > -1) && navU.indexOf('Mozilla/5.0') > -1 && navU.indexOf('AppleWebKit') > -1;
+// Android Browser (not Chrome)
+var regExAppleWebKit = new RegExp(/AppleWebKit\/([\d.]+)/);
+var resultAppleWebKitRegEx = regExAppleWebKit.exec(navU);
+var appleWebKitVersion = (resultAppleWebKitRegEx === null ? null : parseFloat(regExAppleWebKit.exec(navU)[1]));
+var isAndroidBrowser = isAndroidMobile && appleWebKitVersion !== null && appleWebKitVersion < 537;
+//var isAndroidBrowser = appleWebKitVersion !== null && appleWebKitVersion < 537;
+
+/*
  * Código de maquetación
  * ---------------------
  */
@@ -209,7 +226,7 @@ function Application($scope, $http) {
 
 	createEmptyPosts(5);
 	
-	//getPosts();
+	getPosts();
 
 	/* TODO: Ver si es que es necesario
 	$(window).scroll(function() {
@@ -218,7 +235,7 @@ function Application($scope, $http) {
 
 	var getPostsInterval = setInterval(tryGetPosts, 500);
 	
-	function tryGetPosts() { // TODO: En main con pos abs no carga a menos que haya scroll sólo en android
+	function tryGetPosts() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
 		if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
 			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
@@ -494,7 +511,8 @@ function Application($scope, $http) {
 						errorMsg = "An unknown error occurred."
 						break;
 				}
-				alert('Mal! ' + errorMsg);
+				// TODO: Manejar error 
+				//alert('Mal! ' + errorMsg);
 				error(errorMsg);
 			});
 		} else {
@@ -547,6 +565,10 @@ angular.module('Juaku', [])
 				}*/
 				if(!$(element).hasClass('blank')) {
 					$(element).parent().addClass('loaded');
+					// Fantasma android
+					if (isAndroidMobile) {
+						$(element).addClass('raw');
+					}
 				}
 				$(element).css('opacity', 1);
 			});

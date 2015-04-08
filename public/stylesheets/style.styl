@@ -148,6 +148,7 @@ aside #events-side
 	width: inherit
 	display: inline-block
 	position: fixed
+	top: 65px // Android Web Browser
 
 /*
  * Controles
@@ -219,7 +220,7 @@ section#view
 	padding: 10px 0 // NEWLOGO
 	position: relative // MAC X Scroll
 	z-index: 1 // MAC X Scroll
-	//transform: translate3d(0,0,0) TODO: evitar para Android no se requiere en iPhone 4
+	//transform: translate3d(0,0,0) //TODO: evitar para Android no se requiere en iPhone 4
 /*section#view #view-wrapper
 	padding: 10px 0 // NEWLOGO*/
 
@@ -232,7 +233,7 @@ section#view section#post-list .post div.media
 	font-size: 0
 	position: relative // Muestra espacio de img
 	background-color: rgba(255,255,255,0.3)
-	transition: background-color 500ms
+	//transition: background-color 500ms
 	//background-image: url('/images/load.gif')
 	//background-repeat: no-repeat
 	//background-position: 50% 50%
@@ -264,6 +265,9 @@ section#view section#post-list .post div.media img.media // Muestra espacio de i
 	opacity: 0
 	transition: opacity 1000ms //TODO: Fantasmas en Android e IE
 
+section#view section#post-list .post div.media img.media.raw // Aparece en sin animación. Android Web Browser
+	transition: none
+
 section#view section#post-list .post .bottom
 	background-color: #FFF
 	width: 100%
@@ -271,16 +275,24 @@ section#view section#post-list .post .bottom
 	//padding: 10px
 	display: table
 	font-size: 0px
+	table-layout: fixed // Andorid
 
 section#view section#post-list .post .bottom .info
-	display: table
-	width: 100%
+	//display: table
+	display: table-cell
+	//width: 100%
+	//width: 90px
 	vertical-align: top
+	padding: 5px
+	//background: #0FF //A
 	
 section#view section#post-list .post .bottom .info .info-wrapper
 	display: table
-	padding: 5px
-	padding-right: 5px
+	//padding: 5px
+	//padding-right: 5px
+	width: 100%
+	//background: #F00 //A
+	table-layout: fixed // Android
 
 /*section#view section#post-list .post:after  //RE-FLAT
 	content: ''
@@ -298,6 +310,8 @@ section#view section#post-list .post .bottom .post-detail
 
 section#view section#post-list .post .bottom .author-img
 	display: table-cell
+	width: 45px // Android
+	//background: #F0F //A
 
 section#view section#post-list .post .bottom .author-img img
 	width: 40px
@@ -312,6 +326,7 @@ section#view section#post-list .post .bottom .post-detail
 	width: 100%
 	//width: 215px
 	//min-width: 215px
+	//background: #0F0 //A
 	
 /*
 section#view section#post-list .post .bottom .post-detail .post-data
@@ -361,6 +376,7 @@ section#view section#post-list .post .bottom .post-detail .post-title
 	line-height: 22px
 	//padding-bottom: 1px
 	//margin-top: 2px
+	//background: #00F //A
 	
 //section#view section#post-list .post .bottom .post-detail .post-title .author-name
 //	display: inline-block
@@ -383,6 +399,7 @@ section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 12px
 	color: #999
 	//margin-top: 3px
+	//background: #FF0 //A
 
 section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter
 	text-transform: uppercase
@@ -402,7 +419,7 @@ section#view section#post-list .post .bottom .like object // Para que no se cort
 	height: 50px
 
 section#view section#post-list .post .bottom .like
-	width: 50px // Firefox
+	width: 50px // Firefox, Android Browser
 	//height: 50px
 	background-color: #FAFAFA
 	//border-left: 1px solid #EEE //RE-FLAT
