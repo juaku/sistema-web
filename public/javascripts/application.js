@@ -189,6 +189,7 @@ function Application($scope, $http) {
 	getGeo(function() {
 		$http.post('/user', $scope.user).success(function(data) {
 			getPosts();
+			getEvents();
 		}).error();
 	}, function(errorMsg) {
 		//getPosts();
@@ -206,6 +207,7 @@ function Application($scope, $http) {
 	var getPostTries = 0;
 	var getPostTriesLimit = 30;
 	$scope.posts = [];
+	$scope.events = [];
 
 	createEmptyPosts(5);
 	
@@ -263,7 +265,6 @@ function Application($scope, $http) {
 			} else {
 				if(data.posts != undefined) {
 					postQueryCount++;
-					$scope.events = data.events;
 					next(data.posts);
 				} else {
 					next();
@@ -502,22 +503,22 @@ function Application($scope, $http) {
 		}
 	}
 
-	// TODO: Evaluar remoción
-	/*
-	 * Events
-	 */
+	function getEvents () {
+		// TODO: Evaluar remoción
+		/*
+		 * Events
+		 */
 
-	$scope.events = [];
-
-	// Cargar eventos
-/*	$http.get('/event').success(function(data) {
-		$scope.events = data;
-		console.log($scope.events);
-		/*for (var i = 0; i < $scope.posts.length; i++) {
-			$scope.events[i].media = 'uploads/' + $scope.posts[i].media;
-			$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
-		};*/
-	/*});*/
+		// Cargar eventos
+		$http.get('/event').success(function(data) {
+			$scope.events = data.events;
+			console.log($scope.events);
+			/*for (var i = 0; i < $scope.posts.length; i++) {
+				$scope.events[i].media = 'uploads/' + $scope.posts[i].media;
+				$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
+			};*/
+		});
+	}
 
 } // Fin Controlador - function Application($scope, $http)
 

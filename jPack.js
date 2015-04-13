@@ -523,7 +523,6 @@ jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, e
  */
 jPack.getAllPosts = function(req, next, error) {
 	var posts = [];
-	var events = [];
 	
 	var Post = Parse.Object.extend('Post');
 	
@@ -594,25 +593,8 @@ jPack.getAllPosts = function(req, next, error) {
 				posts[i].location.latitude = results[i].get('location').latitude;
 				posts[i].location.longitude = results[i].get('location').longitude;
 				//
-				addMoment(results[i].get('event').get('name'));
 				getFBInfo(i,crip.deco(results[i].get('author').get('username')));
 			}
-
-			function addMoment(name) {
-				var index = -1;
-				for(var i in events) {
-					if(events[i].name == name) {
-						index = i;
-						break;
-					}
-				}
-				if(index >= 0) {
-					events[index].count++;
-				} else {
-					events[events.length] = {name: name, count: 1};
-				}
-			}
-
 			function getFBInfo(i, fbUserId) {
 				FB.api('/'+fbUserId+'/',  function(profile) {
 					posts[i].author = {};
@@ -628,7 +610,7 @@ jPack.getAllPosts = function(req, next, error) {
 				c--;
 				if(c===0) {
 					//getNumberOfFriendsAttendingEvent();
-					var response = {posts: posts, events: events};//, attendingEvents: attendingEvents};
+					var response = {posts: posts};//, attendingEvents: attendingEvents};
 					next(response);
 				}
 			}
@@ -716,7 +698,7 @@ jPack.getAllPosts = function(req, next, error) {
 					});
 				});
 			}*/
-			}, function(e) {
+		}, function(e) {
 			error(e);
 		});
 	}
@@ -762,25 +744,34 @@ jPack.getAllEvents = function(req, next, error) {
 		next(count);
 	});
 */
-/*
 	var Event = Parse.Object.extend("Event");
 	var query = new Parse.Query(Event);
 	var events = [];
 	query.descending("createdAt");
 	query.find().then(function(results) {
 		var Post = Parse.Object.extend("Post");
-		var counter = 0;
 		for(var i = 0; i < results.length; i++) {
 			events[i] = {};
-			events[i].name = results[i].get('name');
+			events[i].id = results[i].id;
+			events[i].name = results[i].get("name");
+			events[i].count = 0;
 		}
-		//getEventCount();
-		//next(events);
 		var queries = [];
-		for(var i = 0; i < events.length; i++) {
-			queries[i] = new Parse.Query(Post);
-			queries[i].equalTo("event", results[i]);
-		}
+		var postQuery = new Parse.Query(Post);
+		postQuery.include("event");
+		postQuery.select("event");
+		postQuery.find().then(function(eventPost) {
+			for (var i = 0; i < events.length; i++) {
+				for (var j = 0; j < eventPost.length; j++) {
+					if(events[i].id == eventPost[j].attributes.event.id) {
+						events[i].count++;
+					}
+				}
+			}
+			var response = {events: events};
+			next(response);
+		});
+		/*
 		var mainQuery = Parse.Query.or.apply(this, queries);
 		mainQuery.find().then(function(results) {
 			for(var i = 0; i < results.length; i++) {
@@ -791,11 +782,13 @@ jPack.getAllEvents = function(req, next, error) {
 			//if(counter == results.length) {
 			//	next(events);
 			//}
-			next(events);
-		}, function(e) {
-			error(e);
-		});
-		*/
+			next(events);*/
+	}, function(e) {
+		error(e);
+	});
+	//});
+
+	
 		/*
 		var jUser = new jPack.user(req.session.jUser);
 		jUser.getAttendance(function(response) {
