@@ -230,31 +230,23 @@ section#view section#post-list .post
 	//position: relative
 
 section#view section#post-list .post div.media
-	font-size: 0
+	//font-size: 0
 	position: relative // Muestra espacio de img
-	background-color: rgba(255,255,255,0.3)
+	background-color: rgba(255,255,255,0.5)
 	//transition: background-color 500ms
 	//background-image: url('/images/load.gif')
 	//background-repeat: no-repeat
 	//background-position: 50% 50%
-	animation: load 1s linear infinite
 
-section#view section#post-list .post div.media.loaded
-	animation: none
-
-@keyframes load
-	0%
-		background: rgba(255,255,255,0)
-	50%
-		background: rgba(255,255,255,1)
-	100%
-		background: rgba(255,255,255,0.0)
+/*section#view section#post-list .post div.media.loaded
+	animation: none*/
 
 /*section#view section#post-list .post div.animate
 	background-color: rgba(255,255,255,1)*/
 
 section#view section#post-list .post div.media img
 	width: 100%
+	display: block // En lugar de font-size: 0;
 	//max-width: 500px // NEWLOGO
 	//max-height: 500px // Error: Si es que IMG no es cuadrada por algún motivo. // NEWLOGO
 
@@ -263,10 +255,39 @@ section#view section#post-list .post div.media img.media // Muestra espacio de i
 	top: 0
 	left: 0
 	opacity: 0
-	transition: opacity 1000ms //TODO: Fantasmas en Android e IE
+	//transition: opacity 1000ms //TODO: Fantasmas en Android e IE
+	
+section#view section#post-list .post div.media img.media.show
+	opacity: 1
+	animation: show-img 500ms linear
 
-section#view section#post-list .post div.media img.media.raw // Aparece en sin animación. Android Web Browser
+/*section#view section#post-list .post div.media img.media.raw // Aparece sin animación. Android Web Browser
 	transition: none
+*/
+
+section#view section#post-list .post div.media .preloader
+	width: 30px
+	height: 30px
+	border-radius: 30px
+	position: absolute
+	top: 50%
+	left: 50%
+	margin: -15px
+	animation: preloader 750ms linear infinite
+
+@keyframes preloader
+	0%
+		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
+	50%
+		box-shadow: 0 0 0 10px rgba(0,0,0,0.05)
+	100%
+		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
+
+@keyframes show-img
+	0%
+		opacity: 0
+	100%
+		opacity: 1
 
 section#view section#post-list .post .bottom
 	background-color: #FFF
@@ -274,7 +295,7 @@ section#view section#post-list .post .bottom
 	height: 30px
 	//padding: 10px
 	display: table
-	font-size: 0px
+	//font-size: 0px // Reemplazado por display: block; img autor
 	table-layout: fixed // Andorid
 
 section#view section#post-list .post .bottom .info
@@ -318,6 +339,7 @@ section#view section#post-list .post .bottom .author-img img
 	height: 40px
 	margin-right: 5px
 	background-color: #EEE
+	display: block //En lugar de font-size: 0;
 
 section#view section#post-list .post .bottom .post-detail
 	display: table
@@ -426,12 +448,13 @@ section#view section#post-list .post .bottom .like
 	//border-left: 1px solid #F5F5F5
 	display: table-cell
 	vertical-align: bottom
-	font-size: 0
+	//font-size: 0 //Reemplazado por display: block; .like-svg
 
 section#view section#post-list .post .bottom .like .like-svg
 	width: 50px
 	height: 50px
 	cursor: pointer
+	display: block // En lugar de font-size: 0;
 
 section#view section#post-list .post .bottom .like .selected .like-svg #inner
 	fill: #F05

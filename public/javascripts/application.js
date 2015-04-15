@@ -86,7 +86,9 @@
  *
  * Para poder descartar al Andorid Web Browser que tiene problemas con 
  * la animación de carga de imagenes.
+ * UPDATE: NO es necesario ya que se cambió a 'animation'
  */
+ /*
 var navU = navigator.userAgent;
 // Android Mobile // No aparece Android en tableta WOO
 var isAndroidMobile = (navU.indexOf('Android') > -1 || navU.indexOf('Linux') > -1) && navU.indexOf('Mozilla/5.0') > -1 && navU.indexOf('AppleWebKit') > -1;
@@ -96,11 +98,13 @@ var resultAppleWebKitRegEx = regExAppleWebKit.exec(navU);
 var appleWebKitVersion = (resultAppleWebKitRegEx === null ? null : parseFloat(regExAppleWebKit.exec(navU)[1]));
 var isAndroidBrowser = isAndroidMobile && appleWebKitVersion !== null && appleWebKitVersion < 537;
 //var isAndroidBrowser = appleWebKitVersion !== null && appleWebKitVersion < 537;
+*/
 
 /*
  * Código de maquetación
  * ---------------------
  */
+window.scrollTo(0, 1);
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
@@ -551,7 +555,6 @@ function Application($scope, $http) {
 	}
 
 } // Fin Controlador - function Application($scope, $http)
-
 // Directivas
 angular.module('Juaku', [])
 .directive('lastPostLoaded', function($timeout) { // Detectar la última carga de Posts
@@ -577,13 +580,14 @@ angular.module('Juaku', [])
 					$(element).css('transition-duration', '0s');
 				}*/
 				if(!$(element).hasClass('blank')) {
-					$(element).parent().addClass('loaded');
-					// Fantasma android
-					if (isAndroidMobile) {
+					$(element).parent().find('.preloader').remove();
+					// Fantasma android // No es necesario debido a que se cambió a 'animation'
+					/*if (isAndroidMobile) {
 						$(element).addClass('raw');
-					}
+					}*/
 				}
-				$(element).css('opacity', 1);
+				//$(element).css('opacity', 1);
+				$(element).addClass('show');
 			});
 		}
 	};
