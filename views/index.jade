@@ -89,12 +89,13 @@ block content
                 .event-name.promoted-event-name @Aura
                 .event-people.promoted-event-people 1280 #{__('people')}
             .events-list
-              .event(ng-repeat="event in events | limitTo: 7")
+              .event(ng-repeat="event in events | limitTo: limit")
                 .event-name
                   span.at-simbol @
                   span.event-name {{ event.name }}
                 .event-people {{ event.count }} #{__('people')}
-            .show-more #{__('Show more')}
+            .show-more
+              a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
           footer 
             nav Términos y condiciones · Más
             #brand Juaku © 2015

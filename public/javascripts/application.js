@@ -156,6 +156,10 @@ $(document).ready(function() {
 		$('main').scrollTop(mainScrollStatus);
 	});
 
+	$('.show-more').on('click', function() {
+		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
+	});
+
 	/*$('#main').scroll(function(event) {
 		$('#blurred-back').scrollTop($(this).scrollTop());
 	});*/
@@ -473,6 +477,14 @@ function Application($scope, $http) {
 		});
 	}
 
+	$scope.showMoreEvents = function(oldLimit) {
+		$scope.limit = oldLimit;
+		if($scope.limit <= $scope.events.length)
+			$scope.limit = $scope.limit+3;
+		else
+			console.log("No hay más eventos en tu ciudad");
+	}
+
 	/*
 	 * Geo
 	 */
@@ -530,7 +542,7 @@ function Application($scope, $http) {
 		// Cargar eventos
 		$http.get('/event').success(function(data) {
 			$scope.events = data.events;
-			console.log($scope.events);
+			$scope.limit = 7;
 			/*for (var i = 0; i < $scope.posts.length; i++) {
 				$scope.events[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
