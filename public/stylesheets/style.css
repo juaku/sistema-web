@@ -217,26 +217,16 @@ section#view section#post-list .post {
   margin-bottom: 15px;
 }
 section#view section#post-list .post div.media {
-  font-size: 0;
   position: relative;
-  background-color: rgba(255,255,255,0.3);
-  -webkit-animation: load 1s linear infinite;
-  -moz-animation: load 1s linear infinite;
-  -o-animation: load 1s linear infinite;
-  -ms-animation: load 1s linear infinite;
-  animation: load 1s linear infinite;
+  background-color: rgba(255,255,255,0.5);
 }
-section#view section#post-list .post div.media.loaded {
-  -webkit-animation: none;
-  -moz-animation: none;
-  -o-animation: none;
-  -ms-animation: none;
-  animation: none;
-}
+/*section#view section#post-list .post div.media.loaded
+	animation: none*/
 /*section#view section#post-list .post div.animate
 	background-color: rgba(255,255,255,1)*/
 section#view section#post-list .post div.media img {
   width: 100%;
+  display: block;
 }
 section#view section#post-list .post div.media img.media {
   position: absolute;
@@ -245,25 +235,40 @@ section#view section#post-list .post div.media img.media {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
-  -webkit-transition: opacity 1000ms;
-  -moz-transition: opacity 1000ms;
-  -o-transition: opacity 1000ms;
-  -ms-transition: opacity 1000ms;
-  transition: opacity 1000ms;
 }
-section#view section#post-list .post div.media img.media.raw {
-  -webkit-transition: none;
-  -moz-transition: none;
-  -o-transition: none;
-  -ms-transition: none;
-  transition: none;
+section#view section#post-list .post div.media img.media.show {
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
+  -webkit-animation: show-img 500ms linear;
+  -moz-animation: show-img 500ms linear;
+  -o-animation: show-img 500ms linear;
+  -ms-animation: show-img 500ms linear;
+  animation: show-img 500ms linear;
+}
+/*section#view section#post-list .post div.media img.media.raw // Aparece sin animación. Android Web Browser
+	transition: none
+*/
+section#view section#post-list .post div.media .preloader {
+  width: 30px;
+  height: 30px;
+  -webkit-border-radius: 30px;
+  border-radius: 30px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -15px;
+  -webkit-animation: preloader 750ms linear infinite;
+  -moz-animation: preloader 750ms linear infinite;
+  -o-animation: preloader 750ms linear infinite;
+  -ms-animation: preloader 750ms linear infinite;
+  animation: preloader 750ms linear infinite;
 }
 section#view section#post-list .post .bottom {
   background-color: #fff;
   width: 100%;
   height: 30px;
   display: table;
-  font-size: 0px;
   table-layout: fixed;
 }
 section#view section#post-list .post .bottom .info {
@@ -297,6 +302,7 @@ section#view section#post-list .post .bottom .author-img img {
   height: 40px;
   margin-right: 5px;
   background-color: #eee;
+  display: block;
 }
 section#view section#post-list .post .bottom .post-detail {
   display: table;
@@ -385,12 +391,12 @@ section#view section#post-list .post .bottom .like {
   background-color: #fafafa;
   display: table-cell;
   vertical-align: bottom;
-  font-size: 0;
 }
 section#view section#post-list .post .bottom .like .like-svg {
   width: 50px;
   height: 50px;
   cursor: pointer;
+  display: block;
 }
 section#view section#post-list .post .bottom .like .selected .like-svg #inner {
   fill: #f05;
@@ -826,47 +832,107 @@ section#view section#post-list .post .bottom .post-detail .sub-info {
 	section#new-post
 		padding-top: 45px
 */
-@-moz-keyframes load {
+@-moz-keyframes preloader {
   0% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
   50% {
-    background: #fff;
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
   }
   100% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
 }
-@-webkit-keyframes load {
+@-webkit-keyframes preloader {
   0% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
   50% {
-    background: #fff;
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
   }
   100% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
 }
-@-o-keyframes load {
+@-o-keyframes preloader {
   0% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
   50% {
-    background: #fff;
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
   }
   100% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
 }
-@keyframes load {
+@keyframes preloader {
   0% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
   }
   50% {
-    background: #fff;
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.05);
   }
   100% {
-    background: rgba(255,255,255,0);
+    -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+    box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
+  }
+}
+@-moz-keyframes show-img {
+  0% {
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+  }
+  100% {
+    opacity: 1;
+    -ms-filter: none;
+    filter: none;
+  }
+}
+@-webkit-keyframes show-img {
+  0% {
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+  }
+  100% {
+    opacity: 1;
+    -ms-filter: none;
+    filter: none;
+  }
+}
+@-o-keyframes show-img {
+  0% {
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+  }
+  100% {
+    opacity: 1;
+    -ms-filter: none;
+    filter: none;
+  }
+}
+@keyframes show-img {
+  0% {
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: alpha(opacity=0);
+  }
+  100% {
+    opacity: 1;
+    -ms-filter: none;
+    filter: none;
   }
 }
