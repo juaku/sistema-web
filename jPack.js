@@ -18,6 +18,9 @@ var url = require('url');
 
 var CronJob = require('cron').CronJob;
 
+//Para restingir el uso del @, signos de admiración, interrogación y caracteres especiales
+var validate = require("validate.js")
+
 // Herramientas Geo - (Evaluar si es necesaria)
 //var geolib = require('geolib');
 
@@ -270,39 +273,109 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
  * @return null
  */
 jPack.user.prototype.newPost = function(newPost, next, error) {
-	console.log('J0 - ' + this.parseSessionToken);
-	console.log(newPost.coords);
-	Parse.User.become(this.parseSessionToken).then(function (user) {
-		console.log('J1');
-		var Event = Parse.Object.extend("Event");
-		var query = new Parse.Query(Event);
-		query.equalTo("name", newPost.eventName);
-		query.find().then(function(results) {
-			if(results.length > 0) {
-				console.log('J2');
-				savePost(newPost, user, results[0], function() {
-					next();
-				}, function(e) {
-					error(e);
-				});
-			} else {
-				console.log('J3');
-				var event = new Event();
-				event.set('name', newPost.eventName);
-				event.save().then(function(newEvent) {
-					savePost(newPost, user, newEvent, function() {
-						console.log('J4');
+	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
+	var flag = validate({post: newPost.eventName}, {post: {format: pattern}});
+	console.log(flag);
+	if(flag!=undefined) {
+		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
+		next();
+	} else {
+		Parse.User.become(this.parseSessionToken).then(function (user) {
+			console.log('J1');
+			var Event = Parse.Object.extend("Event");
+			var query = new Parse.Query(Event);
+			//var str = newPost.eventName;
+			//var res= str.split("@");
+			//var newPostEventName = res[1];
+			//console.log("RES!!!!!!!!!!!!!!!! SPLIT");
+			//console.log( newPost.eventName);
+			query.equalTo("name", newPost.eventName);
+			query.find().then(function(results) {
+				if(results.length > 0) {
+					console.log('J2');
+					savePost(newPost, user, results[0], function() {
 						next();
 					}, function(e) {
 						error(e);
 					});
-				}, function(e) {
-					error(e);
-				});
-			}
+				} else {
+					console.log('J3');
+					var event = new Event();
+					event.set('name', newPost.eventName);
+					event.save().then(function(newEvent) {
+						savePost(newPost, user, newEvent, function() {
+							console.log('J4');
+							next();
+						}, function(e) {
+							error(e);
+						});
+					}, function(e) {
+						error(e);
+					});
+				}
+			}, function(e) {
+				error(e);
+			});
+		});
+	}
+}
+
+/*
+ * @descrip Asigna relación de like con el post clickeado
+ * @param {object} post, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.setLike = function(post, next, error) {
+	//console.log('J0 - ' + this.parseSessionToken);
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		
+		var Post = Parse.Object.extend("Post");
+		var query = new Parse.Query(Post);
+		var relation = user.relation("likes");
+
+		var str = post.media;
+		var res= str.split("/");
+		var postMedia = res[1];
+
+		query.equalTo("media", postMedia);
+		query.find().then(function(results) {
+			relation.add(results[0]);
+			user.save();
+			next();
 		}, function(e) {
 			error(e);
 		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @descrip Remueve relación de like con el post clickeado
+ * @param {object} newPost, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.setUnlike = function(post, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var Post = Parse.Object.extend("Post");
+		var query = new Parse.Query(Post);
+		var relation = user.relation("likes");
+		
+		var str = post.media;
+		var res= str.split("/");
+		var postMedia = res[1];
+
+		query.equalTo("media", postMedia);
+		query.find().then(function(results) {
+			relation.remove(results[0]);
+			user.save();
+			next();
+		}, function(e) {
+			error(e);
+		});
+		next();
+	}, function(e) {
+		error(e);
 	});
 }
 
@@ -575,129 +648,154 @@ jPack.getAllPosts = function(req, next, error) {
 	}
 
 	function findQuery(count) {
-		var query = getQuery();
-		query.find().then(function(results) {
-			console.log('Find Results: ' + results.length);
-			if(results.length == 0) {
-				next(results);
-			}
-			var c = results.length;
-			for(var i in results) {
-				//console.log(results[i].get('media'));
-				posts[i] = {};
-				posts[i].media = results[i].get('media');
-				posts[i].event = results[i].get('event').get('name');
-				posts[i].time = results[i].createdAt;
-				//
-				posts[i].location = {};
-				posts[i].location.latitude = results[i].get('location').latitude;
-				posts[i].location.longitude = results[i].get('location').longitude;
-				//
-				getFBInfo(i,crip.deco(results[i].get('author').get('username')));
-			}
-			function getFBInfo(i, fbUserId) {
-				FB.api('/'+fbUserId+'/',  function(profile) {
-					posts[i].author = {};
-					posts[i].author.firstName = profile.first_name;
-					posts[i].author.lastName = profile.last_name;
-					FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-						posts[i].author.picture= picture.data.url;
-						triggerNext();
-					});
-				});
-			}
-			function triggerNext() {
-				c--;
-				if(c===0) {
-					//getNumberOfFriendsAttendingEvent();
-					var response = {posts: posts};//, attendingEvents: attendingEvents};
-					next(response);
+		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+			var query = getQuery();
+			var relation = user.relation("likes");
+			query.find().then(function(results) {
+				console.log('Find Results: ' + results.length);
+				if(results.length == 0) {
+					next(results);
 				}
-			}
-
-	/*
-			function getNumberOfFriendsAttendingEvent() {
-				var attendingEvents = [];
-				var arrayOfUserIds = [];
-				Parse.User.become(this.parseSessionToken).then(function (user) {
-					var User = Parse.Object.extend("User");
-					var userQuery = new Parse.Query(User);
-
-					userQuery.notEqualTo("objectId", user.id);
-					var Post = Parse.Object.extend("Post");
-					var postQuery = new Parse.Query(Post);
-					postQuery.include("author");
-					postQuery.include("event");
-
-					postQuery.matchesQuery('author', userQuery);
-					postQuery.find().then(function(results) {
-						var c = results.length;
-						for(var i in results) {
-							attendingEvents[i] = {};
-							var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
-							arrayOfUserIds[i] = results[i].get('author').get('userId');
-							if(!aux) {
-								triggerNext();
-							}
-						}
-
-						function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
-							var index = -1;
-							for(var j in attendingEvents) {
-								if(attendingEvents[j].name == name) {
-									index = j;
+				var c = results.length;
+				relation.query().find().then(function(list) {
+					// list contains the posts that the current user likes.
+					//console.log(list);
+					//console.log(list[0]._serverData.media);
+				
+					for(var i in results) {
+						//console.log(results[i].get('media'));
+						posts[i] = {};
+						posts[i].media = results[i].get('media');
+						posts[i].event = results[i].get('event').get('name');
+						posts[i].time = results[i].createdAt;
+						if (list.length == 0) {
+							posts[i].like = false;
+						} else {
+							for(var j = 0; j<list.length; j++) {
+								if(list[j]._serverData.media == posts[i].media) {
+									posts[i].like = true;
 									break;
+								} else {
+									posts[i].like = false;
+								}
+							}	
+						}
+						//
+						posts[i].location = {};
+						posts[i].location.latitude = results[i].get('location').latitude;
+						posts[i].location.longitude = results[i].get('location').longitude;
+						//
+						getFBInfo(i,crip.deco(results[i].get('author').get('username')));
+					}
+					function getFBInfo(i, fbUserId) {
+						FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+							posts[i].author = {};
+							posts[i].author.firstName = profile.first_name;
+							posts[i].author.lastName = profile.last_name;
+							FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+								posts[i].author.picture= picture.data.url;
+								triggerNext();
+							});
+						});
+					}
+					function triggerNext() {
+						c--;
+						if(c===0) {
+							//getNumberOfFriendsAttendingEvent();
+							var response = {posts: posts};//, attendingEvents: attendingEvents};
+							next(response);
+						}
+					}
+				}, function(e) {
+					error(e);
+				});
+
+		/*
+				function getNumberOfFriendsAttendingEvent() {
+					var attendingEvents = [];
+					var arrayOfUserIds = [];
+					Parse.User.become(this.parseSessionToken).then(function (user) {
+						var User = Parse.Object.extend("User");
+						var userQuery = new Parse.Query(User);
+
+						userQuery.notEqualTo("objectId", user.id);
+						var Post = Parse.Object.extend("Post");
+						var postQuery = new Parse.Query(Post);
+						postQuery.include("author");
+						postQuery.include("event");
+
+						postQuery.matchesQuery('author', userQuery);
+						postQuery.find().then(function(results) {
+							var c = results.length;
+							for(var i in results) {
+								attendingEvents[i] = {};
+								var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
+								arrayOfUserIds[i] = results[i].get('author').get('userId');
+								if(!aux) {
+									triggerNext();
 								}
 							}
-							if(index >= 0) {
-								var flag = 0;
-								var currentAuthor = results[i].get('author').get('userId');
-								for(var k=0; k<=attendingEvents.length; k++) {
-									if(currentAuthor == arrayOfUserIds[k]) { 
-										return 0;
-									} else {
-										attendingEvents[index].count++;
-										FB.api('/'+fbUserId+'/',  function(profile) {
-											var n = 1;
-											var aux = 1;
-											do {
-												if(attendingEvents[index].going[n] != "") {
-													attendingEvents[index].going[n] = {};
-													attendingEvents[index].going[n].userId = userId;
-													attendingEvents[index].going[n].firstName = profile.first_name;
-													attendingEvents[index].going[n].lastName = profile.last_name;
-													triggerNext();
-													aux = 0;
-												}
-												n++;
-											} while(aux);
-										});
-										return 1;
+
+							function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
+								var index = -1;
+								for(var j in attendingEvents) {
+									if(attendingEvents[j].name == name) {
+										index = j;
+										break;
 									}
 								}
-							} else {
-								attendingEvents[i] = {name: name, count: 1};
-								FB.api('/'+fbUserId+'/',  function(profile) {
-									attendingEvents[i].going = [];
-									attendingEvents[i].going[0] = {};
-									attendingEvents[i].going[0].userId = userId;
-									attendingEvents[i].going[0].firstName = profile.first_name;
-									attendingEvents[i].going[0].lastName = profile.last_name;
-									triggerNext();
-								});
-								return 1;
+								if(index >= 0) {
+									var flag = 0;
+									var currentAuthor = results[i].get('author').get('userId');
+									for(var k=0; k<=attendingEvents.length; k++) {
+										if(currentAuthor == arrayOfUserIds[k]) { 
+											return 0;
+										} else {
+											attendingEvents[index].count++;
+											FB.api('/'+fbUserId+'/',  function(profile) {
+												var n = 1;
+												var aux = 1;
+												do {
+													if(attendingEvents[index].going[n] != "") {
+														attendingEvents[index].going[n] = {};
+														attendingEvents[index].going[n].userId = userId;
+														attendingEvents[index].going[n].firstName = profile.first_name;
+														attendingEvents[index].going[n].lastName = profile.last_name;
+														triggerNext();
+														aux = 0;
+													}
+													n++;
+												} while(aux);
+											});
+											return 1;
+										}
+									}
+								} else {
+									attendingEvents[i] = {name: name, count: 1};
+									FB.api('/'+fbUserId+'/',  function(profile) {
+										attendingEvents[i].going = [];
+										attendingEvents[i].going[0] = {};
+										attendingEvents[i].going[0].userId = userId;
+										attendingEvents[i].going[0].firstName = profile.first_name;
+										attendingEvents[i].going[0].lastName = profile.last_name;
+										triggerNext();
+									});
+									return 1;
+								}
 							}
-						}
-						function triggerNext() {
-							c--;
-							if(c===0) {
-								var response = {posts: posts, events: events, attendingEvents: attendingEvents};
-								next(response);
+							function triggerNext() {
+								c--;
+								if(c===0) {
+									var response = {posts: posts, events: events, attendingEvents: attendingEvents};
+									next(response);
+								}
 							}
-						}
+						});
 					});
-				});
-			}*/
+				}*/
+			}, function(e) {
+				error(e);
+			});
 		}, function(e) {
 			error(e);
 		});

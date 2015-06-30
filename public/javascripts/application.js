@@ -164,6 +164,15 @@ $(document).ready(function() {
 		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
 	});
 
+	//Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
+	$("#new-event-name").bind('keypress', function(event) {
+		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
+		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+		console.log(regex.test(key));
+		if (!regex.test(key)) {
+			event.preventDefault();
+		}
+	});
 	/*$('#main').scroll(function(event) {
 		$('#blurred-back').scrollTop($(this).scrollTop());
 	});*/
@@ -310,6 +319,7 @@ function Application($scope, $http) {
 				$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
+				$scope.posts[i].like = tmpPosts[i].like;
 			}
 		}
 		//console.log($scope.posts.length);
@@ -349,6 +359,20 @@ function Application($scope, $http) {
 		console.log(userToFollow);
 	}
 
+	//Asigna like a la foto que se indicó
+	$scope.likeClick = function(post) {
+		$scope.post = post;
+		if (!$scope.post.like) {
+			$scope.post.like = true;
+			$http.post('/post/like', $scope.post).success(function(data) {
+			}).error();
+		} else {
+			$scope.post.like = false;
+			$http.post('/post/unlike', $scope.post).success(function(data) {
+			}).error();
+		}
+	}
+
 	/*
 	 * Post
 	 */
@@ -370,7 +394,7 @@ function Application($scope, $http) {
 		}).success(function(data) {
 		}).error();
 	*/
-		$http.post('/post', $scope.newPost).success(function(data) {
+		$http.post('/post/new', $scope.newPost).success(function(data) {
 		}).error();
 	}
 

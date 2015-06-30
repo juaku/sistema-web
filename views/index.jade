@@ -75,8 +75,8 @@ block content
                       .time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm"}}
                       //.separator ·
                       //.friends 24 #{__('friends')}
-              .like
-                object
+              .like(ng-click="likeClick(post)")
+                object(ng-class="{selected: post.like}")
                   svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
                     path(fill="#D0D0D7" d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
       aside#second
