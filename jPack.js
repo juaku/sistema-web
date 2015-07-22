@@ -275,7 +275,7 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 jPack.user.prototype.newPost = function(newPost, next, error) {
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
 	var flag = validate({post: newPost.eventName}, {post: {format: pattern}});
-	console.log(flag);
+	//console.log(flag);
 	if(flag!=undefined) {
 		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
 		next();
@@ -470,25 +470,36 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
 function savePost(data, user, event, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
-	saveMedia(data.media, mediaName, mediaExt, function() {
-		var Post = Parse.Object.extend("Post");
-		post = new Post();
-		console.log(mediaName + mediaExt);
-		post.set('media', mediaName + '.' + mediaExt);
-		post.set('author', user);
-		post.set('event', event);
-		console.log(data.coords);
-		post.set('coords', data.coords);
-		var point = new Parse.GeoPoint({latitude: data.coords.latitude, longitude: data.coords.longitude});
-		post.set("location", point);
-		post.save().then(function(newPost) {
-			postCount++;
-			if(postCount >= postUpdate) {
-				updateEventList();
-			}
-			next();
-		}, function(e) {
-			error(e);
+	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
+		var base64data = imgBase64;
+		var namePhoto = mediaName;
+		var parseFile = new Parse.File(namePhoto+".txt", {base64: base64data});
+		parseFile.save().then(function() {
+			// The file has been saved to Parse.
+			console.log("el archivo fue guardado en parse con éxito");
+			var Post = Parse.Object.extend("Post");
+			post = new Post();
+			post.set("file", parseFile);
+			console.log(mediaName + mediaExt);
+			post.set('media', mediaName + '.' + mediaExt);
+			post.set('author', user);
+			post.set('event', event);
+			console.log(data.coords);
+			post.set('coords', data.coords);
+			var point = new Parse.GeoPoint({latitude: data.coords.latitude, longitude: data.coords.longitude});
+			post.set("location", point);
+			post.save().then(function(newPost) {
+				postCount++;
+				if(postCount >= postUpdate) {
+					updateEventList();
+				}
+				next();
+			}, function(e) {
+				error(e);
+			});
+		}, function(error) {
+			console.log("error al guardar el archivo en parse");
+			// The file either could not be read, or could not be saved to Parse.
 		});
 	}, function(e) {
 		error(e);
@@ -519,7 +530,7 @@ function saveMedia(data, name, ext, next, error) {
 	var buf = new Buffer(data, 'base64');
 	// TODO: Verificación de archivo
 	fs.writeFile('./public/uploads/'+ name +'.'+ ext, buf);
-	next();
+	next(data);
 }
 
 /*
@@ -668,6 +679,8 @@ jPack.getAllPosts = function(req, next, error) {
 						posts[i].media = results[i].get('media');
 						posts[i].event = results[i].get('event').get('name');
 						posts[i].time = results[i].createdAt;
+						posts[i].file = results[i].get('file');
+						posts[i].file.url = posts[i].file.url();
 						if (list.length == 0) {
 							posts[i].like = false;
 						} else {
