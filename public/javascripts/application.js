@@ -217,11 +217,11 @@ function Application($scope, $http) {
 	$scope.user = {};
 
 	$scope.user.data = {};
-	$scope.user.peopleToFollow = [];
+	//$scope.user.peopleToFollow = [];
 
 
 	getGeo(function() {
-		$http.post('/user', $scope.user).success(function(data) {
+		$http.post('/user/getGeo', $scope.user).success(function(data) {
 			getPosts();
 			getEvents();
 		}).error();
@@ -340,16 +340,36 @@ function Application($scope, $http) {
 	}
 
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
-	$http.get('/user').success(function(data) {
+	$http.get('/user/getAllUsers').success(function(data) {
 		//$scope.user.fbFriends = data;
-		$scope.usuarios = data;
+		$scope.usuario = data;
 	});
 
-	// Envía un objeto con los datos de las personas a seguir mediante un post 
-	$scope.setFollowRelation = function() {
-		$scope.user.peopleToFollow = peopleToFollow;
-		$http.post('/user', $scope.user).success(function(data) {
-		}).error();
+	// Envía un objeto con los datos de la persona que deseas seguir o dejar de seguir mediante un post 
+	$scope.followRelation = function(userToFollow) {
+		$scope.user.userToFollow = userToFollow;
+		if (!$scope.user.userToFollow.following) {
+			$scope.user.userToFollow.following = true;
+			$http.post('/user/follow', $scope.user).success(function(data) {
+			}).error();
+		} else {
+			$scope.user.userToFollow.following = false;
+			$http.post('/user/unfollow', $scope.user).success(function(data) {
+			}).error();
+		}
+	}
+
+	// Obtiene a las personas que te siguen o que sigues
+	$scope.getFollowers = function(i) {
+		if (i==1) {
+			$http.get('/user/getFollowers', $scope.user).success(function(data) {
+				$scope.followers = data;
+			}).error();
+		} else if (i==2) {
+			$http.get('/user/getFollowing', $scope.user).success(function(data) {
+				$scope.following = data;
+			}).error();
+		}
 	}
 
 	// Se almacena en un arreglo a las personas que deseas seguir para luego hacer la relación mediante seFollowRelation

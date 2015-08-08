@@ -320,7 +320,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 	}
 }
 
-/*
+/*D
  * @descrip Asigna relación de like con el post clickeado
  * @param {object} post, {function} next, {function} error.
  * @return null
@@ -350,7 +350,7 @@ jPack.user.prototype.setLike = function(post, next, error) {
 	});
 }
 
-/*
+/*D
  * @descrip Remueve relación de like con el post clickeado
  * @param {object} newPost, {function} next, {function} error.
  * @return null
@@ -379,72 +379,325 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 	});
 }
 
-/*
- * @descrip Realiza la relación de seguidores, de acuerdo a quien quieras seguir 
- * @param {array of objects} peopleToFollow, {function} next, {function} error.
+/*D
+ * @descrip Crea la relación de seguir a una persona 
+ * @param {object} userToFollow, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.setNewFollowRelation = function(peopleToFollow, next, error) {
+jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
-		var query = new Parse.Query(User);
-		var relation = user.relation("following");
-		var query = new Parse.Query(User);
-		var arrayPeopleToFollow = []
-		for(var i = 0; i<peopleToFollow.length; i++) {
-			text = peopleToFollow[i].id.toString();
-			key = '2903724R3c3D7j5G6y4R';
-			var hash = crypto.createHmac('sha256', key);
-			hash.update(text);
-			var value = hash.digest('hex');
-			arrayPeopleToFollow[arrayPeopleToFollow.length] = value;
+		var Follow = Parse.Object.extend("Follow");
+		follow = new Follow();
+		var queryUser = new Parse.Query(User);
+		//var relation = user.relation("following");
+		if(userToFollow.username != undefined) {
+			queryUser.equalTo("username", userToFollow.username);
+			queryUser.find().then(function(results) {
+				follow.set("from", user);//También puede usarse Parse.User.current() en vez de 'user', objeto del usuario actual
+				follow.set("to", results[0]);//objecto del usuario a seguir
+				follow.set("date", Date());
+				follow.save();
+				/*relation.add(results[0]);
+				user.save();*/
+				console.log("Empezaste a seguir a " + userToFollow.firstName);
+				next();
+			}, function(e) {
+				error(e);
+			});
 		}
-		query.containedIn("userId", arrayPeopleToFollow);
-		query.find().then(function(results) {
-			for (var i = 0; i < results.length; i++) {
-				relation.add(results[i]);
-			} 
-			user.save();
-			next();
-		});
+	}, function(e) {
+		error(e);
 	});
 }
 
-/*
- * @descrip Obtiene los amigos de facebook que están usando juaku 
+/*D
+ * @descrip Deshace la relación de seguir a una persona 
+ * @param {object} userToFollow, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		var Follow = Parse.Object.extend("Follow");
+		var queryUser = new Parse.Query(User);
+		var relationObjectId= ""; //Este es el objectId de la relación a eliminar
+		//var relation = user.relation("following");
+		if(userToFollow.username != undefined) {
+			queryUser.equalTo("username", userToFollow.username);
+			queryUser.find().then(function(results) {
+				var queryFollow = new Parse.Query(Follow);
+				queryFollow.equalTo("from", user);
+				queryFollow.equalTo("to", results[0]);
+				queryFollow.find().then(function(response) {
+					relationObjectId = response[0].id;
+					var mainQueryFollow = new Parse.Query(Follow);
+						mainQueryFollow.get(relationObjectId).then(function(relation) {
+							relation.destroy().then(function(){
+								console.log("dejaste de seguir a " + userToFollow.firstName);
+								next();
+							}, function(e) {
+								error(e);
+							});
+						}, function(e) {
+							error(e);
+						});
+				}, function(e) {
+					error(e);
+				});
+				/*relation.remove(results[0]);
+				user.save();*/
+			}, function(e) {
+				error(e);
+			});
+		}
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Obtiene todas las personas que siguen al usuario actual
+ * @param {object} req, {function} next, {function} error.
+ * @return {array} followers
+ */
+jPack.user.prototype.getFollowers = function(req, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var followers = [];
+		var followersItemCount = 0;
+		var Follow = Parse.Object.extend("Follow");
+		var queryFollow = new Parse.Query(Follow);
+		queryFollow.include("from");
+		queryFollow.equalTo("to", user);
+		queryFollow.find().then(function(users) {
+			console.log("users.length " + users.length);
+			if(users.length != 0) {
+				followersItemCount = users.length;
+				console.log("Te siguen: " + users.length + " personas.");
+				for(var i = 0; i<users.length; i++) {
+					var userResult = users[i];
+					var columnTo = userResult.get("from");
+					var fbUserId = crip.deco(columnTo.get("username"));
+					var date = userResult.get("date");
+					getFBInfo(i, fbUserId);
+				}
+				function getFBInfo(i, fbUserId) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+						followers[i] = {};
+						followers[i].firstName = profile.first_name;
+						followers[i].lastName = profile.last_name;
+						followers[i].date = date;
+						FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+							followers[i].picture= picture.data.url;
+							triggerNext();
+						});
+					});
+				}
+				function triggerNext() {
+					followersItemCount--;
+					if(followersItemCount===0) {
+						next();
+					}
+				}
+			} else { 
+				console.log("No tienes seguidores");
+				next(followers);
+			}
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Obiene todas las personas que el usuario actual está siguiendo
+ * @param {object} req, {function} next, {function} error.
+ * @return {array} following
+ */
+jPack.user.prototype.getFollowing = function(req, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var following = [];
+		var followingItemCount = 0;
+		var Follow = Parse.Object.extend("Follow");
+		var queryFollow = new Parse.Query(Follow);
+		queryFollow.include("to");
+		queryFollow.equalTo("from", user);
+		queryFollow.find().then(function(users) {
+			if(users.length != 0) {
+				followingItemCount = users.length;
+				console.log("Estás siguiendo: " + users.length + " personas.");
+				for(var i = 0; i<users.length; i++) {
+					var userResult = users[i];
+					var columnTo = userResult.get("to");
+					var fbUserId = crip.deco(columnTo.get("username"));
+					var date = userResult.get("date");
+					getFBInfo(i, fbUserId);
+					function getFBInfo(i, fbUserId) {
+						FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+							following[i] = {};
+							following[i].firstName = profile.first_name;
+							following[i].lastName = profile.last_name;
+							following[i].date = date;
+							FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+								following[i].picture= picture.data.url;
+								triggerNext();
+							});
+						});
+					}
+					function triggerNext() {
+						followingItemCount--;
+						if(followingItemCount===0) {
+							next(following);
+						}
+					}
+				}
+			} else {
+				console.log("No estás siguiendo a nadie");
+				next(following);
+			}
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Obtiene los amigos de facebook que están usando la aplicación 
  * @param {object} req, {function} next, {function} error.
  * @return {array} usingIds
  */
-jPack.user.prototype.showFriendsUsingApp = function(req, next, error) {
-	//var idProfile = req.session.passport.user.id;
+jPack.user.prototype.getFriendsUsingApp = function(req, next, error) {
+	var idProfile = req.session.passport.user.id;
+	var friendsUsing = [];
+	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
 	Parse.User.become(this.parseSessionToken).then(function (user) {
-		var User = Parse.Object.extend("User");
-		req.session.jUser.getFriendsUsingApp(req.session, function(response) {
+		//var User = Parse.Object.extend("User"); //TODO: ver si es necesario, sino borrarla
+		// list contains the users that the current user is following.
+		FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: req.session.jUser.accessToken}, function(response) {
 			if (response && !response.error) {
-				var usingIds = [];
-				for (var i = 0; i < response.length; i++) {
-					usingIds[usingIds.length] = response[i];
+				//console.log(response.data);
+				for(var i = 0; i<response.data.length; i++) {
+					if(response.data[i].installed == true && response.data[i].id != idProfile) {
+						friendsUsing[i] = {};
+						friendsUsing[i].installed = response.data[i].installed;
+						friendsUsing[i].name = response.data[i].name;
+						//friendsUsing[i].id = response.data[i].id;
+						text = response.data[i].id;
+						key = '2903724R3c3D7j5G6y4R';
+						var hash = crypto.createHmac('sha256', key);
+						hash.update(text);
+						var value = hash.digest('hex');
+						friendsUsing[i].id = value;
+						isFollowing(friendsUsing[i], function() {
+							aux = aux + 1;
+							if(aux == friendsUsing.length) {
+								next(friendsUsing);
+							}
+						}, function(e) {
+							error(e);
+						});
+					}
 				}
 			}
-			next(usingIds);
-		})
+		});
+		function isFollowing (friendsUsing, next, error) {
+			var User = Parse.Object.extend("User");
+			var Follow = Parse.Object.extend("Follow");
+			var queryUser = new Parse.Query(User);
+			queryUser.equalTo("userId", friendsUsing.id);
+			queryUser.find().then(function(results) {
+				var queryFollow = new Parse.Query(Follow);
+				queryFollow.equalTo("from", user);
+				queryFollow.equalTo("to", results[0]);
+				queryFollow.find().then(function(response) {
+					if(response.length != 0) {
+						friendsUsing.following = true;
+						next();
+					}else {
+						friendsUsing.following = false;
+						next();
+					}
+				}, function(e) {
+					error(e);
+				});
+			}, function(e) {
+				error(e);
+			});
+		}
+	}, function(e) {
+		error(e);
 	});
 }
 
-jPack.user.prototype.getFriendsUsingApp = function(session, next) {
-	var idProfile = session.passport.user.id;
-	var friendsUsing = [];
-	var friendCount=0;
-	FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: this.accessToken}, function(response) {
-		if (response && !response.error) {
-			for(var i = 0; i<response.data.length; i++) {
-				if(response.data[i].installed == true && response.data[i].id != idProfile) {
-					friendsUsing[friendCount] = response.data[i];
-					friendCount++;					
-				}
+/*D
+ * @descrip Obtiene los amigos de facebook que están usando la aplicación 
+ * @param {object} req, {function} next, {function} error.
+ * @return {array} usingIds
+ */
+jPack.user.prototype.getAllUsers = function(req, next, error) {
+	var idProfile = req.session.passport.user.id;
+	var allUsers = [];
+	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		var queryUser = new Parse.Query(User);
+		queryUser.notEqualTo("objectId", user.id);
+		queryUser.find().then(function(users) {
+			for(var i = 0; i<users.length; i++) {
+					allUsers[i] = {};
+					allUsers[i].username = users[i].attributes.username;
+					getFBInfo(i, crip.deco(users[i].attributes.username));
 			}
-			next(friendsUsing);
-		}
+			function getFBInfo(i, fbUserId) {
+				FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+					allUsers[i].firstName = profile.first_name;
+					allUsers[i].lastName = profile.last_name;
+					FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+						allUsers[i].picture= picture.data.url;
+						isFollowing(allUsers[i], function() {
+							aux = aux + 1;
+							if(aux == allUsers.length) {
+								next(allUsers);
+							}
+						}, function(e) {
+							error(e);
+						});
+					});
+				});
+			}
+			function isFollowing (allUsers, next, error) {
+				var User = Parse.Object.extend("User");
+				var Follow = Parse.Object.extend("Follow");
+				var queryUser = new Parse.Query(User);
+				queryUser.equalTo("username", allUsers.username);
+				queryUser.find().then(function(results) {
+					var queryFollow = new Parse.Query(Follow);
+					queryFollow.equalTo("from", user);
+					queryFollow.equalTo("to", results[0]);
+					queryFollow.find().then(function(response) {
+						if(response.length != 0) {
+							allUsers.following = true;
+							next();
+						}else {
+							allUsers.following = false;
+							next();
+						}
+					}, function(e) {
+						error(e);
+					});
+				}, function(e) {
+					error(e);
+				});
+			}
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
 	});
 }
 
@@ -456,10 +709,11 @@ jPack.user.prototype.getFriendsUsingApp = function(session, next) {
 jPack.user.prototype.setGenericData = function(req, next, error) {
 	this.coords = req.body.data.coords;
 	req.session.jUser.coords = this.coords;
-	this.setNewFollowRelation(req.body.peopleToFollow, function(){
+	next();
+	/*this.setFollowRelation(req.body.peopleToFollow, function(){
 		next();
 	},function(){
-	});
+	});*/
 }
 
 /*
