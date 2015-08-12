@@ -239,7 +239,7 @@ function Application($scope, $http) {
 	var tmpLoadingPostsNumber;
 	var tmpPosts = [];
 	var getPostTries = 0;
-	var getPostTriesLimit = 30;
+	var getPostTriesLimit = 20;
 	$scope.posts = [];
 	$scope.events = [];
 
@@ -316,10 +316,9 @@ function Application($scope, $http) {
 		for(var i = numberPostsNow; i < postShown; i++) {
 			if(tmpPosts[i] != undefined) {
 				$scope.posts[i] = tmpPosts[i];
-				$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
+				//$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
-				$scope.posts[i].like = tmpPosts[i].like;
 			}
 		}
 		//console.log($scope.posts.length);

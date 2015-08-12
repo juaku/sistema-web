@@ -328,16 +328,11 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 jPack.user.prototype.setLike = function(post, next, error) {
 	//console.log('J0 - ' + this.parseSessionToken);
 	Parse.User.become(this.parseSessionToken).then(function (user) {
-		
 		var Post = Parse.Object.extend("Post");
 		var query = new Parse.Query(Post);
 		var relation = user.relation("likes");
 
-		var str = post.media;
-		var res= str.split("/");
-		var postMedia = res[1];
-
-		query.equalTo("media", postMedia);
+		query.equalTo("publicId", post.id);
 		query.find().then(function(results) {
 			relation.add(results[0]);
 			user.save();
@@ -360,12 +355,8 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 		var Post = Parse.Object.extend("Post");
 		var query = new Parse.Query(Post);
 		var relation = user.relation("likes");
-		
-		var str = post.media;
-		var res= str.split("/");
-		var postMedia = res[1];
 
-		query.equalTo("media", postMedia);
+		query.equalTo("publicId", post.id);
 		query.find().then(function(results) {
 			relation.remove(results[0]);
 			user.save();
@@ -743,6 +734,8 @@ function savePost(data, user, event, next, error) {
 			var point = new Parse.GeoPoint({latitude: data.coords.latitude, longitude: data.coords.longitude});
 			post.set("location", point);
 			post.save().then(function(newPost) {
+				post.set('publicId', crip.enco(newPost.id));
+				post.save();
 				postCount++;
 				if(postCount >= postUpdate) {
 					updateEventList();
@@ -930,16 +923,17 @@ jPack.getAllPosts = function(req, next, error) {
 					for(var i in results) {
 						//console.log(results[i].get('media'));
 						posts[i] = {};
-						posts[i].media = results[i].get('media');
+						//posts[i].media = results[i].get('media'); // método antiguo utilizado por public/uploads
+						posts[i].id = results[i].get('publicId');
 						posts[i].event = results[i].get('event').get('name');
 						posts[i].time = results[i].createdAt;
 						posts[i].file = results[i].get('file');
-						posts[i].file.url = posts[i].file.url();
+						posts[i].media = posts[i].file.url(); //posts[i].file.url
 						if (list.length == 0) {
 							posts[i].like = false;
 						} else {
 							for(var j = 0; j<list.length; j++) {
-								if(list[j]._serverData.media == posts[i].media) {
+								if(list[j].attributes.publicId == posts[i].id) {
 									posts[i].like = true;
 									break;
 								} else {
