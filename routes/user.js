@@ -59,6 +59,20 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 				console.log(error);
 			});
+		} else if (req.params.action=='block') {
+			jUser.blockUser(req.body.userToBlock, function() {
+				res.status(201).end();
+			}, function(error) {
+				res.status(400).end();
+				console.log(error);
+			});
+		} else if (req.params.action=='unBlock') {
+			jUser.unBlockUser(req.body.userToBlock, function() {
+				res.status(201).end();
+			}, function(error) {
+				res.status(400).end();
+				console.log(error);
+			});
 		}
 	}
 });
