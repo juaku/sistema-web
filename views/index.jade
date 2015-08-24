@@ -24,8 +24,8 @@ block content
                 span.profile-firstname #{user.firstName} 
                 br
                 span.profile-lastname #{user.lastName}
-            section#friends
-              .friend #{__('Friend activity')}
+            //section#friends
+            //  .friend #{__('Friend activity')}
       section#view
         //input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
         //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
@@ -82,14 +82,15 @@ block content
       aside#second
         section#events-side
           section#events-controls
-            .search-box
-              input(type="text", placeholder="#{__('Search events')}") 
+            //.search-box // Moverlo a header
+            //  input(type="text", placeholder="#{__('Search events')}") 
             .promoted
-              .promoted-title #{__('Promoted')}
+              .promoted-title.title #{__('Promoted')}
               .event.promoted-event
                 .event-name.promoted-event-name @Aura
                 .event-people.promoted-event-people 1280 #{__('people')}
             .events-list
+              .events-title.title #{__('Trends')}
               .event(ng-repeat="event in events | limitTo: limit")
                 .event-name
                   span.at-simbol @

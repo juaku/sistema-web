@@ -90,10 +90,10 @@ header
 	//box-shadow: 0 2px 0 rgba(0,0,0,0.05) // NEWLOGO // RE-FLAT
 
 header #title a
-	background-image: url('/images/sprite.png?v=1005')
+	background-image: url('/images/sprite.svg?v=1005')
 	background-repeat: no-repeat
-	background-size: 110px
-	width: 110px
+	/*background-size: 112.5px*/ /* Borroso en FF*/
+	width: 112.5px
 	height: 45px
 	display: block
 	margin: 0 auto
@@ -158,7 +158,7 @@ section#people-side
 
 section#people-controls section#profile
 	background-color: #FFF
-	padding: 5px
+	//padding: 5px
 	width: 100px
 	height: 170px
 	text-align: left
@@ -170,7 +170,7 @@ section#people-controls section#profile img
 	height: 100px
 
 section#people-controls section#profile h2.profile-name
-	margin: 3px 5px 0 2px
+	margin: 5px
 	font-size: 14px
 	line-height: 14px
 	overflow: hidden
@@ -185,6 +185,7 @@ section#people-controls section#profile h2.profile-name .profile-lastname
 	font-size: 12px
 	font-weight: normal
 
+/*
 section#people-controls section#friends
 	margin-top: 20px
 	display: inline-block
@@ -206,6 +207,7 @@ section#people-controls section#friends .friend:before
 	display: block
 	margin-top: 30px
 	color: rgba(0,0,0,0.1)
+*/
 
 /*
  * Vista
@@ -273,7 +275,7 @@ section#view section#post-list .post div.media .preloader
 	top: 50%
 	left: 50%
 	margin: -15px
-	animation: preloader 750ms linear infinite
+	animation: preloader 750ms linear //infinite // Genera parpadeo cambiar por otra cosa
 
 @keyframes preloader
 	0%
@@ -304,7 +306,7 @@ section#view section#post-list .post .bottom .info
 	//width: 100%
 	//width: 90px
 	vertical-align: top
-	padding: 5px
+	//padding: 5px
 	//background: #0FF //A
 	
 section#view section#post-list .post .bottom .info .info-wrapper
@@ -331,12 +333,12 @@ section#view section#post-list .post .bottom .post-detail
 
 section#view section#post-list .post .bottom .author-img
 	display: table-cell
-	width: 45px // Android
+	width: 55px // Android
 	//background: #F0F //A
 
 section#view section#post-list .post .bottom .author-img img
-	width: 40px
-	height: 40px
+	width: 55px
+	height: 55px
 	margin-right: 5px
 	background-color: #EEE
 	display: block //En lugar de font-size: 0;
@@ -346,6 +348,7 @@ section#view section#post-list .post .bottom .post-detail
 	//display: table-cell
 	table-layout: fixed
 	width: 100%
+	padding: 6px 5px 5px 10px
 	//width: 215px
 	//min-width: 215px
 	//background: #0F0 //A
@@ -389,19 +392,25 @@ section#view section#post-list .post .bottom .post-detail .sub:first-letter
 
 section#view section#post-list .post .bottom .post-detail .post-title
 	font-size: 17px
-	color: #333
+	color: #F05
 	//width: 0
 	//display: table-cell
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
-	line-height: 22px
+	//line-height: 22px
+	letter-spacing: -0.5px
 	//padding-bottom: 1px
 	//margin-top: 2px
 	//background: #00F //A
 	
 //section#view section#post-list .post .bottom .post-detail .post-title .author-name
 //	display: inline-block
+
+section#view section#post-list .post .bottom .post-detail .post-title .author-name
+	color: #333
+	font-size: 16px
+	font-weight: bold
 	
 section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName
 	display: none
@@ -409,7 +418,7 @@ section#view section#post-list .post .bottom .post-detail .post-title .author-na
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted
 	//font-family: Tahoma, Arial, sans-serif
 	//display: inline-block
-	color: #F05
+	//color: #F05
 	max-width: 70%
 	//letter-spacing: -0.5px
 
@@ -420,15 +429,17 @@ section#view section#post-list .post .bottom .post-detail .post-title .event-pos
 section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 12px
 	color: #999
-	//margin-top: 3px
+	letter-spacing: -0.5px
+	//margin-top: 2px
 	//background: #FF0 //A
 
+
+section#view section#post-list .post .bottom .post-detail .sub-info .time
+	display: inline-block	
+	
 section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter
 	text-transform: uppercase
 
-section#view section#post-list .post .bottom .post-detail .sub-info .time
-	display: inline-block
-	
 section#view section#post-list .post .bottom .post-detail .sub-info .separator
 	display: inline-block
 	margin: 0 5px
@@ -437,13 +448,14 @@ section#view section#post-list .post .bottom .post-detail .sub-info .friends
 	display: inline-block
 
 section#view section#post-list .post .bottom .like object // Para que no se corte el texto
-	width: 50px
-	height: 50px
+	width: 55px
+	height: 55px
 
 section#view section#post-list .post .bottom .like
-	width: 50px // Firefox, Android Browser
+	width: 55px // Firefox, Android Browser
 	//height: 50px
-	background-color: #FAFAFA
+	//background-color: #FAFAFA
+	//background-color: #FAFAFA
 	//border-left: 1px solid #EEE //RE-FLAT
 	//border-left: 1px solid #F5F5F5
 	display: table-cell
@@ -451,8 +463,8 @@ section#view section#post-list .post .bottom .like
 	//font-size: 0 //Reemplazado por display: block; .like-svg
 
 section#view section#post-list .post .bottom .like .like-svg
-	width: 50px
-	height: 50px
+	width: 55px
+	height: 55px
 	cursor: pointer
 	display: block // En lugar de font-size: 0;
 
@@ -464,14 +476,14 @@ section#view section#post-list .post .bottom .like .selected .like-svg #inner
  */
 aside section#events-controls
 	background: #FFF
-	padding: 5px 0
+	//padding: 5px 0
 
-aside section#events-controls .search-box
+//aside section#events-controls .search-box
 aside section#events-controls .promoted
 aside section#events-controls .events-list
 aside section#events-controls .show-more
-	margin: 15px 10px
-
+	padding: 10px
+/*
 aside section#events-controls .search-box
 	margin-top: 10px
 
@@ -487,18 +499,22 @@ aside section#events-controls .search-box input
 	border: none
 	border-radius: 20px
 	outline: none
-
-aside section#events-controls .promoted .promoted-title
-	font-size: 10px
-	color: #CCC
-	text-transform: uppercase
+*/
+aside section#events-controls .title
+	font-size: 11px
+	color: #AAA
+	//text-transform: uppercase
+		
+aside section#events-controls .events-title
+	font-size: 14px
 
 aside section#events-controls .event
 	margin: 5px 0
 
 aside section#events-controls .event .event-name
 	//font-family: Tahoma, Arial, sans-serif
-	font-size: 15px
+	font-size: 17px
+	letter-spacing: -0.5px
 	color: #F05
 	overflow: hidden
 	white-space: nowrap
@@ -515,13 +531,13 @@ aside section#events-controls .event .event-people
 	color: #999
 	margin-left: 15px
 
-aside section#events-controls .promoted:after
+/*aside section#events-controls .promoted:after
 aside section#events-controls .events-list:after
 	content: ''
 	display: block
 	background: #FAFAFA
 	height: 5px
-	margin-top: 15px
+	margin-top: 15px*/
 
 aside section#events-controls .show-more
 	text-align: center
@@ -727,22 +743,22 @@ footer #brand
 		padding: 4px 0 5px 0;
 
 	header #title a
-		background-size: 85px
-		width: 85px
+		/*background-size: 87.5px*/ /* Borroso en FF*/
+		width: 87.5px
 		height: 35px
-
-	/*section#view section#post-list .post // NEWLOGO
+		
+	section#view section#post-list .post .bottom .post-detail .post-title
+		//font-size: 16px
+		//letter-spacing: -0.5px
+	
+	section#view section#post-list .post .bottom .post-detail .sub-info
+		//letter-spacing: -0.5px
+		
+/*section#view section#post-list .post // NEWLOGO
 		margin-bottom: 15px*/
 
 /*section#view #view-wrapper
 		padding: 0 // NEWLOGO*/
-
-	section#view section#post-list .post .bottom .post-detail .post-title
-		//font-size: 16px
-		letter-spacing: -0.5px
-	
-	section#view section#post-list .post .bottom .post-detail .sub-info
-		letter-spacing: -0.5px
 
 /*
 @media (max-width: 969px) 
