@@ -84,12 +84,11 @@ header {
   top: 0;
 }
 header #title a {
-  background-image: url("/images/sprite.png?v=1005");
+  background-image: url("/images/sprite.svg?v=1005");
   background-repeat: no-repeat;
-  -webkit-background-size: 110px;
-  -moz-background-size: 110px;
-  background-size: 110px;
-  width: 110px;
+/*background-size: 112.5px*/
+/* Borroso en FF*/
+  width: 115px;
   height: 45px;
   display: block;
   margin: 0 auto;
@@ -149,7 +148,6 @@ section#people-side {
 }
 section#people-controls section#profile {
   background-color: #fff;
-  padding: 5px;
   width: 100px;
   height: 170px;
   text-align: left;
@@ -161,7 +159,7 @@ section#people-controls section#profile img {
   height: 100px;
 }
 section#people-controls section#profile h2.profile-name {
-  margin: 3px 5px 0 2px;
+  margin: 5px;
   font-size: 14px;
   line-height: 14px;
   overflow: hidden;
@@ -177,28 +175,29 @@ section#people-controls section#profile h2.profile-name .profile-lastname {
   font-size: 12px;
   font-weight: normal;
 }
-section#people-controls section#friends {
-  margin-top: 20px;
-  display: inline-block;
-}
-section#people-controls section#friends .friend {
-  background-color: rgba(255,255,255,0.5);
-  font-size: 12px;
-  color: #999;
-  width: 90px;
-  height: 150px;
-  display: inline-block;
-  margin-bottom: 10px;
-  text-align: center;
-  padding: 10px;
-}
-section#people-controls section#friends .friend:before {
-  content: '+';
-  font-size: 50px;
-  display: block;
-  margin-top: 30px;
-  color: rgba(0,0,0,0.1);
-}
+/*
+section#people-controls section#friends
+	margin-top: 20px
+	display: inline-block
+
+section#people-controls section#friends .friend
+	background-color: rgba(255, 255, 255, 0.5)
+	font-size: 12px
+	color: #999
+	width: 90px
+	height 150px
+	display: inline-block
+	margin-bottom: 10px
+	text-align: center
+	padding: 10px
+
+section#people-controls section#friends .friend:before
+	content: '+'
+	font-size: 50px
+	display: block
+	margin-top: 30px
+	color: rgba(0,0,0,0.1)
+*/
 /*
  * Vista
  */
@@ -274,7 +273,6 @@ section#view section#post-list .post .bottom {
 section#view section#post-list .post .bottom .info {
   display: table-cell;
   vertical-align: top;
-  padding: 5px;
 }
 section#view section#post-list .post .bottom .info .info-wrapper {
   display: table;
@@ -295,19 +293,20 @@ section#view section#post-list .post .bottom .post-detail {
 }
 section#view section#post-list .post .bottom .author-img {
   display: table-cell;
-  width: 45px;
+  width: 55px;
 }
 section#view section#post-list .post .bottom .author-img img {
-  width: 40px;
-  height: 40px;
+  width: 55px;
+  height: 55px;
   margin-right: 5px;
-  background-color: #eee;
+  background-color: #fff;
   display: block;
 }
 section#view section#post-list .post .bottom .post-detail {
   display: table;
   table-layout: fixed;
   width: 100%;
+  padding: 6px 5px 5px 10px;
 }
 /*
 section#view section#post-list .post .bottom .post-detail .post-data
@@ -347,18 +346,22 @@ section#view section#post-list .post .bottom .post-detail .sub:first-letter
 */
 section#view section#post-list .post .bottom .post-detail .post-title {
   font-size: 17px;
-  color: #333;
+  color: #f05;
   overflow: hidden;
   white-space: nowrap;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  line-height: 22px;
+  letter-spacing: -0.5px;
+}
+section#view section#post-list .post .bottom .post-detail .post-title .author-name {
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName {
   display: none;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted {
-  color: #f05;
   max-width: 70%;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted .at-simbol {
@@ -368,12 +371,13 @@ section#view section#post-list .post .bottom .post-detail .post-title .event-pos
 section#view section#post-list .post .bottom .post-detail .sub-info {
   font-size: 12px;
   color: #999;
-}
-section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter {
-  text-transform: uppercase;
+  letter-spacing: -0.5px;
 }
 section#view section#post-list .post .bottom .post-detail .sub-info .time {
   display: inline-block;
+}
+section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter {
+  text-transform: uppercase;
 }
 section#view section#post-list .post .bottom .post-detail .sub-info .separator {
   display: inline-block;
@@ -383,18 +387,17 @@ section#view section#post-list .post .bottom .post-detail .sub-info .friends {
   display: inline-block;
 }
 section#view section#post-list .post .bottom .like object {
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
 }
 section#view section#post-list .post .bottom .like {
-  width: 50px;
-  background-color: #fafafa;
+  width: 55px;
   display: table-cell;
   vertical-align: bottom;
 }
 section#view section#post-list .post .bottom .like .like-svg {
-  width: 50px;
-  height: 50px;
+  width: 55px;
+  height: 55px;
   cursor: pointer;
   display: block;
 }
@@ -406,41 +409,42 @@ section#view section#post-list .post .bottom .like .selected .like-svg #inner {
  */
 aside section#events-controls {
   background: #fff;
-  padding: 5px 0;
 }
-aside section#events-controls .search-box,
 aside section#events-controls .promoted,
 aside section#events-controls .events-list,
 aside section#events-controls .show-more {
-  margin: 15px 10px;
-}
-aside section#events-controls .search-box {
-  margin-top: 10px;
-}
-aside section#events-controls .search-box input {
-  background: #f5f5f5;
-  color: #999;
-  width: 160px;
-  height: 10px;
-  font-size: 14px;
-  font-style: italic;
   padding: 10px;
-  margin: 0;
-  border: none;
-  -webkit-border-radius: 20px;
-  border-radius: 20px;
-  outline: none;
 }
-aside section#events-controls .promoted .promoted-title {
-  font-size: 10px;
-  color: #ccc;
-  text-transform: uppercase;
+/*
+aside section#events-controls .search-box
+	margin-top: 10px
+
+aside section#events-controls .search-box input
+	background: #F5F5F5
+	color: #999
+	width: 160px
+	height: 10px
+	font-size: 14px
+	font-style: italic
+	padding: 10px
+	margin: 0
+	border: none
+	border-radius: 20px
+	outline: none
+*/
+aside section#events-controls .title {
+  font-size: 11px;
+  color: #aaa;
+}
+aside section#events-controls .events-title {
+  font-size: 14px;
 }
 aside section#events-controls .event {
   margin: 5px 0;
 }
 aside section#events-controls .event .event-name {
-  font-size: 15px;
+  font-size: 17px;
+  letter-spacing: -0.5px;
   color: #f05;
   overflow: hidden;
   white-space: nowrap;
@@ -458,14 +462,13 @@ aside section#events-controls .event .event-people {
   color: #999;
   margin-left: 15px;
 }
-aside section#events-controls .promoted:after,
-aside section#events-controls .events-list:after {
-  content: '';
-  display: block;
-  background: #fafafa;
-  height: 5px;
-  margin-top: 15px;
-}
+/*aside section#events-controls .promoted:after
+aside section#events-controls .events-list:after
+	content: ''
+	display: block
+	background: #FAFAFA
+	height: 5px
+	margin-top: 15px*/
 aside section#events-controls .show-more {
   text-align: center;
 }
@@ -667,21 +670,16 @@ footer #brand {
     padding: 4px 0 5px 0;
   }
   header #title a {
-    -webkit-background-size: 85px;
-    -moz-background-size: 85px;
-    background-size: 85px;
-    width: 85px;
+/*background-size: 87.5px*/
+/* Borroso en FF*/
+    width: 87.5px;
     height: 35px;
   }
 }
+/*section#view section#post-list .post // NEWLOGO
+		margin-bottom: 15px*/
 /*section#view #view-wrapper
 		padding: 0 // NEWLOGO*/
-section#view section#post-list .post .bottom .post-detail .post-title {
-  letter-spacing: -0.5px;
-}
-section#view section#post-list .post .bottom .post-detail .sub-info {
-  letter-spacing: -0.5px;
-}
 /*
 @media (max-width: 969px) 
 	main
