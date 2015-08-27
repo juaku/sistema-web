@@ -392,6 +392,20 @@ function Application($scope, $http) {
 		}
 	}
 
+	// Envía un objeto con los datos de la persona que deseas bloquear o desbloquear mediante un post 
+	$scope.blockUser = function(userToBlock) {
+		$scope.user.userToBlock = userToBlock;
+		if (!$scope.user.userToBlock.block) {
+			$scope.user.userToBlock.block = true;
+			$http.post('/user/block', $scope.user).success(function(data) {
+			}).error();
+		} else {
+			$scope.user.userToBlock.block = false;
+			$http.post('/user/unBlock', $scope.user).success(function(data) {
+			}).error();
+		}
+	}
+
 	/*
 	 * Post
 	 */

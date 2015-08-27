@@ -333,8 +333,8 @@ jPack.user.prototype.setLike = function(post, next, error) {
 		var relation = user.relation("likes");
 
 		query.equalTo("publicId", post.id);
-		query.find().then(function(results) {
-			relation.add(results[0]);
+		query.find().then(function(postLiked) {
+			relation.add(postLiked[0]);
 			user.save();
 			next();
 		}, function(e) {
@@ -357,8 +357,8 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 		var relation = user.relation("likes");
 
 		query.equalTo("publicId", post.id);
-		query.find().then(function(results) {
-			relation.remove(results[0]);
+		query.find().then(function(postUnLiked) {
+			relation.remove(postUnLiked[0]);
 			user.save();
 			next();
 		}, function(e) {
@@ -384,9 +384,9 @@ jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
 		//var relation = user.relation("following");
 		if(userToFollow.username != undefined) {
 			queryUser.equalTo("username", userToFollow.username);
-			queryUser.find().then(function(results) {
+			queryUser.find().then(function(userFollowed) {
 				follow.set("from", user);//También puede usarse Parse.User.current() en vez de 'user', objeto del usuario actual
-				follow.set("to", results[0]);//objecto del usuario a seguir
+				follow.set("to", userFollowed[0]);//objecto del usuario a seguir
 				follow.set("date", Date());
 				follow.save();
 				/*relation.add(results[0]);
@@ -416,12 +416,12 @@ jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
 		//var relation = user.relation("following");
 		if(userToFollow.username != undefined) {
 			queryUser.equalTo("username", userToFollow.username);
-			queryUser.find().then(function(results) {
+			queryUser.find().then(function(userFollowed) {
 				var queryFollow = new Parse.Query(Follow);
 				queryFollow.equalTo("from", user);
-				queryFollow.equalTo("to", results[0]);
-				queryFollow.find().then(function(response) {
-					relationObjectId = response[0].id;
+				queryFollow.equalTo("to", userFollowed[0]);
+				queryFollow.find().then(function(userToUnFollow) {
+					relationObjectId = userToUnFollow[0].id;
 					var mainQueryFollow = new Parse.Query(Follow);
 						mainQueryFollow.get(relationObjectId).then(function(relation) {
 							relation.destroy().then(function(){
@@ -635,58 +635,129 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
+		var relation = user.relation("blockedUsers");
 		var queryUser = new Parse.Query(User);
 		queryUser.notEqualTo("objectId", user.id);
 		queryUser.find().then(function(users) {
-			for(var i = 0; i<users.length; i++) {
-					allUsers[i] = {};
-					allUsers[i].username = users[i].attributes.username;
-					getFBInfo(i, crip.deco(users[i].attributes.username));
-			}
-			function getFBInfo(i, fbUserId) {
-				FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
-					allUsers[i].firstName = profile.first_name;
-					allUsers[i].lastName = profile.last_name;
-					FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-						allUsers[i].picture= picture.data.url;
-						isFollowing(allUsers[i], function() {
-							aux = aux + 1;
-							if(aux == allUsers.length) {
-								next(allUsers);
+			relation.query().find().then(function(listOfBlockedUsers) {
+			//listOfBlockedUsers contains the users that the current user blocked.
+				for(var i = 0; i<users.length; i++) {
+						allUsers[i] = {};
+						allUsers[i].username = users[i].attributes.username;
+						getFBInfo(i, crip.deco(users[i].attributes.username));
+				}
+				function getFBInfo(i, fbUserId) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+						allUsers[i].firstName = profile.first_name;
+						allUsers[i].lastName = profile.last_name;
+						FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+							allUsers[i].picture= picture.data.url;
+							if (listOfBlockedUsers.length == 0) {
+								allUsers[i].block = false;
+							} else {
+								for(var j = 0; j<listOfBlockedUsers.length; j++) {
+									if(listOfBlockedUsers[j].attributes.username == allUsers[i].username) {
+										allUsers[i].block = true;
+										break;
+									} else {
+										allUsers[i].block = false;
+									}
+								}
+							}
+							isFollowing(allUsers[i], function() {
+								aux = aux + 1;
+								if(aux == allUsers.length) {
+									next(allUsers);
+								}
+							}, function(e) {
+								error(e);
+							});
+						});
+					});
+				}
+				function isFollowing (allUsers, next, error) {
+					var User = Parse.Object.extend("User");
+					var Follow = Parse.Object.extend("Follow");
+					var queryUser = new Parse.Query(User);
+					queryUser.equalTo("username", allUsers.username);
+					queryUser.find().then(function(userFollowed) {
+						var queryFollow = new Parse.Query(Follow);
+						queryFollow.equalTo("from", user);
+						queryFollow.equalTo("to", userFollowed[0]);
+						queryFollow.find().then(function(response) {
+							if(response.length != 0) {
+								allUsers.following = true;
+								next();
+							}else {
+								allUsers.following = false;
+								next();
 							}
 						}, function(e) {
 							error(e);
 						});
-					});
-				});
-			}
-			function isFollowing (allUsers, next, error) {
-				var User = Parse.Object.extend("User");
-				var Follow = Parse.Object.extend("Follow");
-				var queryUser = new Parse.Query(User);
-				queryUser.equalTo("username", allUsers.username);
-				queryUser.find().then(function(results) {
-					var queryFollow = new Parse.Query(Follow);
-					queryFollow.equalTo("from", user);
-					queryFollow.equalTo("to", results[0]);
-					queryFollow.find().then(function(response) {
-						if(response.length != 0) {
-							allUsers.following = true;
-							next();
-						}else {
-							allUsers.following = false;
-							next();
-						}
 					}, function(e) {
 						error(e);
 					});
-				}, function(e) {
-					error(e);
-				});
-			}
+				}
+			}, function(e) {
+				error(e);
+			});
 		}, function(e) {
 			error(e);
 		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Asigna relación de bloqueo
+ * @param {object} userToBlock, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.blockUser = function(userToBlock, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		var queryUser = new Parse.Query(User);//TODO: cambiar User por Parse.User
+		var relation = user.relation("blockedUsers");
+		
+		if(userToBlock.username != undefined) {
+			queryUser.equalTo("username", userToBlock.username);
+			queryUser.find().then(function(blockedUser) {
+				relation.add(blockedUser[0]);
+				user.save();
+				next();
+			}, function(e) {
+				error(e);
+			});
+		}
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Remueve relación de bloqueo
+ * @param {object} userToBlock, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
+	console.log("unBlockUser!");
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var User = Parse.Object.extend("User");
+		var queryUser = new Parse.Query(User);//TODO: cambiar User por Parse.User
+		var relation = user.relation("blockedUsers");
+
+		if(userToBlock.username != undefined) {
+			queryUser.equalTo("username", userToBlock.username);
+			queryUser.find().then(function(blockedUser) {
+				relation.remove(blockedUser[0]);
+				user.save();
+				next();
+			}, function(e) {
+				error(e);
+			});
+		}
 	}, function(e) {
 		error(e);
 	});
@@ -1071,7 +1142,7 @@ jPack.getAllPosts = function(req, next, error) {
 		var nowDate = new Date();
 		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
 		//console.log('Días atras: ' + req.session.queryTimeLimit/24);
-		
+
 		query.greaterThan('createdAt', queryDate);
 		query.descending('createdAt');
 		//query.withinKilometers('location', userGeoPoint, 1);
