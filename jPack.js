@@ -333,8 +333,8 @@ jPack.user.prototype.setLike = function(post, next, error) {
 		var relation = user.relation("likes");
 
 		query.equalTo("publicId", post.id);
-		query.find().then(function(results) {
-			relation.add(results[0]);
+		query.find().then(function(postLiked) {
+			relation.add(postLiked[0]);
 			user.save();
 			next();
 		}, function(e) {
@@ -357,8 +357,8 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 		var relation = user.relation("likes");
 
 		query.equalTo("publicId", post.id);
-		query.find().then(function(results) {
-			relation.remove(results[0]);
+		query.find().then(function(postUnLiked) {
+			relation.remove(postUnLiked[0]);
 			user.save();
 			next();
 		}, function(e) {
@@ -384,9 +384,9 @@ jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
 		//var relation = user.relation("following");
 		if(userToFollow.username != undefined) {
 			queryUser.equalTo("username", userToFollow.username);
-			queryUser.find().then(function(results) {
+			queryUser.find().then(function(userFollowed) {
 				follow.set("from", user);//También puede usarse Parse.User.current() en vez de 'user', objeto del usuario actual
-				follow.set("to", results[0]);//objecto del usuario a seguir
+				follow.set("to", userFollowed[0]);//objecto del usuario a seguir
 				follow.set("date", Date());
 				follow.save();
 				/*relation.add(results[0]);
@@ -416,12 +416,12 @@ jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
 		//var relation = user.relation("following");
 		if(userToFollow.username != undefined) {
 			queryUser.equalTo("username", userToFollow.username);
-			queryUser.find().then(function(results) {
+			queryUser.find().then(function(userFollowed) {
 				var queryFollow = new Parse.Query(Follow);
 				queryFollow.equalTo("from", user);
-				queryFollow.equalTo("to", results[0]);
-				queryFollow.find().then(function(response) {
-					relationObjectId = response[0].id;
+				queryFollow.equalTo("to", userFollowed[0]);
+				queryFollow.find().then(function(userToUnFollow) {
+					relationObjectId = userToUnFollow[0].id;
 					var mainQueryFollow = new Parse.Query(Follow);
 						mainQueryFollow.get(relationObjectId).then(function(relation) {
 							relation.destroy().then(function(){
@@ -680,10 +680,10 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 					var Follow = Parse.Object.extend("Follow");
 					var queryUser = new Parse.Query(User);
 					queryUser.equalTo("username", allUsers.username);
-					queryUser.find().then(function(results) {
+					queryUser.find().then(function(userFollowed) {
 						var queryFollow = new Parse.Query(Follow);
 						queryFollow.equalTo("from", user);
-						queryFollow.equalTo("to", results[0]);
+						queryFollow.equalTo("to", userFollowed[0]);
 						queryFollow.find().then(function(response) {
 							if(response.length != 0) {
 								allUsers.following = true;
