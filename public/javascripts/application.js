@@ -406,6 +406,15 @@ function Application($scope, $http) {
 		}
 	}
 
+	// Envía un objeto con los datos de la persona que deseas bloquear o desbloquear mediante un post
+	$scope.askLocation = function(postId) {
+		$scope.user.postToAskLocation = postId;
+		console.log("$scope.user.postToAskLocation: "+$scope.user.postToAskLocation)
+		$http.post('/user/askLocation', $scope.user).success(function() {
+		}).error();
+
+	}
+
 	/*
 	 * Post
 	 */

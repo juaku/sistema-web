@@ -1290,6 +1290,60 @@ jPack.getAllEvents = function(req, next, error) {
 	}*/
 }
 
+/*D
+ * @descrip Envía push notification, pide tu ubicación
+ * @param {object} postToAskLocationId, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.askLocation = function(postToAskLocationId, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var installationQuery = new Parse.Query(Parse.Installation);
+		var Post = Parse.Object.extend("Post");
+		var postQuery = new Parse.Query(Post);
+		var userToSendNotification;
+
+		postQuery.include("author");
+		postQuery.equalTo("publicId", postToAskLocationId);
+		postQuery.find().then(function(userToAsk) {
+			if(userToAsk.length != 0) {
+				userToSendNotification = userToAsk[0].get("author");
+				sendNotification(userToSendNotification, next, error);
+			} else {
+				console.log("error");
+				next();
+			}
+		}, function(e) {
+			error(e);
+		});
+
+		data = {
+      "alert": "Rodrigo pidió tu ubicación!!!.",
+      "sound": "cheering.caf" // default ios sound.
+    };
+
+		function sendNotification(userToSendNotification, next, error) {
+			installationQuery.equalTo("user", userToSendNotification);
+			//installationQuery.equalTo('deviceToken', '9e69945890218f9be34edf1ff3524d6627669ab656b734cb67df73556d2f68e8');
+			Parse.Push.send({
+				where: installationQuery, // Set our Installation query
+				data: data
+			}, {
+				success: function() {
+					// Push was successful
+					console.log("push notification enviada con éxito");
+					next();
+				},
+				error: function(error) {
+					// Handle error
+					console.log("Error! al enviar notificación");
+					error();
+				}
+			});
+		}
+	}, function(e) {
+		error(e);
+	});
+}
 
 // TODO: Evaluar remoción
 jPack.agenda = function () {
