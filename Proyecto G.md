@@ -1,61 +1,56 @@
-Variables básicas
---------- -------
-objSelfUsr = Usuario
-objPostIde = Post
-objEventId = Evento
-objEventPo = Evento de 'objPostIde'
-objAutPost = Autor de 'objPostIde'
-arrayLikes = Likes de 'objPostIde'
-arrayPoEve = Posts del 'objEventId'
-arrayFollo = Seguidos por 'objSelfUsr'
-arrayFlagA = Denuncias a 'objSelfUsr'
-arrayFlagP = Denuncias a 'objPostIde'
-posGPSPost = Ubicación de 'objPostIde'
-posGPSSelf = ubicación de 'objSelfUsr' 
+# Variables básicas
+- objSelfUsr = Usuario
+- objPostIde = Post
+- objEventId = Evento
+- objEventPo = Evento de 'objPostIde'
+- objAutPost = Autor de 'objPostIde'
+- arrayLikes = Likes de 'objPostIde'
+- arrayPoEve = Posts del 'objEventId'
+- arrayFollo = Seguidos por 'objSelfUsr'
+- arrayFlagA = Denuncias a 'objSelfUsr'
+- arrayFlagP = Denuncias a 'objPostIde'
+- posGPSPost = Ubicación de 'objPostIde'
+- posGPSSelf = ubicación de 'objSelfUsr' 
 
-¿Qué posts mostrar primero?
----------------------------
-timeRecent (0 - ~) = ¿Qué tan cerca está 'objPostIde' de ahora?
-cntLocaGPS (0 - ~) = ¿Qué tan cerca está 'posGPSPost' de 'posGPSSelf'?
-cntLikesPo (0 - ~) = ¿Cuántos 'arrayLikes'?
-cntLikFoll (0 - ~) = ¿Cuántos de 'arrayFollo' están en 'arrayLikes'?
-cntFlagPst (0 - ~) = ¿Cantidad de 'arrayFlagP'?
-cntFlagAut (0 - ~) = ¿Cantidad de 'arrayFlagA'?
-boolAutFol (0 , 1) = ¿'objAutPost' está en 'arrayFollo'?
-boolSelfAu (0 , 1) = ¿'objSelfUsr' es 'objAutPost'?
-boolLocTru (0 , 1) = ¿La ubicación es exacta?
-boolBanned (0 , 1) = ¿'objAutPost' está baneado?
+# ¿Qué posts mostrar primero?
+- timeRecent (0 - ~) = ¿Qué tan cerca está 'objPostIde' de ahora?
+- cntLocaGPS (0 - ~) = ¿Qué tan cerca está 'posGPSPost' de 'posGPSSelf'?
+- cntLikesPo (0 - ~) = ¿Cuántos 'arrayLikes'?
+- cntLikFoll (0 - ~) = ¿Cuántos de 'arrayFollo' están en 'arrayLikes'?
+- cntFlagPst (0 - ~) = ¿Cantidad de 'arrayFlagP'?
+- cntFlagAut (0 - ~) = ¿Cantidad de 'arrayFlagA'?
+- boolAutFol (0 , 1) = ¿'objAutPost' está en 'arrayFollo'?
+- boolSelfAu (0 , 1) = ¿'objSelfUsr' es 'objAutPost'?
+- boolLocTru (0 , 1) = ¿La ubicación es exacta?
+- boolBanned (0 , 1) = ¿'objAutPost' está baneado?
 
-¿Qué evento mostrar primero?
-----------------------------
-countPostE = ¿Cuantos 'arrayPoEve'?
-countFollE = ¿Cuántos 'arrayFollo' son autores en 'arrayPoEve'?
-countPoLoE = ¿Cuántos 'arrayPoEve' tiene un 'cntLocaGPS' (cercano)? (!)
-countRecPE = ¿Cuan recientes son los 'arrayPoEve'de 'objEventId'?
-boolSeltEv = ¿'objSelfUsr' está es 'objAutPost' de 'arrayPoEve'?
+# ¿Qué evento mostrar primero?
+- countPostE = ¿Cuantos 'arrayPoEve'?
+- countFollE = ¿Cuántos 'arrayFollo' son autores en 'arrayPoEve'?
+- countPoLoE = ¿Cuántos 'arrayPoEve' tiene un 'cntLocaGPS' (cercano)? (!)
+- countRecPE = ¿Cuan recientes son los 'arrayPoEve'de 'objEventId'?
+- boolSeltEv = ¿'objSelfUsr' está es 'objAutPost' de 'arrayPoEve'?
 
-Tiempo
-------
-Cantidad de 'cntLikesPo' en T1
-Cantidad de 'cntLikFoll' en T2
-Cantidad de 'cntPostEve' en T3
-Cantidad de 'cntFollEve' en T4
-Cantidad de 'cntRecPstE' en T5
-Cantidad de 'cntPostEve' de 'objectPost' en T6
-Cantidad de 'objPostIde' de 'objSelfUsr' en 'arrayPoEve' en T7
+# Tiempo
+- Cantidad de 'cntLikesPo' en T1
+- Cantidad de 'cntLikFoll' en T2
+- Cantidad de 'cntPostEve' en T3
+- Cantidad de 'cntFollEve' en T4
+- Cantidad de 'cntRecPstE' en T5
+- Cantidad de 'cntPostEve' de 'objectPost' en T6
+- Cantidad de 'objPostIde' de 'objSelfUsr' en 'arrayPoEve' en T7
 
-Fitness
--------
-cntMtPLoad = ¿Cuantas cargas de página?
-cntMtPosts = ¿Cuantos post se realizaron?
-cntMtScrol = ¿Cuantos 'scrolls' se realizaron?
-cntMtLikes = ¿Cuantos likes se dieron?
-cntMtCliEv = ¿Cuantos clicks se dieron a eventos?
-cntMtSearc = ¿Cuántas búsquedas se realizaron?
-cntMtFollO = ¿Cuántas solicitudes de seguimiento se solicitaron? (!)
-cntMtFollI = ¿Cuántas solicitudes de seguimiento se recibieron? (!)
-cntMtLocaO = ¿Cuántas solicitudes de ubicación se solicitaron?
-cntMtLocaI = ¿Cuántas solicitudes de ubicación se recibieron?
+# Fitness
+- cntMtPLoad = ¿Cuantas cargas de página?
+- cntMtPosts = ¿Cuantos post se realizaron?
+- cntMtScrol = ¿Cuantos 'scrolls' se realizaron?
+- cntMtLikes = ¿Cuantos likes se dieron?
+- cntMtCliEv = ¿Cuantos clicks se dieron a eventos?
+- cntMtSearc = ¿Cuántas búsquedas se realizaron?
+- cntMtFollO = ¿Cuántas solicitudes de seguimiento se solicitaron? (!)
+- cntMtFollI = ¿Cuántas solicitudes de seguimiento se recibieron? (!)
+- cntMtLocaO = ¿Cuántas solicitudes de ubicación se solicitaron?
+- cntMtLocaI = ¿Cuántas solicitudes de ubicación se recibieron?
 
 Mt = 24 horas / Mtx de manera que {Mtx:Mt , 1:24 , 2:12 , 3:8 }
 
@@ -63,9 +58,9 @@ Mt NO se debe borrar ni reemplazar, sino se debe conservar para, por ejemplo, re
 
 'cntSesLoad' en 'TimeD' (día) y en 'TimeM' (minutos)
 
-Algoritmo
----------
+# Algoritmo
 
+```
 Inicio - Muestra de datos 
 	Delta (0 - 1) = Obtener Delta()
 
@@ -97,16 +92,15 @@ Inicio - Muestra de datos
 			Sino
 				Desechar individuo (¿Mejorar?)
 Fin
-
-Datos
------
-	FittnessGen
-		Ix
-		Fx
-		Fitness
-		Date
-		NumGen
-	FitnessData
-		FitnessAverage
-		Delta
+```
+# Datos
+	1. FittnessGen
+		- Ix
+		- Fx
+		- Fitness
+		- Date
+		- NumGen
+	2. FitnessData
+		- FitnessAverage
+		- Delta
 
