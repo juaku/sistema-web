@@ -1,4 +1,4 @@
-Variables básicas
+# Variables básicas
 --------- -------
 objSelfUsr = Usuario
 objPostIde = Post
@@ -13,7 +13,7 @@ arrayFlagP = Denuncias a 'objPostIde'
 posGPSPost = Ubicación de 'objPostIde'
 posGPSSelf = ubicación de 'objSelfUsr' 
 
-¿Qué posts mostrar primero?
+# ¿Qué posts mostrar primero?
 ---------------------------
 timeRecent (0 - ~) = ¿Qué tan cerca está 'objPostIde' de ahora?
 cntLocaGPS (0 - ~) = ¿Qué tan cerca está 'posGPSPost' de 'posGPSSelf'?
@@ -26,7 +26,7 @@ boolSelfAu (0 , 1) = ¿'objSelfUsr' es 'objAutPost'?
 boolLocTru (0 , 1) = ¿La ubicación es exacta?
 boolBanned (0 , 1) = ¿'objAutPost' está baneado?
 
-¿Qué evento mostrar primero?
+# ¿Qué evento mostrar primero?
 ----------------------------
 countPostE = ¿Cuantos 'arrayPoEve'?
 countFollE = ¿Cuántos 'arrayFollo' son autores en 'arrayPoEve'?
@@ -34,7 +34,7 @@ countPoLoE = ¿Cuántos 'arrayPoEve' tiene un 'cntLocaGPS' (cercano)? (!)
 countRecPE = ¿Cuan recientes son los 'arrayPoEve'de 'objEventId'?
 boolSeltEv = ¿'objSelfUsr' está es 'objAutPost' de 'arrayPoEve'?
 
-Tiempo
+# Tiempo
 ------
 Cantidad de 'cntLikesPo' en T1
 Cantidad de 'cntLikFoll' en T2
@@ -44,7 +44,7 @@ Cantidad de 'cntRecPstE' en T5
 Cantidad de 'cntPostEve' de 'objectPost' en T6
 Cantidad de 'objPostIde' de 'objSelfUsr' en 'arrayPoEve' en T7
 
-Fitness
+# Fitness
 -------
 cntMtPLoad = ¿Cuantas cargas de página?
 cntMtPosts = ¿Cuantos post se realizaron?
@@ -63,7 +63,7 @@ Mt NO se debe borrar ni reemplazar, sino se debe conservar para, por ejemplo, re
 
 'cntSesLoad' en 'TimeD' (día) y en 'TimeM' (minutos)
 
-Algoritmo
+# Algoritmo
 ---------
 
 Inicio - Muestra de datos 
