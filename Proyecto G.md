@@ -1,5 +1,4 @@
 # Variables básicas
-# --------- -------
 - objSelfUsr = Usuario
 - objPostIde = Post
 - objEventId = Evento
@@ -14,7 +13,6 @@
 - posGPSSelf = ubicación de 'objSelfUsr' 
 
 # ¿Qué posts mostrar primero?
-# ---------------------------
 - timeRecent (0 - ~) = ¿Qué tan cerca está 'objPostIde' de ahora?
 - cntLocaGPS (0 - ~) = ¿Qué tan cerca está 'posGPSPost' de 'posGPSSelf'?
 - cntLikesPo (0 - ~) = ¿Cuántos 'arrayLikes'?
@@ -27,7 +25,6 @@
 - boolBanned (0 , 1) = ¿'objAutPost' está baneado?
 
 # ¿Qué evento mostrar primero?
-# ----------------------------
 - countPostE = ¿Cuantos 'arrayPoEve'?
 - countFollE = ¿Cuántos 'arrayFollo' son autores en 'arrayPoEve'?
 - countPoLoE = ¿Cuántos 'arrayPoEve' tiene un 'cntLocaGPS' (cercano)? (!)
@@ -35,7 +32,6 @@
 - boolSeltEv = ¿'objSelfUsr' está es 'objAutPost' de 'arrayPoEve'?
 
 # Tiempo
-# ------
 - Cantidad de 'cntLikesPo' en T1
 - Cantidad de 'cntLikFoll' en T2
 - Cantidad de 'cntPostEve' en T3
@@ -45,7 +41,6 @@
 - Cantidad de 'objPostIde' de 'objSelfUsr' en 'arrayPoEve' en T7
 
 # Fitness
-# -------
 - cntMtPLoad = ¿Cuantas cargas de página?
 - cntMtPosts = ¿Cuantos post se realizaron?
 - cntMtScrol = ¿Cuantos 'scrolls' se realizaron?
@@ -64,7 +59,6 @@ Mt NO se debe borrar ni reemplazar, sino se debe conservar para, por ejemplo, re
 'cntSesLoad' en 'TimeD' (día) y en 'TimeM' (minutos)
 
 # Algoritmo
-# ---------
 
 ```
 Inicio - Muestra de datos 
@@ -100,7 +94,6 @@ Inicio - Muestra de datos
 Fin
 ```
 # Datos
-# -----
 	1. FittnessGen
 		- Ix
 		- Fx
