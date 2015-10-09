@@ -1174,48 +1174,108 @@ jPack.getAllEvents = function(req, next, error) {
 		next(count);
 	});
 */
-	var Event = Parse.Object.extend("Event");
-	var query = new Parse.Query(Event);
 	var events = [];
-	query.descending("createdAt");
-	query.find().then(function(results) {
-		var Post = Parse.Object.extend("Post");
-		for(var i = 0; i < results.length; i++) {
-			events[i] = {};
-			events[i].id = results[i].id;
-			events[i].name = results[i].get("name");
-			events[i].count = 0;
+	var eventPost = [];
+	var currentDate = new Date();
+	var month = getMonthFormatted(currentDate.getMonth()+1);
+	var date = getDateFormatted(currentDate.getDate());
+	var hours = getHoursFormatted(currentDate.getHours()+5); //le sumo 5 por el time zone de perú
+	var minutes = getMinutesFormatted(currentDate.getMinutes());
+	var seconds = getSecondsFormatted(currentDate.getSeconds());
+	var milliseconds = getMillisecondsFormatted(currentDate.getMilliseconds());
+
+	var currentDatetime = currentDate.getFullYear() + "-"
+								+ month + "-"
+								+ date + "T"
+								+ hours + ":"
+								+ minutes + ":"
+								+ seconds + "."
+								+ milliseconds + "Z";
+
+	var limitDateTime = currentDate.getFullYear() + "-"
+										+ getHoursFormatted(month-3) + "-"
+										+ date + "T"  //getDateFormatted(date-3)
+										+ hours + ":"
+										+ minutes + ":"
+										+ seconds + "."
+										+ milliseconds + "Z";
+
+	var Post = Parse.Object.extend("Post");
+	var postQuery = new Parse.Query(Post);
+	var arrayEvents = [];
+	postQuery.include("event");
+	postQuery.select("event");
+	postQuery.lessThan("createdAt", currentDatetime);
+	postQuery.greaterThan("createdAt", limitDateTime);
+
+	postQuery.find().then(function(results) {
+		console.log("results.length: " + results.length);
+		for (var i = 0; i < results.length; i++) {
+			eventPost[i] = {};
+			eventPost[i].id = results[i].attributes.event.id;
+			eventPost[i].name = results[i].attributes.event.attributes.name;
+			eventPost[i].count = 0;
+			arrayEvents[i] = results[i].attributes.event.attributes.name;
 		}
-		var queries = [];
-		var postQuery = new Parse.Query(Post);
-		postQuery.include("event");
-		postQuery.select("event");
-		postQuery.find().then(function(eventPost) {
+
+		var Event = Parse.Object.extend("Event");
+		var eventQuery = new Parse.Query(Event);
+		eventQuery.containedIn("name",arrayEvents);
+		eventQuery.find().then(function(response) {
+			console.log("response.length: " + response.length);
+			for (var i = 0; i < response.length; i++) {
+				events[i] = {};
+				events[i].id = response[i].id;
+				events[i].name = response[i].get("name");
+				events[i].count = 0;
+			}
 			for (var i = 0; i < events.length; i++) {
 				for (var j = 0; j < eventPost.length; j++) {
-					if(events[i].id == eventPost[j].attributes.event.id) {
+					if(events[i].id == eventPost[j].id) {
 						events[i].count++;
+					}
+				}
+			}
+			//Ordenamiento burbuja en base al número de posts por cada evento
+			for (var i = 0; i < events.length; i++) {
+				for (var j = 0; j < events.length-1; j++) {
+					if(events[j].count < events[j+1].count) {
+						var aux  = events[j];
+						events[j] = events[j+1];
+						events[j+1] = aux;
 					}
 				}
 			}
 			var response = {events: events};
 			next(response);
 		});
-		/*
-		var mainQuery = Parse.Query.or.apply(this, queries);
-		mainQuery.find().then(function(results) {
-			for(var i = 0; i < results.length; i++) {
-				//console.log(results.length);
-			}
-			//events[i].count = count;
-			//counter++;
-			//if(counter == results.length) {
-			//	next(events);
-			//}
-			next(events);*/
 	}, function(e) {
 		error(e);
 	});
+	function getMonthFormatted (month) {
+		return month < 10 ? '0' + month : month;
+	}
+	function getDateFormatted (date) {
+		return date < 10 ? '0' + date : date;
+	}
+	function getHoursFormatted (hours) {
+		return hours < 10 ? '0' + hours : hours;
+	}
+	function getMinutesFormatted (minutes) {
+		return minutes < 10 ? '0' + minutes : minutes;
+	}
+	function getSecondsFormatted (seconds) {
+		return seconds < 10 ? '0' + seconds : seconds;
+	}
+	function getMillisecondsFormatted (milliSeconds) {
+		if(milliSeconds > 9 && milliSeconds < 99) {
+			return '0' + milliSeconds;
+		} if(milliSeconds < 10) {
+			return '00' + milliSeconds;
+		} else {
+			return milliSeconds;
+		}
+	}
 	//});
 
 	
