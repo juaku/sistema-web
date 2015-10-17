@@ -652,7 +652,7 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 						allUsers[i].lastName = profile.last_name;
 						FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
 							allUsers[i].picture= picture.data.url;
-							if (listOfBlockedUsers.length == 0) {
+							if(listOfBlockedUsers.length == 0) {
 								allUsers[i].block = false;
 							} else {
 								for(var j = 0; j<listOfBlockedUsers.length; j++) {
@@ -938,7 +938,7 @@ jPack.getAllPosts = function(req, next, error) {
 	}
 	var userGeoPoint = new Parse.GeoPoint({latitude: point.latitude, longitude: point.longitude});
 
-	var resultsLimit = 20;
+	var resultsLimit = 10;
 	var queryNumber = 0;
 	var queryTimeLimitStep = 24*20;
 
@@ -1143,83 +1143,103 @@ jPack.getAllPosts = function(req, next, error) {
 	}
 
 	function getQuery(next, error) {
-		var nowDate = new Date();
-		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
-		if(req.params.filter == 'getAllPosts') {
-			var query = new Parse.Query(Post);
+		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+			var nowDate = new Date();
+			var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
+			var relation = user.relation('blockedUsers');
+			relation.query().find().then(function(listOfBlockedUsers) {
+				if(req.params.filter == 'getAllPosts') {
+					// listOfBlockedUsers contains the users that the current user blocks.
+					var query = new Parse.Query(Post);
+					if(listOfBlockedUsers.length != 0) {
+						query.notContainedIn('author', listOfBlockedUsers);
+					}
+					//console.log('Días atras: ' + req.session.queryTimeLimit/24);
 
-			//console.log('Días atras: ' + req.session.queryTimeLimit/24);
+					query.greaterThan('createdAt', queryDate);
+					query.descending('createdAt');
+					//query.withinKilometers('location', userGeoPoint, 1);
+					query.near('location', userGeoPoint);
 
-			query.greaterThan('createdAt', queryDate);
-			query.descending('createdAt');
-			//query.withinKilometers('location', userGeoPoint, 1);
-			query.near('location', userGeoPoint);
+					query.include('author');
+					query.include('event');
+					query.limit(resultsLimit);
+					//console.log('Skip Number: ' + (resultsLimit * queryNumber));
+					query.skip(resultsLimit * queryNumber);
+					next(query);
+				} else if(req.params.filter == 'getMediaByEvent') {
+					var postQuery = new Parse.Query(Post);
 
-			query.include('author');
-			query.include('event');
-			query.limit(resultsLimit);
-			//console.log('Skip Number: ' + (resultsLimit * queryNumber));
-			query.skip(resultsLimit * queryNumber);
-			next(query);
+					var postId = req.params.id;
 
-		} else if(req.params.filter == 'getMediaByEvent') {
-			var postQuery = new Parse.Query(Post);
+					postQuery.include('event');
+					postQuery.equalTo('publicId', postId);
+					postQuery.find().then(function(post) {
+						var postQuery2 = new Parse.Query(Post);
+						if(listOfBlockedUsers.length != 0) {
+							postQuery2.notContainedIn('author', listOfBlockedUsers);
+						}
+						postQuery2.descending('createdAt');
+						postQuery2.include('author');
+						postQuery2.include('event');
+						postQuery2.limit(resultsLimit);
+						postQuery2.skip(resultsLimit * queryNumber);
+						postQuery2.equalTo('event', post[0].get('event'));
+						next(postQuery2);
+					}, function(e) {
+						console.length('error');
+						error(e);
+					});
+				} else if(req.params.filter == 'getMediaByAuthor') {
+					var postQuery = new Parse.Query(Post);
 
-			var postId = req.params.id;
+					var postId = req.params.id;
 
-			postQuery.include('event');
-			postQuery.equalTo('publicId', postId);
-			postQuery.find().then(function(post) {
-				var postQuery2 = new Parse.Query(Post);
-				postQuery2.descending('createdAt');
-				postQuery2.include('author');
-				postQuery2.include('event');
-				postQuery2.limit(resultsLimit);
-				postQuery2.skip(resultsLimit * queryNumber);
-				postQuery2.equalTo('event', post[0].get('event'));
-				next(postQuery2);
+					postQuery.include('author');
+					postQuery.equalTo('publicId', postId);
+					postQuery.find().then(function(post) {
+						var postQuery2 = new Parse.Query(Post);
+						if(listOfBlockedUsers.length != 0) {
+							postQuery2.notContainedIn('author', listOfBlockedUsers);
+						}
+						postQuery2.descending('createdAt');
+						postQuery2.include('author');
+						postQuery2.include('event');
+						postQuery2.limit(resultsLimit);
+						postQuery2.skip(resultsLimit * queryNumber);
+						postQuery2.equalTo('author', post[0].get('author'));
+						next(postQuery2);
+					}, function(e) {
+						error(e);
+					});
+				} else if(req.params.filter == 'getMediaByTrend') {
+					var Event = Parse.Object.extend("Event");
+					var eventQuery = new Parse.Query(Event);
+					var postQuery = new Parse.Query(Post);
+					var eventId = req.params.id;
+
+					eventQuery.equalTo("objectId", eventId);
+					eventQuery.find().then(function(chosenEvent) {
+						if(listOfBlockedUsers.length != 0) {
+							postQuery.notContainedIn('author', listOfBlockedUsers);
+						}
+						postQuery.descending('createdAt');
+						postQuery.include('author');
+						postQuery.include('event');
+						postQuery.limit(resultsLimit);
+						postQuery.skip(resultsLimit * queryNumber);
+						postQuery.equalTo('event', chosenEvent[0]);
+						next(postQuery);
+					}, function(e) {
+						error(e);
+					});
+				}
 			}, function(e) {
-				console.length('error');
 				error(e);
 			});
-		} else if(req.params.filter == 'getMediaByAuthor') {
-			var postQuery = new Parse.Query(Post);
-
-			var postId = req.params.id;
-
-			postQuery.include('author');
-			postQuery.equalTo('publicId', postId);
-			postQuery.find().then(function(post) {
-				var postQuery2 = new Parse.Query(Post);
-				postQuery2.descending('createdAt');
-				postQuery2.include('author');
-				postQuery2.include('event');
-				postQuery2.limit(resultsLimit);
-				postQuery2.skip(resultsLimit * queryNumber);
-				postQuery2.equalTo('author', post[0].get('author'));
-				next(postQuery2);
-			}, function(e) {
-				error(e);
-			});
-		} else if(req.params.filter == 'getMediaByTrend') {
-			var Event = Parse.Object.extend("Event");
-			var eventQuery = new Parse.Query(Event);
-			var postQuery = new Parse.Query(Post);
-			var eventId = req.params.id;
-
-			eventQuery.equalTo("objectId", eventId);
-			eventQuery.find().then(function(chosenEvent) {
-				postQuery.descending('createdAt');
-				postQuery.include('author');
-				postQuery.include('event');
-				postQuery.limit(resultsLimit);
-				postQuery.skip(resultsLimit * queryNumber);
-				postQuery.equalTo('event', chosenEvent[0]);
-				next(postQuery);
-			}, function(e) {
-				error(e);
-			});
-		}
+		}, function(e) {
+			error(e);
+		});
 	}
 }
 
@@ -1239,108 +1259,121 @@ jPack.getAllEvents = function(req, next, error) {
 		next(count);
 	});
 */
-	var events = [];
-	var eventPost = [];
-	var currentDate = new Date();
-	var month = getMonthFormatted(currentDate.getMonth()+1);
-	var date = getDateFormatted(currentDate.getDate());
-	var hours = getHoursFormatted(currentDate.getHours()+5); //le sumo 5 por el time zone de perú
-	var minutes = getMinutesFormatted(currentDate.getMinutes());
-	var seconds = getSecondsFormatted(currentDate.getSeconds());
-	var milliseconds = getMillisecondsFormatted(currentDate.getMilliseconds());
+	Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+		var events = [];
+		var eventPost = [];
+		var currentDate = new Date();
+		var month = getMonthFormatted(currentDate.getMonth()+1);
+		var date = getDateFormatted(currentDate.getDate());
+		var hours = getHoursFormatted(currentDate.getHours()+5); //le sumo 5 por el time zone de perú
+		var minutes = getMinutesFormatted(currentDate.getMinutes());
+		var seconds = getSecondsFormatted(currentDate.getSeconds());
+		var milliseconds = getMillisecondsFormatted(currentDate.getMilliseconds());
 
-	var currentDatetime = currentDate.getFullYear() + "-"
-								+ month + "-"
-								+ date + "T"
-								+ hours + ":"
-								+ minutes + ":"
-								+ seconds + "."
-								+ milliseconds + "Z";
+		var relation = user.relation('blockedUsers');
 
-	var limitDateTime = currentDate.getFullYear() + "-"
-										+ getHoursFormatted(month-3) + "-"
-										+ date + "T"  //getDateFormatted(date-3)
-										+ hours + ":"
-										+ minutes + ":"
-										+ seconds + "."
-										+ milliseconds + "Z";
+		var currentDatetime = currentDate.getFullYear() + "-"
+									+ month + "-"
+									+ date + "T"
+									+ hours + ":"
+									+ minutes + ":"
+									+ seconds + "."
+									+ milliseconds + "Z";
 
-	var Post = Parse.Object.extend("Post");
-	var postQuery = new Parse.Query(Post);
-	var arrayEvents = [];
-	postQuery.include("event");
-	postQuery.select("event");
-	postQuery.lessThan("createdAt", currentDatetime);
-	postQuery.greaterThan("createdAt", limitDateTime);
+		var limitDateTime = currentDate.getFullYear() + "-"
+											+ getHoursFormatted(month-3) + "-"
+											+ date + "T"  //getDateFormatted(date-3)
+											+ hours + ":"
+											+ minutes + ":"
+											+ seconds + "."
+											+ milliseconds + "Z";
 
-	postQuery.find().then(function(results) {
-		console.log("results.length: " + results.length);
-		for (var i = 0; i < results.length; i++) {
-			eventPost[i] = {};
-			eventPost[i].id = results[i].attributes.event.id;
-			eventPost[i].name = results[i].attributes.event.attributes.name;
-			eventPost[i].count = 0;
-			arrayEvents[i] = results[i].attributes.event.attributes.name;
-		}
-
-		var Event = Parse.Object.extend("Event");
-		var eventQuery = new Parse.Query(Event);
-		eventQuery.containedIn("name",arrayEvents);
-		eventQuery.find().then(function(response) {
-			console.log("response.length: " + response.length);
-			for (var i = 0; i < response.length; i++) {
-				events[i] = {};
-				events[i].id = response[i].id;
-				events[i].name = response[i].get("name");
-				events[i].count = 0;
+		relation.query().find().then(function(listOfBlockedUsers) {
+			var Post = Parse.Object.extend("Post");
+			var postQuery = new Parse.Query(Post);
+			var arrayEvents = [];
+			if(listOfBlockedUsers.length != 0) {
+				postQuery.notContainedIn('author', listOfBlockedUsers);
 			}
-			for (var i = 0; i < events.length; i++) {
-				for (var j = 0; j < eventPost.length; j++) {
-					if(events[i].id == eventPost[j].id) {
-						events[i].count++;
-					}
+			postQuery.include("event");
+			postQuery.select("event");
+			postQuery.lessThan("createdAt", currentDatetime);
+			postQuery.greaterThan("createdAt", limitDateTime);
+
+			postQuery.find().then(function(results) {
+				console.log("results.length: " + results.length);
+				for (var i = 0; i < results.length; i++) {
+					eventPost[i] = {};
+					eventPost[i].id = results[i].attributes.event.id;
+					eventPost[i].name = results[i].attributes.event.attributes.name;
+					eventPost[i].count = 0;
+					arrayEvents[i] = results[i].attributes.event.attributes.name;
 				}
-			}
-			//Ordenamiento burbuja en base al número de posts por cada evento
-			for (var i = 0; i < events.length; i++) {
-				for (var j = 0; j < events.length-1; j++) {
-					if(events[j].count < events[j+1].count) {
-						var aux  = events[j];
-						events[j] = events[j+1];
-						events[j+1] = aux;
+
+				var Event = Parse.Object.extend("Event");
+				var eventQuery = new Parse.Query(Event);
+				eventQuery.containedIn("name",arrayEvents);
+				eventQuery.find().then(function(response) {
+					console.log("response.length: " + response.length);
+					for (var i = 0; i < response.length; i++) {
+						events[i] = {};
+						events[i].id = response[i].id;
+						events[i].name = response[i].get("name");
+						events[i].count = 0;
 					}
-				}
-			}
-			var response = {events: events};
-			next(response);
+					for (var i = 0; i < events.length; i++) {
+						for (var j = 0; j < eventPost.length; j++) {
+							if(events[i].id == eventPost[j].id) {
+								events[i].count++;
+							}
+						}
+					}
+					//Ordenamiento burbuja en base al número de posts por cada evento
+					for (var i = 0; i < events.length; i++) {
+						for (var j = 0; j < events.length-1; j++) {
+							if(events[j].count < events[j+1].count) {
+								var aux  = events[j];
+								events[j] = events[j+1];
+								events[j+1] = aux;
+							}
+						}
+					}
+					var response = {events: events};
+					next(response);
+				});
+			}, function(e) {
+				error(e);
+			});
+		}, function(e) {
+			error(e);
 		});
+		function getMonthFormatted (month) {
+			return month < 10 ? '0' + month : month;
+		}
+		function getDateFormatted (date) {
+			return date < 10 ? '0' + date : date;
+		}
+		function getHoursFormatted (hours) {
+			return hours < 10 ? '0' + hours : hours;
+		}
+		function getMinutesFormatted (minutes) {
+			return minutes < 10 ? '0' + minutes : minutes;
+		}
+		function getSecondsFormatted (seconds) {
+			return seconds < 10 ? '0' + seconds : seconds;
+		}
+		function getMillisecondsFormatted (milliSeconds) {
+			if(milliSeconds > 9 && milliSeconds < 99) {
+				return '0' + milliSeconds;
+			} if(milliSeconds < 10) {
+				return '00' + milliSeconds;
+			} else {
+				return milliSeconds;
+			}
+		}
 	}, function(e) {
 		error(e);
 	});
-	function getMonthFormatted (month) {
-		return month < 10 ? '0' + month : month;
-	}
-	function getDateFormatted (date) {
-		return date < 10 ? '0' + date : date;
-	}
-	function getHoursFormatted (hours) {
-		return hours < 10 ? '0' + hours : hours;
-	}
-	function getMinutesFormatted (minutes) {
-		return minutes < 10 ? '0' + minutes : minutes;
-	}
-	function getSecondsFormatted (seconds) {
-		return seconds < 10 ? '0' + seconds : seconds;
-	}
-	function getMillisecondsFormatted (milliSeconds) {
-		if(milliSeconds > 9 && milliSeconds < 99) {
-			return '0' + milliSeconds;
-		} if(milliSeconds < 10) {
-			return '00' + milliSeconds;
-		} else {
-			return milliSeconds;
-		}
-	}
 	//});
 
 	
