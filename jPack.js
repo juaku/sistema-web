@@ -919,7 +919,7 @@ jPack.event.prototype.getEventCoverObject = function(accessToken, index, next, e
 }
 
 
-/* @descrip Método para obtener los 15 primeros post de la BD y número de amigos que van a un evento
+/* @descrip Método para obtener los 20 primeros posts de la BD con filtro como evento, autor, trend o sin filtro
  * @param {function} next, {function} error
  * @return null
  */
@@ -955,178 +955,183 @@ jPack.getAllPosts = function(req, next, error) {
 	});
 
 	function countResults(tries, next, reCount, error) {
-		var query = getQuery();
-
-		query.count().then(function(count) {
-			//console.log('Count: ' +  count + ' Required: ' + resultsLimit * (queryNumber+1));
-			if(count < resultsLimit * (queryNumber+1)) {
-				req.session.queryTimeLimit = req.session.queryTimeLimit + queryTimeLimitStep;
-				if (tries > 20) {
-					console.log('Tiempo Agotado'); // TODO: Manejo de errores.
-					next(count);
+		getQuery(function(query) {
+			query.count().then(function(count) {
+				//console.log('Count: ' +  count + ' Required: ' + resultsLimit * (queryNumber+1));
+				if(count < resultsLimit * (queryNumber+1)) {
+					req.session.queryTimeLimit = req.session.queryTimeLimit + queryTimeLimitStep;
+					if (tries > 20) {
+						console.log('Tiempo Agotado'); // TODO: Manejo de errores.
+						next(count);
+					} else {
+						//console.log('Tries: ' + tries);
+						reCount(++tries);
+					};
 				} else {
-					//console.log('Tries: ' + tries);
-					reCount(++tries);
-				};
-			} else {
-				next(count);
-			}
+					next(count);
+				}
+			}, function(e) {
+				error(e);
+			});
 		}, function(e) {
 			error(e);
 		});
+
 	}
 
 	function findQuery(count) {
 		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
-			var query = getQuery();
-			var relation = user.relation("likes");
-			query.find().then(function(results) {
-				console.log('Find Results: ' + results.length);
-				if(results.length == 0) {
-					next(results);
-				}
-				var c = results.length;
-				relation.query().find().then(function(list) {
-					// list contains the posts that the current user likes.
-					//console.log(list);
-					//console.log(list[0]._serverData.media);
-				
-					for(var i in results) {
-						//console.log(results[i].get('media'));
-						posts[i] = {};
-						//posts[i].media = results[i].get('media'); // método antiguo utilizado por public/uploads
-						posts[i].id = results[i].get('publicId');
-						posts[i].event = results[i].get('event').get('name');
-						posts[i].time = results[i].createdAt;
-						posts[i].file = results[i].get('file');
-						posts[i].media = posts[i].file.url(); //posts[i].file.url
-						if (list.length == 0) {
-							posts[i].like = false;
-						} else {
-							for(var j = 0; j<list.length; j++) {
-								if(list[j].attributes.publicId == posts[i].id) {
-									posts[i].like = true;
-									break;
-								} else {
-									posts[i].like = false;
-								}
-							}	
-						}
-						//
-						posts[i].location = {};
-						posts[i].location.latitude = results[i].get('location').latitude;
-						posts[i].location.longitude = results[i].get('location').longitude;
-						//
-						getFBInfo(i,crip.deco(results[i].get('author').get('username')));
+			getQuery(function(query) {
+				var relation = user.relation('likes');
+				query.find().then(function(results) {
+					console.log('Find Results: ' + results.length);
+					if(results.length == 0) {
+						next(results);
 					}
-					function getFBInfo(i, fbUserId) {
-						FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
-							posts[i].author = {};
-							posts[i].author.firstName = profile.first_name;
-							posts[i].author.lastName = profile.last_name;
-							FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-								posts[i].author.picture= picture.data.url;
-								triggerNext();
+					var c = results.length;
+					relation.query().find().then(function(list) {
+						// list contains the posts that the current user likes.
+						//console.log(list);
+						//console.log(list[0]._serverData.media);
+						for(var i in results) {
+							//console.log(results[i].get('media'));
+							posts[i] = {};
+							//posts[i].media = results[i].get('media'); // método antiguo utilizado por public/uploads
+							posts[i].id = results[i].get('publicId');
+							posts[i].event = results[i].get('event').get('name');
+							posts[i].time = results[i].createdAt;
+							posts[i].file = results[i].get('file');
+							posts[i].media = posts[i].file.url(); //posts[i].file.url
+							if (list.length == 0) {
+								posts[i].like = false;
+							} else {
+								for(var j = 0; j<list.length; j++) {
+									if(list[j].attributes.publicId == posts[i].id) {
+										posts[i].like = true;
+										break;
+									} else {
+										posts[i].like = false;
+									}
+								}
+							}
+							//
+							posts[i].location = {};
+							posts[i].location.latitude = results[i].get('location').latitude;
+							posts[i].location.longitude = results[i].get('location').longitude;
+							//
+							getFBInfo(i,crip.deco(results[i].get('author').get('username')));
+						}
+						function getFBInfo(i, fbUserId) {
+							FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+								posts[i].author = {};
+								posts[i].author.firstName = profile.first_name;
+								posts[i].author.lastName = profile.last_name;
+								FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+									posts[i].author.picture= picture.data.url;
+									triggerNext();
+								});
+							});
+						}
+						function triggerNext() {
+							c--;
+							if(c===0) {
+								//getNumberOfFriendsAttendingEvent();
+								var response = {posts: posts};//, attendingEvents: attendingEvents};
+								next(response);
+							}
+						}
+					}, function(e) {
+						error(e);
+					});
+
+			/*
+					function getNumberOfFriendsAttendingEvent() {
+						var attendingEvents = [];
+						var arrayOfUserIds = [];
+						Parse.User.become(this.parseSessionToken).then(function (user) {
+							var User = Parse.Object.extend("User");
+							var userQuery = new Parse.Query(User);
+
+							userQuery.notEqualTo("objectId", user.id);
+							var Post = Parse.Object.extend("Post");
+							var postQuery = new Parse.Query(Post);
+							postQuery.include("author");
+							postQuery.include("event");
+
+							postQuery.matchesQuery('author', userQuery);
+							postQuery.find().then(function(results) {
+								var c = results.length;
+								for(var i in results) {
+									attendingEvents[i] = {};
+									var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
+									arrayOfUserIds[i] = results[i].get('author').get('userId');
+									if(!aux) {
+										triggerNext();
+									}
+								}
+
+								function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
+									var index = -1;
+									for(var j in attendingEvents) {
+										if(attendingEvents[j].name == name) {
+											index = j;
+											break;
+										}
+									}
+									if(index >= 0) {
+										var flag = 0;
+										var currentAuthor = results[i].get('author').get('userId');
+										for(var k=0; k<=attendingEvents.length; k++) {
+											if(currentAuthor == arrayOfUserIds[k]) {
+												return 0;
+											} else {
+												attendingEvents[index].count++;
+												FB.api('/'+fbUserId+'/',  function(profile) {
+													var n = 1;
+													var aux = 1;
+													do {
+														if(attendingEvents[index].going[n] != "") {
+															attendingEvents[index].going[n] = {};
+															attendingEvents[index].going[n].userId = userId;
+															attendingEvents[index].going[n].firstName = profile.first_name;
+															attendingEvents[index].going[n].lastName = profile.last_name;
+															triggerNext();
+															aux = 0;
+														}
+														n++;
+													} while(aux);
+												});
+												return 1;
+											}
+										}
+									} else {
+										attendingEvents[i] = {name: name, count: 1};
+										FB.api('/'+fbUserId+'/',  function(profile) {
+											attendingEvents[i].going = [];
+											attendingEvents[i].going[0] = {};
+											attendingEvents[i].going[0].userId = userId;
+											attendingEvents[i].going[0].firstName = profile.first_name;
+											attendingEvents[i].going[0].lastName = profile.last_name;
+											triggerNext();
+										});
+										return 1;
+									}
+								}
+								function triggerNext() {
+									c--;
+									if(c===0) {
+										var response = {posts: posts, events: events, attendingEvents: attendingEvents};
+										next(response);
+									}
+								}
 							});
 						});
-					}
-					function triggerNext() {
-						c--;
-						if(c===0) {
-							//getNumberOfFriendsAttendingEvent();
-							var response = {posts: posts};//, attendingEvents: attendingEvents};
-							next(response);
-						}
-					}
+					}*/
 				}, function(e) {
 					error(e);
 				});
-
-		/*
-				function getNumberOfFriendsAttendingEvent() {
-					var attendingEvents = [];
-					var arrayOfUserIds = [];
-					Parse.User.become(this.parseSessionToken).then(function (user) {
-						var User = Parse.Object.extend("User");
-						var userQuery = new Parse.Query(User);
-
-						userQuery.notEqualTo("objectId", user.id);
-						var Post = Parse.Object.extend("Post");
-						var postQuery = new Parse.Query(Post);
-						postQuery.include("author");
-						postQuery.include("event");
-
-						postQuery.matchesQuery('author', userQuery);
-						postQuery.find().then(function(results) {
-							var c = results.length;
-							for(var i in results) {
-								attendingEvents[i] = {};
-								var aux = addNumberOfFriendsInEachEvent(results[i].get('event').get('name'), crip.deco(results[i].get('author').get('username')), results[i].get('author').get('userId'), i);
-								arrayOfUserIds[i] = results[i].get('author').get('userId');
-								if(!aux) {
-									triggerNext();
-								}
-							}
-
-							function addNumberOfFriendsInEachEvent(name, fbUserId, userId, i) {
-								var index = -1;
-								for(var j in attendingEvents) {
-									if(attendingEvents[j].name == name) {
-										index = j;
-										break;
-									}
-								}
-								if(index >= 0) {
-									var flag = 0;
-									var currentAuthor = results[i].get('author').get('userId');
-									for(var k=0; k<=attendingEvents.length; k++) {
-										if(currentAuthor == arrayOfUserIds[k]) { 
-											return 0;
-										} else {
-											attendingEvents[index].count++;
-											FB.api('/'+fbUserId+'/',  function(profile) {
-												var n = 1;
-												var aux = 1;
-												do {
-													if(attendingEvents[index].going[n] != "") {
-														attendingEvents[index].going[n] = {};
-														attendingEvents[index].going[n].userId = userId;
-														attendingEvents[index].going[n].firstName = profile.first_name;
-														attendingEvents[index].going[n].lastName = profile.last_name;
-														triggerNext();
-														aux = 0;
-													}
-													n++;
-												} while(aux);
-											});
-											return 1;
-										}
-									}
-								} else {
-									attendingEvents[i] = {name: name, count: 1};
-									FB.api('/'+fbUserId+'/',  function(profile) {
-										attendingEvents[i].going = [];
-										attendingEvents[i].going[0] = {};
-										attendingEvents[i].going[0].userId = userId;
-										attendingEvents[i].going[0].firstName = profile.first_name;
-										attendingEvents[i].going[0].lastName = profile.last_name;
-										triggerNext();
-									});
-									return 1;
-								}
-							}
-							function triggerNext() {
-								c--;
-								if(c===0) {
-									var response = {posts: posts, events: events, attendingEvents: attendingEvents};
-									next(response);
-								}
-							}
-						});
-					});
-				}*/
 			}, function(e) {
-				error(e);
+				console.length('error');
 			});
 		}, function(e) {
 			error(e);
@@ -1137,24 +1142,84 @@ jPack.getAllPosts = function(req, next, error) {
 		countResults(tries, findQuery, reCount, error);
 	}
 
-	function getQuery() {
-		var query = new Parse.Query(Post);
+	function getQuery(next, error) {
 		var nowDate = new Date();
 		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
-		//console.log('Días atras: ' + req.session.queryTimeLimit/24);
+		if(req.params.filter == 'getAllPosts') {
+			var query = new Parse.Query(Post);
 
-		query.greaterThan('createdAt', queryDate);
-		query.descending('createdAt');
-		//query.withinKilometers('location', userGeoPoint, 1);
-		query.near('location', userGeoPoint);
-		
-		query.include('author');
-		query.include('event');
-		query.limit(resultsLimit);
-		//console.log('Skip Number: ' + (resultsLimit * queryNumber));
-		query.skip(resultsLimit * queryNumber);
+			//console.log('Días atras: ' + req.session.queryTimeLimit/24);
 
-		return query;		
+			query.greaterThan('createdAt', queryDate);
+			query.descending('createdAt');
+			//query.withinKilometers('location', userGeoPoint, 1);
+			query.near('location', userGeoPoint);
+
+			query.include('author');
+			query.include('event');
+			query.limit(resultsLimit);
+			//console.log('Skip Number: ' + (resultsLimit * queryNumber));
+			query.skip(resultsLimit * queryNumber);
+			next(query);
+
+		} else if(req.params.filter == 'getMediaByEvent') {
+			var postQuery = new Parse.Query(Post);
+
+			var postId = req.params.id;
+
+			postQuery.include('event');
+			postQuery.equalTo('publicId', postId);
+			postQuery.find().then(function(post) {
+				var postQuery2 = new Parse.Query(Post);
+				postQuery2.descending('createdAt');
+				postQuery2.include('author');
+				postQuery2.include('event');
+				postQuery2.limit(resultsLimit);
+				postQuery2.skip(resultsLimit * queryNumber);
+				postQuery2.equalTo('event', post[0].get('event'));
+				next(postQuery2);
+			}, function(e) {
+				console.length('error');
+				error(e);
+			});
+		} else if(req.params.filter == 'getMediaByAuthor') {
+			var postQuery = new Parse.Query(Post);
+
+			var postId = req.params.id;
+
+			postQuery.include('author');
+			postQuery.equalTo('publicId', postId);
+			postQuery.find().then(function(post) {
+				var postQuery2 = new Parse.Query(Post);
+				postQuery2.descending('createdAt');
+				postQuery2.include('author');
+				postQuery2.include('event');
+				postQuery2.limit(resultsLimit);
+				postQuery2.skip(resultsLimit * queryNumber);
+				postQuery2.equalTo('author', post[0].get('author'));
+				next(postQuery2);
+			}, function(e) {
+				error(e);
+			});
+		} else if(req.params.filter == 'getMediaByTrend') {
+			var Event = Parse.Object.extend("Event");
+			var eventQuery = new Parse.Query(Event);
+			var postQuery = new Parse.Query(Post);
+			var eventId = req.params.id;
+
+			eventQuery.equalTo("objectId", eventId);
+			eventQuery.find().then(function(chosenEvent) {
+				postQuery.descending('createdAt');
+				postQuery.include('author');
+				postQuery.include('event');
+				postQuery.limit(resultsLimit);
+				postQuery.skip(resultsLimit * queryNumber);
+				postQuery.equalTo('event', chosenEvent[0]);
+				next(postQuery);
+			}, function(e) {
+				error(e);
+			});
+		}
 	}
 }
 

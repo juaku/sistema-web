@@ -231,6 +231,8 @@ function Application($scope, $http) {
 	});
 
 
+	var idAux;
+	var typeOfFilterAux;
 	var gettingPosts = false;
 	var firstPostsLoad = true;
 	var postQueryCount = 0;
@@ -252,14 +254,15 @@ function Application($scope, $http) {
 			tryGetPosts();
 	});*/
 
-	var getPostsInterval = setInterval(tryGetPosts, 500);
+	var getPostsInterval = setInterval(function() { tryGetPosts(); }, 500);
 	
 	function tryGetPosts() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+
 		if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
 			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
 				getPostTries = 0;
-				getPosts();
+				getPosts(idAux, typeOfFilterAux);
 			} else {
 				getPostTries++;
 			}
@@ -267,13 +270,15 @@ function Application($scope, $http) {
 	}
 
 	// Cargar los post originales
-	function getPosts() {
+	function getPosts(id, typeOfFilter) {
+		idAux = id;
+		typeOfFilterAux = typeOfFilter;
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
 			//
 			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
-				postsQuery(function(data) {
+				postsQuery(id, typeOfFilter, function(data) {
 					if(data!=undefined) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
@@ -292,8 +297,14 @@ function Application($scope, $http) {
 		}
 	}
 
-	function postsQuery(next, error) {
-		$http.get('/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+	function postsQuery(id, typeOfFilter, next, error) {
+		var postId = id;
+		var filter = typeOfFilter;
+		if(id == undefined && filter == undefined) {
+			postId = 0;
+			filter = 'getAllPosts';
+		}
+		$http.get('/post/getPosts/' + filter + '/' + postId + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 			if(status == 204) {
 				clearInterval(getPostsInterval);
 			} else {
@@ -553,6 +564,24 @@ function Application($scope, $http) {
 			$scope.limit = $scope.limit+3;
 		else
 			console.log("No hay más eventos en tu ciudad");
+	}
+
+	$scope.getMediaByFilter = function(id, filter) {
+		loadedImgs = 0;
+		gettingPosts = false;
+		firstPostsLoad = true;
+		postQueryCount = 0;
+		postLoadStep = 10;
+		postShown = 0;
+		tmpLoadingPostsNumber;
+		tmpPosts = [];
+		getPostTries = 0;
+		getPostTriesLimit = 20;
+		$scope.posts = [];
+		//$scope.events = [];
+		createEmptyPosts(5);
+
+		getPosts(id, filter);
 	}
 
 	/*

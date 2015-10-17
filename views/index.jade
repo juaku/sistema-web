@@ -63,11 +63,13 @@ block content
                   .post-detail
                     .post-title
                       span.author-name
-                        span.author-firstName {{ post.author.firstName }}
+                        //span.author-firstName {{ post.author.firstName }}
+                        a.author-firstName(href='#' ng-click="getMediaByFilter(post.id, 'getMediaByAuthor')") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
                       span.event-posted(ng-if="post.event")
                         span.at-simbol @
-                        span.event-name {{ post.event }}
+                        //span.event-name {{ post.event }}
+                        a.event-name(href='#' ng-click="getMediaByFilter(post.id, 'getMediaByEvent')") {{ post.event }}
                     .sub-info
                       .time(ng-if="post.timeElapsed.type  == 's' ") #{__('Just now')}
                       .time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
@@ -92,7 +94,7 @@ block content
             .events-list
               .events-title.title #{__('Trends')}
               .event(ng-repeat="event in events | limitTo: limit")
-                .event-name
+                a.event-name(href='#' ng-click="getMediaByFilter(event.id, 'getMediaByTrend')")
                   span.at-simbol @
                   span.event-name {{ event.name }}
                 .event-people {{ event.count }} #{__('people')}
