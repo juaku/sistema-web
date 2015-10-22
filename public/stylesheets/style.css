@@ -582,6 +582,14 @@ section#float-controls #main-controls #camera
   vertical-align: middle;
   float: right;
 }
+#fbButton {
+  background: rgba(0,0,0,0.3);
+  width: 30px;
+  height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  float: right;
+}
 /*
  * New post
  */

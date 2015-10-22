@@ -272,7 +272,7 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
  * @param {object} newPost, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.newPost = function(newPost, next, error) {
+jPack.user.prototype.newPost = function(req, newPost, next, error) {
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
 	var flag = validate({post: newPost.eventName}, {post: {format: pattern}});
 	//console.log(flag);
@@ -293,7 +293,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 			query.find().then(function(results) {
 				if(results.length > 0) {
 					console.log('J2');
-					savePost(newPost, user, results[0], function() {
+					savePost(req, newPost, user, results[0], function() {
 						next();
 					}, function(e) {
 						error(e);
@@ -303,7 +303,7 @@ jPack.user.prototype.newPost = function(newPost, next, error) {
 					var event = new Event();
 					event.set('name', newPost.eventName);
 					event.save().then(function(newEvent) {
-						savePost(newPost, user, newEvent, function() {
+						savePost(req, newPost, user, newEvent, function() {
 							console.log('J4');
 							next();
 						}, function(e) {
@@ -783,19 +783,19 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
  * @par {string} data, {object} user, {object} event, {function} next, {function} error.
  * @return null
  */ 
-function savePost(data, user, event, next, error) {
+function savePost(req, data, user, event, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
 	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
 		var base64data = imgBase64;
 		var namePhoto = mediaName;
-		var parseFile = new Parse.File(namePhoto+".txt", {base64: base64data});
+		var parseFile = new Parse.File(namePhoto+'.txt', {base64: base64data});
 		parseFile.save().then(function() {
 			// The file has been saved to Parse.
-			console.log("el archivo fue guardado en parse con éxito");
+			console.log('el archivo fue guardado en parse con éxito');
 			var Post = Parse.Object.extend("Post");
 			post = new Post();
-			post.set("file", parseFile);
+			post.set('file', parseFile);
 			console.log(mediaName + mediaExt);
 			post.set('media', mediaName + '.' + mediaExt);
 			post.set('author', user);
@@ -807,6 +807,11 @@ function savePost(data, user, event, next, error) {
 			post.save().then(function(newPost) {
 				post.set('publicId', crip.enco(newPost.id));
 				post.save();
+				var parseFileURL = parseFile.url();
+				//compartir foto en facebook
+				if(data.shareOnFb) {
+					shareMediaOnFb(req, parseFileURL, error);
+				}
 				postCount++;
 				if(postCount >= postUpdate) {
 					updateEventList();
@@ -816,12 +821,31 @@ function savePost(data, user, event, next, error) {
 				error(e);
 			});
 		}, function(error) {
-			console.log("error al guardar el archivo en parse");
+			console.log('error al guardar el archivo en parse');
 			// The file either could not be read, or could not be saved to Parse.
 		});
 	}, function(e) {
 		error(e);
 	});
+}
+
+function shareMediaOnFb(req, parseFileURL, error) {
+	var albumId = '';
+
+	FB.api('/' + albumId + '/photos","POST',
+		{
+			'url': parseFileURL,
+			'access_token': req.session.jUser.accessToken
+		},
+			function (response) {
+				if (response && !response.error) {
+					// handle the result
+					console.log('Foto compartida en facebook exitósamente');
+				} else {
+					error();
+				}
+			}
+	);
 }
 
 /*
