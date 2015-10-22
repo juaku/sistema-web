@@ -45,7 +45,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='new') {
-			jUser.newPost(req.body, function() {
+			jUser.newPost(req, req.body, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);

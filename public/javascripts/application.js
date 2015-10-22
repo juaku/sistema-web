@@ -160,6 +160,11 @@ $(document).ready(function() {
 		$('main').scrollTop(mainScrollStatus);
 	});
 
+	$('#fbButton').on('click', function() {
+		console.log("click cambiar color");
+		$('#fbButton').css("background-color", "blue");
+	});
+
 	$('.show-more').on('click', function() {
 		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
 	});
@@ -257,7 +262,6 @@ function Application($scope, $http) {
 	var getPostsInterval = setInterval(function() { tryGetPosts(); }, 500);
 	
 	function tryGetPosts() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-
 		if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
 			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
@@ -430,6 +434,16 @@ function Application($scope, $http) {
 	 * Post
 	 */
 	$scope.newPost = {};
+	$scope.newPost.shareOnFb = false;
+
+	$scope.shareOnfB = function() {
+		if(!$scope.newPost.shareOnFb) {
+			$scope.newPost.shareOnFb = true;
+		} else {
+			$scope.newPost.shareOnFb = false;
+		}
+		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
+	}
 
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();

@@ -21,7 +21,7 @@ block content
             section#profile
               img(src=user.profilePicture)
               h2.profile-name
-                span.profile-firstname #{user.firstName} 
+                span.profile-firstname #{user.firstName}
                 br
                 span.profile-lastname #{user.lastName}
             //section#friends
@@ -39,6 +39,7 @@ block content
               li @Help
           #createNewEvent
             input(type="text" id="new-event-name" ng-model="newPost.eventName")
+            #fbButton(ng-click="shareOnfB()")
           #positionMap
             img(src="")
           #load-media-again
