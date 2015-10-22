@@ -3,7 +3,7 @@
  * ------- ---------
  */
 body {
-  background-color: #f3f3f5;
+  background-color: #fff;
   color: #333;
   font-family: Arial, sans-serif;
   font-size: 14px;
@@ -78,7 +78,7 @@ main#start section#access #methods #FB
 header {
   background-color: #fff;
   width: 100%;
-  padding: 5px 0;
+  padding: 10px 0;
   position: fixed;
   z-index: 10;
   top: 0;
@@ -101,7 +101,7 @@ header #title a h1 {
  */
 main {
   width: 100%;
-  top: 55px;
+  top: 65px;
   bottom: 0px;
   position: absolute;
   overflow: auto;
@@ -202,22 +202,21 @@ section#people-controls section#friends .friend:before
  * Vista
  */
 section#view {
-  background-color: rgba(255,255,255,0);
+  background-color: #f3f3f5;
   padding-bottom: 50px;
   max-width: 530px;
   height: 100%;
-  padding: 10px 0;
+/*padding: 10px 0 // NEWLOGO*/
   position: relative;
   z-index: 1;
 }
 /*section#view #view-wrapper
 	padding: 10px 0 // NEWLOGO*/
 section#view section#post-list .post {
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 section#view section#post-list .post div.media {
   position: relative;
-  background-color: rgba(255,255,255,0.5);
 }
 /*section#view section#post-list .post div.media.loaded
 	animation: none*/
