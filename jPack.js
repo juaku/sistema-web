@@ -831,8 +831,7 @@ function savePost(req, data, user, event, next, error) {
 
 function shareMediaOnFb(req, parseFileURL, error) {
 	var albumId = '';
-
-	FB.api('/' + albumId + '/photos","POST',
+	FB.api('/' + albumId + '/photos','POST',
 		{
 			'url': parseFileURL,
 			'access_token': req.session.jUser.accessToken
@@ -842,7 +841,7 @@ function shareMediaOnFb(req, parseFileURL, error) {
 					// handle the result
 					console.log('Foto compartida en facebook exitósamente');
 				} else {
-					error();
+					error(e);
 				}
 			}
 	);
