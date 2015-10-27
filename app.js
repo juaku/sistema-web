@@ -146,7 +146,8 @@ app.locals.title = 'Juaku';
 //DEV: Restringir el uso a usuarios que no sean clientes del servidor
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
-		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128' || req.ip.substring(0, 11) == '190.113.211' || req.ip.substring(0, 11) == '190.113.210') {
+		//if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128' || req.ip.substring(0, 11) == '190.113.211' || req.ip.substring(0, 11) == '190.113.210') {
+		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || (parseInt(req.ip.split('.')[0]) == 179 && parseInt(req.ip.split('.')[1]) == 7)) {
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )

@@ -16,11 +16,11 @@ body {
   height: 100%;
 }
 a {
-  color: #555;
+  color: inherit;
   text-decoration: none;
 }
 a:hover {
-  color: #000;
+  color: inherit;
 }
 /*
  * Estilos específicos: /login
@@ -84,11 +84,12 @@ header {
   top: 0;
 }
 header #title a {
-  background-image: url("/images/sprite.svg?v=1005");
+  background-image: url("/images/juaku.svg?v=1005");
   background-repeat: no-repeat;
-/*background-size: 112.5px*/
-/* Borroso en FF*/
-  width: 115px;
+  -webkit-background-size: 125px 45px;
+  -moz-background-size: 125px 45px;
+  background-size: 125px 45px;
+  width: 125px;
   height: 45px;
   display: block;
   margin: 0 auto;
@@ -235,14 +236,16 @@ section#view section#post-list .post div.media img.media {
   filter: alpha(opacity=0);
 }
 section#view section#post-list .post div.media img.media.show {
-  opacity: 1;
-  -ms-filter: none;
-  filter: none;
   -webkit-animation: show-img 500ms linear;
   -moz-animation: show-img 500ms linear;
   -o-animation: show-img 500ms linear;
   -ms-animation: show-img 500ms linear;
   animation: show-img 500ms linear;
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  -o-animation-fill-mode: forwards;
+  -ms-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 /*section#view section#post-list .post div.media img.media.raw // Aparece sin animación. Android Web Browser
 	transition: none
@@ -297,7 +300,6 @@ section#view section#post-list .post .bottom .author-img {
 section#view section#post-list .post .bottom .author-img img {
   width: 55px;
   height: 55px;
-  margin-right: 5px;
   background-color: #fff;
   display: block;
 }
@@ -305,7 +307,8 @@ section#view section#post-list .post .bottom .post-detail {
   display: table;
   table-layout: fixed;
   width: 100%;
-  padding: 6px 5px 5px 10px;
+  padding: 6px 0 5px 0;
+  letter-spacing: -0.5px;
 }
 /*
 section#view section#post-list .post .bottom .post-detail .post-data
@@ -343,18 +346,22 @@ section#view section#post-list .post .bottom .post-detail .sub
 section#view section#post-list .post .bottom .post-detail .sub:first-letter
 	text-transform: uppercase
 */
+section#view section#post-list .post .bottom .post-detail .post-title,
+section#view section#post-list .post .bottom .post-detail .sub-info {
+  padding-left: 10px;
+  padding-right: 5px;
+}
 section#view section#post-list .post .bottom .post-detail .post-title {
-  font-size: 17px;
+  font-size: 18px;
   color: #f05;
   overflow: hidden;
   white-space: nowrap;
   -o-text-overflow: ellipsis;
   text-overflow: ellipsis;
-  letter-spacing: -0.5px;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .author-name {
   color: #333;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: bold;
 }
 section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName {
@@ -369,15 +376,15 @@ section#view section#post-list .post .bottom .post-detail .post-title .event-pos
 }
 section#view section#post-list .post .bottom .post-detail .sub-info {
   font-size: 12px;
-  color: #999;
-  letter-spacing: -0.5px;
+  color: #bbb;
+  margin-top: 2px;
 }
 section#view section#post-list .post .bottom .post-detail .sub-info .time {
   display: inline-block;
 }
-section#view section#post-list .post .bottom .post-detail .sub-info .time:first-letter {
-  text-transform: uppercase;
-}
+/*section#view section#post-list .post .bottom .post-detail .sub-info .time::first-letter
+	text-transform: uppercase
+*/
 section#view section#post-list .post .bottom .post-detail .sub-info .separator {
   display: inline-block;
   margin: 0 5px;
@@ -475,7 +482,7 @@ aside section#events-controls .show-more {
  * Controles flotantes
  */
 section#float-controls {
-  background-color: #e0e0e5;
+  background-color: #fff;
   -webkit-transition: background-color 250ms linear;
   -moz-transition: background-color 250ms linear;
   -o-transition: background-color 250ms linear;
@@ -491,51 +498,77 @@ section#float-controls {
 }
 section#float-controls .button {
   display: table-cell;
-  padding: 8px 15px;
-  vertical-align: middle;
-  width: 33%;
+  height: 44px;
 }
-section#float-controls .button.center {
-  width: 34%;
-  background: rgba(0,0,0,0.07);
+section#float-controls .button.first,
+section#float-controls .button.last {
+  width: 44px;
 }
-section#float-controls .button .btn-ico {
+section#float-controls .button .ico {
+  background: url("/images/sprite.svg");
+  -webkit-background-size: auto cover;
+  -moz-background-size: auto cover;
+  background-size: auto cover;
+  width: 44px;
+  height: 44px;
   margin: 0 auto;
 }
-section#float-controls .button #users {
-  background: url("/images/b1.png");
-  width: 20px;
-  height: 24px;
-  background-repeat: no-repeat;
-  -webkit-background-size: 100% 100%;
-  -moz-background-size: 100% 100%;
-  background-size: 100% 100%;
-  opacity: 0.2;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-  filter: alpha(opacity=20);
+section#float-controls #btn-options {
+  background-position: 0px;
+  width: 44px;
 }
-section#float-controls .button #camera {
-  background: #fff;
-  width: 28px;
-  height: 28px;
-  -webkit-box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2);
-  box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2);
-  -webkit-border-radius: 30px;
-  border-radius: 30px;
-  cursor: pointer;
+section#float-controls #btn-media {
+  background-position: 176px;
 }
-section#float-controls .button #events {
-  background: url("/images/a.png");
-  width: 26px;
-  height: 26px;
-  background-repeat: no-repeat;
-  -webkit-background-size: 100% 100%;
-  -moz-background-size: 100% 100%;
-  background-size: 100% 100%;
-  opacity: 0.2;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-  filter: alpha(opacity=20);
+section#float-controls #btn-camera {
+  background-position: 132px;
 }
+section#float-controls #btn-events {
+  background-position: 88px;
+}
+section#float-controls #btn-search {
+  background-position: 44px;
+  width: 44px;
+}
+/*	padding: 8px 15px
+	vertical-align: middle
+	width: 33%
+
+section#float-controls .button.center
+	width: 34%
+	//background: rgba(0,0,0,0.07)
+
+section#float-controls .button .btn-ico
+	margin: 0 auto
+
+section#float-controls .button #users
+	background: url("/images/b1.png")
+	width: 20px
+	height: 24px
+	background-repeat: no-repeat
+	background-size: 100% 100%
+	//-webkit-filter: invert(1)
+	opacity: 0.2
+
+section#float-controls .button #camera
+	background: #FFF
+	width: 28px
+	height: 28px
+	//margin: 0 auto
+	box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2)
+	border-radius: 30px
+	cursor: pointer
+
+section#float-controls .button #events
+	background: url("/images/a.png")
+	width: 26px
+	height: 26px
+	background-repeat: no-repeat
+	background-size: 100% 100%
+	//margin: 0 0 0 auto
+	//-webkit-filter: invert(1)
+	opacity: 0.2
+*/
 /*
 section#float-controls #main-controls
 	width: 290px
@@ -677,10 +710,19 @@ footer #brand {
     padding: 4px 0 5px 0;
   }
   header #title a {
-/*background-size: 87.5px*/
-/* Borroso en FF*/
-    width: 87.5px;
+    -webkit-background-size: 97px 35px;
+    -moz-background-size: 97px 35px;
+    background-size: 97px 35px;
+    width: 97px;
     height: 35px;
+/*
+	section#view section#post-list .post .bottom .post-detail .post-title
+		//font-size: 16px
+		//letter-spacing: -0.5px
+	
+	section#view section#post-list .post .bottom .post-detail .sub-info
+		//letter-spacing: -0.5px
+		*/
   }
 }
 /*section#view section#post-list .post // NEWLOGO

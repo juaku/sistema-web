@@ -104,18 +104,18 @@ var isAndroidBrowser = isAndroidMobile && appleWebKitVersion !== null && appleWe
  * Código de maquetación
  * ---------------------
  */
-window.scrollTo(0, 1);
+//window.scrollTo(0, 1);
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
-	$('#camera').click(function(event) {
+	$('#btn-camera').click(function(event) {
 		$('input#media-loader').click();
 		$('body').addClass('float-view');
 	});
 
-	$(window).on('load resize', function() {
+	/*$(window).on('load resize', function() {
 		resizeTask();
-	});
+	});*/
 
 	//TODO: Borrar
 	/*$('input#media-loader').click(function(event) {
@@ -137,7 +137,7 @@ $(document).ready(function() {
 		$('main').animate({scrollLeft: $('main').scrollLeft() - $('#view').width()}, 250);
 	});*/
 
-	// Botones
+	// Botones TODO: Mejorar
 	var mainScrollStatus = 0;
 	$('#users').on('click', function() {
 		mainScrollStatus = $('main').scrollTop();
@@ -153,7 +153,7 @@ $(document).ready(function() {
 		$('#second').css({'display':'block'});
 	});
 
-	$('#camera').on('click', function() {
+	$('#btn-camera').on('click', function() {
 		$('#first').css({'display':'none'});
 		$('#view').css({'display':'block'});
 		$('#second').css({'display':'none'});
@@ -189,11 +189,11 @@ $(document).ready(function() {
 	}, 1);*/
 });
 
-function resizeTask() {
+/*function resizeTask() {
 	//$('#main-controls').width($('section#view').width()); // TODO: Corregir comportamiento
 	//$('#post-list .post-detail .post-title').width(0);
 	//$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
-}
+}*/
 
 
 /*
@@ -224,7 +224,6 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
 
-
 	getGeo(function() {
 		$http.post('/user/getGeo', $scope.user).success(function(data) {
 			getPosts();
@@ -234,7 +233,6 @@ function Application($scope, $http) {
 		//getPosts();
 		console.log(errorMsg);
 	});
-
 
 	var idAux;
 	var typeOfFilterAux;
@@ -251,26 +249,32 @@ function Application($scope, $http) {
 	$scope.events = [];
 
 	createEmptyPosts(5);
-	
-	getPosts();
+	askForPost();
 
 	/* TODO: Ver si es que es necesario
 	$(window).scroll(function() {
-			tryGetPosts();
+			askForPost();
 	});*/
 
-	var getPostsInterval = setInterval(function() { tryGetPosts(); }, 500);
+	//var getPostsInterval = setInterval(function() { askForPost(); }, 500);
+
+	$('main').scroll(function() {
+		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
+			askForPost();
+		}
+	});
 	
-	function tryGetPosts() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-		if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
+	function askForPost() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+		//if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
-			if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
+			getPosts(idAux, typeOfFilterAux);
+			/*if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
 				getPostTries = 0;
 				getPosts(idAux, typeOfFilterAux);
 			} else {
 				getPostTries++;
-			}
-		}
+			}*/
+		//}
 	}
 
 	// Cargar los post originales
@@ -287,6 +291,7 @@ function Application($scope, $http) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
 						};
+						//document.write(borrarEsto);
 						showPosts();
 					} else {
 						gettingPosts = false;
@@ -329,8 +334,11 @@ function Application($scope, $http) {
 		postShown += postLoadStep;
 		//TODO: No se mostrá los n>5 últimos posts.
 		for(var i = numberPostsNow; i < postShown; i++) {
-			if(tmpPosts[i] != undefined) {
-				$scope.posts[i] = tmpPosts[i];
+			if(tmpPosts[i] != undefined && $scope.posts[i] != undefined) {
+				for(var prop in tmpPosts[i]) {
+					$scope.posts[i][prop] = tmpPosts[i][prop];
+				}
+				//$scope.posts[i] = tmpPosts[i];
 				//$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
@@ -583,8 +591,7 @@ function Application($scope, $http) {
 	$scope.getMediaByFilter = function(id, filter) {
 		loadedImgs = 0;
 		gettingPosts = false;
-		firstPostsLoad = true;
-		postQueryCount = 0;
+		firstPostsLoad = true;		postQueryCount = 0;
 		postLoadStep = 10;
 		postShown = 0;
 		tmpLoadingPostsNumber;
@@ -638,7 +645,7 @@ function Application($scope, $http) {
 						break;
 				}
 				// TODO: Manejar error 
-				//alert('Mal! ' + errorMsg);
+				alert('Mal! ' + errorMsg);
 				error(errorMsg);
 			});
 		} else {
@@ -694,16 +701,21 @@ angular.module('Juaku', [])
 					/*if (isAndroidMobile) {
 						$(element).addClass('raw');
 					}*/
+					$(element).addClass('show');
 				}
 				//$(element).css('opacity', 1);
-				$(element).addClass('show');
 			});
 		}
 	};
+})
+.filter('capitalize', function() {
+    return function(input) {
+      return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+    }
 });
 
 function postsLoaded() {
-	resizeTask();
+	//resizeTask();
 	$('.like-svg').off();
 	$('.like-svg').on('click', function() {
 		$(this).parent().toggleClass('selected');

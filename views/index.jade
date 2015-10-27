@@ -67,15 +67,15 @@ block content
                         //span.author-firstName {{ post.author.firstName }}
                         a.author-firstName(href='#' ng-click="getMediaByFilter(post.id, 'getMediaByAuthor')") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      span.event-posted(ng-if="post.event")
+                      a.event-posted(href='#' ng-if="post.event" ng-click="getMediaByFilter(post.id, 'getMediaByEvent')")
                         span.at-simbol @
                         //span.event-name {{ post.event }}
-                        a.event-name(href='#' ng-click="getMediaByFilter(post.id, 'getMediaByEvent')") {{ post.event }}
+                        span.event-name() {{ post.event }}
                     .sub-info
                       .time(ng-if="post.timeElapsed.type  == 's' ") #{__('Just now')}
                       .time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
                       .time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
-                      .time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm"}}
+                      .time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
                       //.separator ·
                       //.friends 24 #{__('friends')}
               .like(ng-click="likeClick(post)")
@@ -106,12 +106,16 @@ block content
             #brand Juaku © 2015
   //main#blurred-back
   section#float-controls
+    .button.first
+      #btn-options.ico
     .button
-      #users.btn-ico
-    .button.center
-      #camera.btn-ico
+      #btn-media.ico
     .button
-      #events.btn-ico
+      #btn-camera.ico
+    .button
+      #btn-events.ico
+    .button.last
+      #btn-search.ico
     //#main-controls
     //.button.hot #{__('')}
     //.button.control-switch
