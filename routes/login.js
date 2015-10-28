@@ -7,9 +7,11 @@ var router = express.Router();
  */
 router.get('/', function(req, res){
   if (req.isAuthenticated()) {
-    res.redirect('/account')
+  	res.redirect('/');
+  	/*var parseSessionToken = {};
+    res.json({parseSessionToken:req.session.jUser.parseSessionToken});*/
   } else {
-    res.render('login');
+		res.render('login');
   }
 });
 

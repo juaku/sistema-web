@@ -10,9 +10,10 @@ var jPack = require('../jPack');
 var Parse = require('../parseConnect').Parse;
 
 var request = require('request');
-
-router.get('/:action/:filter/:id?/:postQueryCount?', ensureAuthenticated, function(req, res) {
-	console.log('POST GET!')
+// TODO: Ver si :action sirve
+// router.get('/:action/:filter/:id?/:postQueryCount?', ensureAuthenticated, function(req, res) {
+router.get('/:filter/:id?/:postQueryCount?', ensureAuthenticated, function(req, res) {
+	console.log('GET media');
 	jPack.getAllPosts(req, function(result) {
 		if(result.length == 0) {
 			res.status(204).end();
@@ -26,6 +27,7 @@ router.get('/:action/:filter/:id?/:postQueryCount?', ensureAuthenticated, functi
 });
 
 router.post('/:action', ensureAuthenticated, function(req, res) {
+	console.log('POST media');
 	if(req.body!=undefined && req.body!=''  && req.params.action!=undefined) {
 		console.log('H1');
 		req.session.jUser = new jPack.user(req.session.jUser);

@@ -313,7 +313,7 @@ function Application($scope, $http) {
 			postId = 0;
 			filter = 'getAllPosts';
 		}
-		$http.get('/post/getPosts/' + filter + '/' + postId + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+		$http.get('/post/' + filter + '/' + postId + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 			if(status == 204) {
 				clearInterval(getPostsInterval);
 			} else {
