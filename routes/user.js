@@ -81,6 +81,3 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 });
 
 module.exports = router;
-
-/*var parseSessionToken = {}
-	res.json({parseSessionToken:req.session.jUser.parseSessionToken});*/

@@ -89,10 +89,8 @@ function issueToken(user, done) {
 
 var routes = require('./routes/index');
 var access = require('./routes/access');
-//var account = require('./routes/account');
 var login = require('./routes/login');
 var logout = require('./routes/logout');
-var event = require('./routes/event');
 var post = require('./routes/post');
 var user = require('./routes/user');
 var list = require('./routes/list');
@@ -160,10 +158,8 @@ if (app.get('env') === 'development') {
 //Usar rutas
 app.use('/', routes);
 app.use('/access', access);
-//app.use('/account', account);
 app.use('/login', login);
 app.use('/logout', logout);
-app.use('/event', event);
 app.use('/post', post);
 app.use('/user', user);
 app.use('/list', list);
