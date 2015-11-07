@@ -275,6 +275,19 @@ function Application($scope, $http) {
 		}
 	}
 
+	$scope.report = function (post) {
+		$scope.post = post;
+		console.log('Application.js ' + $scope.post);
+		$http.post('/post/report', $scope.post).success(function(data) {
+		}).error();
+	}
+	$scope.getReportCount = function (post) {
+		$scope.post = post;
+		console.log('Application.js ' + $scope.post);
+		$http.post('/post/getReportCount', $scope.post).success(function(data) {
+		}).error();
+	}
+
 	// Envía un objeto con los datos de la persona que deseas bloquear o desbloquear mediante un post 
 	$scope.blockUser = function(userToBlock) {
 		$scope.user.userToBlock = userToBlock;
@@ -295,7 +308,6 @@ function Application($scope, $http) {
 		console.log("$scope.user.postToAskLocation: "+$scope.user.postToAskLocation)
 		$http.post('/user/askLocation', $scope.user).success(function() {
 		}).error();
-
 	}
 
 	/*

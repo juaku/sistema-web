@@ -45,6 +45,20 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
+		} else if (req.params.action=='report') {
+			jUser.report(req.body, function() {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
+		} else if (req.params.action=='getReportCount') {
+			jPack.getReportCount(req.body, function() {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
 		}
 		console.log('H2');
 
