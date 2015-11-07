@@ -1,3 +1,16 @@
+/*
+ * Variables
+ * ---------
+ */
+/* Color puro					Trasnparencia
+backColor 	= #FFF		= #FFF
+layerColor	= #F3F3F5	= rgba(0, 0, 0, .05)
+icoColor 		=	#D3D3D5	=	rgba(0, 0, 0, .20)
+fontColor		= #333		= rgba(0, 0, 0, .80)
+accentColor = #F05		= #F05
+hardColor		= #555		= rgba(0, 0, 0, .70)
+softColor		= #AAA		= rgba(0, 0, 0, .35) // No se ve claro en Chrome en Windows
+*/
 /* 
  * Estilos generales
  * ------- ---------
@@ -134,6 +147,13 @@ aside {
   width: 200px;
   padding: 10px;
 }
+aside#first {
+  -webkit-transition: width 500ms;
+  -moz-transition: width 500ms;
+  -o-transition: width 500ms;
+  -ms-transition: width 500ms;
+  transition: width 500ms;
+}
 aside #people-side,
 aside #events-side {
   width: inherit;
@@ -155,7 +175,7 @@ section#people-controls section#profile {
   display: inline-block;
 }
 section#people-controls section#profile img {
-  background-color: #eee;
+  background-color: #f3f3f5;
   width: 100px;
   height: 100px;
 }
@@ -234,18 +254,16 @@ section#view section#post-list .post div.media img.media {
   opacity: 0;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
   filter: alpha(opacity=0);
+  -webkit-transition: opacity 500ms linear;
+  -moz-transition: opacity 500ms linear;
+  -o-transition: opacity 500ms linear;
+  -ms-transition: opacity 500ms linear;
+  transition: opacity 500ms linear;
 }
 section#view section#post-list .post div.media img.media.show {
-  -webkit-animation: show-img 500ms linear;
-  -moz-animation: show-img 500ms linear;
-  -o-animation: show-img 500ms linear;
-  -ms-animation: show-img 500ms linear;
-  animation: show-img 500ms linear;
-  -webkit-animation-fill-mode: forwards;
-  -moz-animation-fill-mode: forwards;
-  -o-animation-fill-mode: forwards;
-  -ms-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
+  opacity: 1;
+  -ms-filter: none;
+  filter: none;
 }
 /*section#view section#post-list .post div.media img.media.raw // Aparece sin animación. Android Web Browser
 	transition: none
@@ -265,6 +283,11 @@ section#view section#post-list .post div.media .preloader {
   -ms-animation: preloader 750ms linear infinite;
   animation: preloader 750ms linear infinite;
 }
+/*@keyframes show-img
+	0%
+		opacity: 0
+	100%
+		opacity: 1*/
 section#view section#post-list .post .bottom {
   background-color: #fff;
   width: 100%;
@@ -408,6 +431,14 @@ section#view section#post-list .post .bottom .like .like-svg {
   cursor: pointer;
   display: block;
 }
+section#view section#post-list .post .bottom .like .like-svg #inner {
+  fill: rgba(0,0,0,0.2);
+  -webkit-transition: fill 250ms;
+  -moz-transition: fill 250ms;
+  -o-transition: fill 250ms;
+  -ms-transition: fill 250ms;
+  transition: fill 250ms;
+}
 section#view section#post-list .post .bottom .like .selected .like-svg #inner {
   fill: #f05;
 }
@@ -415,7 +446,7 @@ section#view section#post-list .post .bottom .like .selected .like-svg #inner {
  * Eventos
  */
 aside section#events-controls {
-  background: #fff;
+  background-color: #fff;
 }
 aside section#events-controls .promoted,
 aside section#events-controls .events-list,
@@ -466,7 +497,7 @@ aside section#events-controls .event .event-name.small {
 }
 aside section#events-controls .event .event-people {
   font-size: 11px;
-  color: #999;
+  color: #aaa;
   margin-left: 15px;
 }
 /*aside section#events-controls .promoted:after
@@ -482,7 +513,7 @@ aside section#events-controls .show-more {
 /*
  * Controles flotantes
  */
-section#float-controls {
+nav#float-controls {
   background-color: #fff;
   -webkit-transition: background-color 250ms linear;
   -moz-transition: background-color 250ms linear;
@@ -490,59 +521,58 @@ section#float-controls {
   -ms-transition: background-color 250ms linear;
   transition: background-color 250ms linear;
   width: 100%;
-  color: rgba(255,255,255,0.9);
   display: none;
   text-align: center;
   position: fixed;
   bottom: 0;
   z-index: 10;
 }
-section#float-controls .button {
+nav#float-controls .control {
   display: table-cell;
   height: 44px;
 }
-section#float-controls .button.first,
-section#float-controls .button.last {
+nav#float-controls .control.first,
+nav#float-controls .control.middle,
+nav#float-controls .control.last {
   width: 44px;
 }
-section#float-controls .button .ico {
-  background: url("/images/sprite.svg");
+nav#float-controls .control .button {
+  background-image: url("/images/sprite.svg");
   -webkit-background-size: auto cover;
   -moz-background-size: auto cover;
   background-size: auto cover;
   width: 44px;
   height: 44px;
   margin: 0 auto;
+  cursor: pointer;
 }
-section#float-controls #btn-options {
+nav#float-controls .control .button.selected {
+  background-color: #f3f3f5;
+}
+nav#float-controls #button-options {
   background-position: 0px;
-  width: 44px;
 }
-section#float-controls #btn-media {
+nav#float-controls #button-posts {
   background-position: 176px;
 }
-section#float-controls #btn-camera {
+nav#float-controls #button-camera {
   background-position: 132px;
 }
-section#float-controls #btn-events {
+nav#float-controls #button-events {
   background-position: 88px;
 }
-section#float-controls #btn-search {
+nav#float-controls #button-search {
   background-position: 44px;
-  width: 44px;
 }
 /*	padding: 8px 15px
 	vertical-align: middle
 	width: 33%
 
-section#float-controls .button.center
+nav#float-controls .button.center
 	width: 34%
 	//background: rgba(0,0,0,0.07)
 
-section#float-controls .button .btn-ico
-	margin: 0 auto
-
-section#float-controls .button #users
+nav#float-controls .button #users
 	background: url("/images/b1.png")
 	width: 20px
 	height: 24px
@@ -551,7 +581,7 @@ section#float-controls .button #users
 	//-webkit-filter: invert(1)
 	opacity: 0.2
 
-section#float-controls .button #camera
+nav#float-controls .button #camera
 	background: #FFF
 	width: 28px
 	height: 28px
@@ -560,7 +590,7 @@ section#float-controls .button #camera
 	border-radius: 30px
 	cursor: pointer
 
-section#float-controls .button #events
+nav#float-controls .button #events
 	background: url("/images/a.png")
 	width: 26px
 	height: 26px
@@ -571,16 +601,16 @@ section#float-controls .button #events
 	opacity: 0.2
 */
 /*
-section#float-controls #main-controls
+nav#float-controls #main-controls
 	width: 290px
 	margin: 0 auto
 	
-section#float-controls #main-controls .button
+nav#float-controls #main-controls .button
 	display: inline-block
 	vertical-align: middle
 	margin: 0 5px
 
-section#float-controls #main-controls .button.control-switch
+nav#float-controls #main-controls .button.control-switch
 	//width: 64px
 	width: 36px
 	//height: 32px
@@ -591,7 +621,7 @@ section#float-controls #main-controls .button.control-switch
 	//padding: 0 5px
 	position: relative
 
-section#float-controls #main-controls .button.control-switch .knob
+nav#float-controls #main-controls .button.control-switch .knob
 	//width: 24px
 	width: 32px
 	//height: 24px
@@ -606,7 +636,7 @@ section#float-controls #main-controls .button.control-switch .knob
 	//left: 45px
 	left: 2px
 
-section#float-controls #main-controls #camera
+nav#float-controls #main-controls #camera
 */
 #send-post {
   background: rgba(0,0,0,0.3);
@@ -625,7 +655,17 @@ section#float-controls #main-controls #camera
   float: right;
 }
 /*
- * New post
+ * Pie
+ */
+footer {
+  margin: 10px 5px;
+  font-size: 12px;
+}
+footer #brand {
+  margin: 5px 0;
+}
+/*
+ * Vistas de la aplicación
  */
 input#media-loader {
   visibility: hidden;
@@ -637,29 +677,43 @@ section#new-post {
 section#new-post canvas#new-media-preview {
   width: 100%;
 }
-body.float-view main #controls,
-body.float-view main #events,
-body.float-view main #view-controls,
-body.float-view main #post-list,
-body.float-view #float-controls {
-  display: none;
-}
-body.float-view section#new-post {
-  display: block;
-}
 section#new-post #positionMap img {
   width: 100%;
 }
 /*
- * Pie
+ * Control de vistas
  */
-footer {
-  margin: 10px 5px;
-  font-size: 12px;
-  color: #aaa;
+body.config-view main #new-post,
+body.config-view main #post-list,
+body.config-view main #last {
+  display: none;
 }
-footer #brand {
-  margin: 5px 0;
+body.config-view main #first {
+  display: block;
+}
+body.posts-view main #first,
+body.posts-view main #new-post,
+body.posts-view main #last {
+  display: none;
+}
+body.posts-view main #post-list {
+  display: block;
+}
+body.new-post-view main #first,
+body.new-post-view main #last,
+body.new-post-view main #post-list {
+  display: none;
+}
+body.new-post-view main #new-post {
+  display: block;
+}
+body.events-view main #first,
+body.events-view main #new-post,
+body.events-view main #post-list {
+  display: none;
+}
+body.events-view main #last {
+  display: block;
 }
 /*
  * Responsive
@@ -678,7 +732,7 @@ footer #brand {
     bottom: 44px;
   }
   aside#first,
-  aside#second {
+  aside#last {
     display: none;
   }
   main #wrapper {
@@ -699,7 +753,7 @@ footer #brand {
   section#view {
     padding: 0;
   }
-  section#float-controls {
+  nav#float-controls {
     display: table;
   }
 }
@@ -934,53 +988,5 @@ footer #brand {
   100% {
     -webkit-box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
     box-shadow: 0 0 0 10px rgba(0,0,0,0.01);
-  }
-}
-@-moz-keyframes show-img {
-  0% {
-    opacity: 0;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    filter: alpha(opacity=0);
-  }
-  100% {
-    opacity: 1;
-    -ms-filter: none;
-    filter: none;
-  }
-}
-@-webkit-keyframes show-img {
-  0% {
-    opacity: 0;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    filter: alpha(opacity=0);
-  }
-  100% {
-    opacity: 1;
-    -ms-filter: none;
-    filter: none;
-  }
-}
-@-o-keyframes show-img {
-  0% {
-    opacity: 0;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    filter: alpha(opacity=0);
-  }
-  100% {
-    opacity: 1;
-    -ms-filter: none;
-    filter: none;
-  }
-}
-@keyframes show-img {
-  0% {
-    opacity: 0;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-    filter: alpha(opacity=0);
-  }
-  100% {
-    opacity: 1;
-    -ms-filter: none;
-    filter: none;
   }
 }

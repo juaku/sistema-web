@@ -108,9 +108,28 @@ var isAndroidBrowser = isAndroidMobile && appleWebKitVersion !== null && appleWe
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
-	$('#btn-camera').click(function(event) {
-		$('input#media-loader').click();
-		$('body').addClass('float-view');
+	$('#float-controls .button').click( function() {
+		$('#float-controls .button').removeClass('selected');
+		$(this).addClass('selected');
+		$('body').removeClass('config-view posts-view new-post-view events-view search-view');
+		switch($('#float-controls .button').index(this)) {
+			case 0:
+				$('body').addClass('config-view');
+				break;
+			case 1:
+				$('body').addClass('posts-view');
+				break;
+			case 2:
+				$('body').addClass('new-post-view');
+				$('input#media-loader').click(); // Petición de archivo
+				break;
+			case 3:
+				$('body').addClass('events-view');
+				break;
+			case 4:
+				$('body').addClass('search-view');
+				break;
+		}
 	});
 
 	/*$(window).on('load resize', function() {
@@ -138,15 +157,23 @@ $(document).ready(function() {
 	});*/
 
 	// Botones TODO: Mejorar
+	/*
 	var mainScrollStatus = 0;
-	$('#users').on('click', function() {
+	$('#btn-config').on('click', function() {
 		mainScrollStatus = $('main').scrollTop();
 		$('#first').css({'display':'block'});
 		$('#view').css({'display':'none'});
 		$('#second').css({'display':'none'});
 	});
 
-	$('#events').on('click', function() {
+	$('#btn-posts').on('click', function() {
+		mainScrollStatus = $('main').scrollTop();
+		$('#first').css({'display':'none'});
+		$('#view').css({'display':'block'});
+		$('#second').css({'display':'none'});
+	});
+
+	$('#btn-events').on('click', function() {
 		mainScrollStatus = $('main').scrollTop();
 		$('#first').css({'display':'none'});
 		$('#view').css({'display':'none'});
@@ -159,6 +186,9 @@ $(document).ready(function() {
 		$('#second').css({'display':'none'});
 		$('main').scrollTop(mainScrollStatus);
 	});
+*/
+
+
 
 	$('#fbButton').on('click', function() {
 		console.log("click cambiar color");
@@ -293,7 +323,6 @@ function Application($scope, $http) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
 						};
-						//document.write(borrarEsto);
 						showPosts();
 					} else {
 						gettingPosts = false;
@@ -348,8 +377,10 @@ function Application($scope, $http) {
 		var numberPostsNow = $scope.posts.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
 		//TODO: No se mostrá los n>5 últimos posts.
+		console.log('#1 numberPostsNow = ' + numberPostsNow + ' postShown = ' + postShown);
 		for(var i = numberPostsNow; i < postShown; i++) {
-			if(tmpPosts[i] != undefined && $scope.posts[i] != undefined) {
+			if(tmpPosts[i] != undefined) {
+				$scope.posts[i] = $scope.posts[i] == undefined? {} : $scope.posts[i];
 				for(var prop in tmpPosts[i]) {
 					$scope.posts[i][prop] = tmpPosts[i][prop];
 				}
