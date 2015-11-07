@@ -50,53 +50,6 @@ a:hover
 	color: inherit
 
 /*
- * Estilos específicos: /login
- * ------- -----------
- */
-
-/*
-main#start
-	background-color: #333
-	margin: 0px
-	width: 100%
-	height: 100%
-
-main#start section#access
-	background-color: #FFF
-	width: 300px
-	height: 500px
-	text-align: center
-	position: relative
-	top: 50%
-	left: 50%
-	transform: translate(-50%, -50%)
-	display: flex
-	flex-direction: column
-	align-items: center
-	justify-content: space-between
-
-main#start section#access #logo
-	background-image: url('/images/sprite.png?v=1005')
-	width: 210px
-	height: 90px
-	background-size: 210px
-	background-repeat: no-repeat
-	margin: 20px
-
-main#start section#access #logo h1
-	display: none
-
-main#start section#access #methods #FB
-	background-color: #3B5998
-	color: #FFF
-	font-weight: bold
-	width: 230px
-	margin: 20px
-	padding: 10px 0
-	text-decoration: none
-	display: block
-	*/
-/*
  * Estilos específicos: /index
  * ------- -----------
  */
@@ -109,10 +62,8 @@ header
 	width: 100%
 	padding: 10px 0
 	position: fixed
-	//position: relative
 	z-index: 10
 	top: 0
-	//box-shadow: 0 2px 0 rgba(0,0,0,0.05) // NEWLOGO // RE-FLAT
 
 header #title a
 	background-image: url('/images/juaku.svg?v=1005')
@@ -132,26 +83,12 @@ header #title a h1
 main
 	width: 100%
 	top: 65px
-	//bottom: 44px
+	//bottom: 44px TODO: Evaluar si es necesario
 	bottom: 0px
 	position: absolute
 	overflow: auto
 	overflow-x: hidden
 	-webkit-overflow-scrolling: touch
-
-//main#main
-	//background: #F3F3F5
-	//bottom: 60px
-/*
-@css {
-	main#blurred-back {
-		//-webkit-filter: blur(5px);
-		//-webkit-filter: blur(1px) brightness(1.1) contrast(3.2) hue-rotate(60deg) invert(0.1) saturate(10) sepia(0.1);
-		-webkit-filter:	blur(5px) brightness(1.1) contrast(3.2) saturate(0);
-		z-index: -1;
-		//overflow: hidden
-	}
-}*/
 
 main #wrapper
 	width: 100%
@@ -186,12 +123,10 @@ section#people-side
 
 section#people-controls section#profile
 	background-color: backColor
-	//padding: 5px
 	width: 100px
 	height: 170px
 	text-align: left
 	display: inline-block
-	//text-align: right
 
 section#people-controls section#profile img
 	background-color: layerColor
@@ -215,71 +150,26 @@ section#people-controls section#profile h2.profile-name .profile-lastname
 	font-weight: normal
 
 /*
-section#people-controls section#friends
-	margin-top: 20px
-	display: inline-block
-
-section#people-controls section#friends .friend
-	background-color: rgba(255, 255, 255, 0.5)
-	font-size: 12px
-	color: #999
-	width: 90px
-	height 150px
-	display: inline-block
-	margin-bottom: 10px
-	text-align: center
-	padding: 10px
-
-section#people-controls section#friends .friend:before
-	content: '+'
-	font-size: 50px
-	display: block
-	margin-top: 30px
-	color: rgba(0,0,0,0.1)
-*/
-
-/*
  * Vista
  */
 
 section#view
-	background-color: layerColor // NEWLOGO
+	background-color: layerColor
 	padding-bottom: 50px
-	//outline: #FFF solid 1px // NEWLOGO
 	max-width: 530px
 	height: 100%
-	/*padding: 10px 0 // NEWLOGO*/
 	position: relative // MAC X Scroll
 	z-index: 1 // MAC X Scroll
-	//transform: translate3d(0,0,0) //TODO: evitar para Android no se requiere en iPhone 4
-/*section#view #view-wrapper
-	padding: 10px 0 // NEWLOGO*/
 
 section#view section#post-list .post
 	margin-bottom: 20px // NEWLOGO
-	//box-shadow: 0 0 10px rgba(0,0,0,0.05) NEW MAC
-	//position: relative
 
 section#view section#post-list .post div.media
-	//font-size: 0
 	position: relative // Muestra espacio de img
-	//background-color: rgba(255,255,255,0)
-	//transition: background-color 500ms
-	//background-image: url('/images/load.gif')
-	//background-repeat: no-repeat
-	//background-position: 50% 50%
-
-/*section#view section#post-list .post div.media.loaded
-	animation: none*/
-
-/*section#view section#post-list .post div.animate
-	background-color: rgba(255,255,255,1)*/
 
 section#view section#post-list .post div.media img
 	width: 100%
 	display: block // En lugar de font-size: 0;
-	//max-width: 500px // NEWLOGO
-	//max-height: 500px // Error: Si es que IMG no es cuadrada por algún motivo. // NEWLOGO
 
 section#view section#post-list .post div.media img.media // Muestra espacio de img
 	position: absolute
@@ -291,12 +181,6 @@ section#view section#post-list .post div.media img.media // Muestra espacio de i
 	
 section#view section#post-list .post div.media img.media.show
 	opacity: 1
-	//animation: show-img 500ms linear
-	//animation-fill-mode: forwards
-
-/*section#view section#post-list .post div.media img.media.raw // Aparece sin animación. Android Web Browser
-	transition: none
-*/
 
 section#view section#post-list .post div.media .preloader
 	width: 30px
@@ -307,12 +191,6 @@ section#view section#post-list .post div.media .preloader
 	left: 50%
 	margin: -15px
 	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
-
-/*@keyframes show-img
-	0%
-		opacity: 0
-	100%
-		opacity: 1*/
 
 @keyframes preloader
 	0%
@@ -326,103 +204,38 @@ section#view section#post-list .post .bottom
 	background-color: backColor
 	width: 100%
 	height: 30px
-	//padding: 10px
 	display: table
-	//font-size: 0px // Reemplazado por display: block; img autor
 	table-layout: fixed // Andorid
 
 section#view section#post-list .post .bottom .info
-	//display: table
 	display: table-cell
-	//width: 100%
-	//width: 90px
 	vertical-align: top
-	//padding: 5px
-	//background: #0FF //A
 	
 section#view section#post-list .post .bottom .info .info-wrapper
 	display: table
-	//padding: 5px
-	//padding-right: 5px
 	width: 100%
-	//background: #F00 //A
 	table-layout: fixed // Android
-
-/*section#view section#post-list .post:after  //RE-FLAT
-	content: ''
-	width: 97% // NEWLOGO
-	margin: 0 1.5% // NEWLOGO
-	background-color: rgba(0,0,0,0.05)  // NEWLOGO
-	height: 2px // NEWLOGO
-	position: absolute
-	z-index: -1*/
 
 section#view section#post-list .post .bottom .author-img
 section#view section#post-list .post .bottom .post-detail
 	vertical-align: top
-	
-//	font-size: 0px
 
 section#view section#post-list .post .bottom .author-img
 	display: table-cell
 	width: 55px // Android
-	//background: #F0F //A
 
 section#view section#post-list .post .bottom .author-img img
 	width: 55px
 	height: 55px
-	//margin-right: 5px
 	background-color: backColor //#EEE
 	display: block //En lugar de font-size: 0;
 
 section#view section#post-list .post .bottom .post-detail
 	display: table
-	//display: table-cell
 	table-layout: fixed
 	width: 100%
 	padding: 6px 0 5px 0
 	letter-spacing: -0.5px
-	//text-align: center
-	//width: 215px
-	//min-width: 215px
-	//background: #0F0 //A
-	
-/*
-section#view section#post-list .post .bottom .post-detail .post-data
-	display: inline-block
-	//width: 60%
-	//max-width: 80%
-	float: left
-
-section#view section#post-list .post .bottom .post-detail .post-data .author-name
-	font-size: 14px
-
-section#view section#post-list .post .bottom .post-detail .post-data .author-name .author-lastName
-	display: none
-
-section#view section#post-list .post .bottom .post-detail .event-data
-	display: inline-block
-	//width: 40%
-	text-align: right
-	float: right
-	max-width: 70%
-
-section#view section#post-list .post .bottom .post-detail .event-data .event-name
-	font-size: 16px
-
-section#view section#post-list .post .bottom .post-detail .pri
-	line-height: 18px
-	text-overflow: ellipsis
-	white-space: nowrap
-	overflow: hidden
-
-section#view section#post-list .post .bottom .post-detail .sub
-	font-size: 11px
-	color: #999
-
-section#view section#post-list .post .bottom .post-detail .sub:first-letter
-	text-transform: uppercase
-*/
 
 section#view section#post-list .post .bottom .post-detail .post-title
 section#view section#post-list .post .bottom .post-detail .sub-info
@@ -432,18 +245,10 @@ section#view section#post-list .post .bottom .post-detail .sub-info
 section#view section#post-list .post .bottom .post-detail .post-title
 	font-size: 18px
 	color: accentColor
-	//width: 0
-	//display: table-cell
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 	margin-top: -1px;
-	//padding-bottom: 1px
-	//margin-top: 2px
-	//background: #00F //A
-	
-//section#view section#post-list .post .bottom .post-detail .post-title .author-name
-//	display: inline-block
 
 section#view section#post-list .post .bottom .post-detail .post-title .author-name
 	color: hardColor
@@ -454,11 +259,7 @@ section#view section#post-list .post .bottom .post-detail .post-title .author-na
 	display: none
 
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted
-	//font-family: Tahoma, Arial, sans-serif
-	//display: inline-block
-	//color: #F05
 	max-width: 70%
-	//letter-spacing: -0.5px
 
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted .at-simbol
 	font-family: Verdana, Arial, sans-serif
@@ -468,23 +269,9 @@ section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 12px
 	color: softColor
 	margin-top: 5px
-	//margin-top: 2px
-	//background: #FF0 //A
-
 
 section#view section#post-list .post .bottom .post-detail .sub-info .time
 	display: inline-block	
-	
-/*section#view section#post-list .post .bottom .post-detail .sub-info .time::first-letter
-	text-transform: uppercase
-*/
-
-section#view section#post-list .post .bottom .post-detail .sub-info .separator
-	display: inline-block
-	margin: 0 5px
-
-section#view section#post-list .post .bottom .post-detail .sub-info .friends
-	display: inline-block
 
 section#view section#post-list .post .bottom .like object // Para que no se corte el texto
 	width: 55px
@@ -492,14 +279,8 @@ section#view section#post-list .post .bottom .like object // Para que no se cort
 
 section#view section#post-list .post .bottom .like
 	width: 55px // Firefox, Android Browser
-	//height: 50px
-	//background-color: #FAFAFA
-	//background-color: #FAFAFA
-	//border-left: 1px solid #EEE //RE-FLAT
-	//border-left: 1px solid #F5F5F5
 	display: table-cell
 	vertical-align: bottom
-	//font-size: 0 //Reemplazado por display: block; .like-svg
 
 section#view section#post-list .post .bottom .like .like-svg
 	width: 55px
@@ -519,34 +300,15 @@ section#view section#post-list .post .bottom .like .selected .like-svg #inner
  */
 aside section#events-controls
 	background-color: backColor
-	//padding: 5px 0
 
-//aside section#events-controls .search-box
 aside section#events-controls .promoted
 aside section#events-controls .events-list
 aside section#events-controls .show-more
 	padding: 10px
-/*
-aside section#events-controls .search-box
-	margin-top: 10px
 
-aside section#events-controls .search-box input
-	background: #F5F5F5
-	color: #999
-	width: 160px
-	height: 10px
-	font-size: 14px
-	font-style: italic
-	padding: 10px
-	margin: 0
-	border: none
-	border-radius: 20px
-	outline: none
-*/
 aside section#events-controls .title
 	font-size: 11px
 	color: softColor
-	//text-transform: uppercase
 		
 aside section#events-controls .events-title
 	font-size: 14px
@@ -555,7 +317,6 @@ aside section#events-controls .event
 	margin: 5px 0
 
 aside section#events-controls .event .event-name
-	//font-family: Tahoma, Arial, sans-serif
 	font-size: 17px
 	letter-spacing: -0.5px
 	color: accentColor
@@ -574,14 +335,6 @@ aside section#events-controls .event .event-people
 	color: softColor
 	margin-left: 15px
 
-/*aside section#events-controls .promoted:after
-aside section#events-controls .events-list:after
-	content: ''
-	display: block
-	background: #FAFAFA
-	height: 5px
-	margin-top: 15px*/
-
 aside section#events-controls .show-more
 	text-align: center
 
@@ -589,28 +342,14 @@ aside section#events-controls .show-more
  * Controles flotantes
  */
 nav#float-controls
-	//background-color: #707077
-	//background-color: #E0E0E5 // NEW MAC
-	//background-color: #D0D0D7 // NEW MAC
-	//background-color: #303037
-	//background-color: #E0E0E5
 	background-color: backColor
-	//background: linear-gradient(to bottom, rgba(48,48,55,0) 0%,rgba(48,48,55,1) 100%)
-	//background: rgba(255,255,255,0.85)
 	transition: background-color 250ms linear
 	width: 100%
-	//height: 32px
-	//height: 36px
-	//color: rgba(255,255,255,0.9)
-	//display: table
 	display: none
-	//padding: 7px 0
 	text-align: center
 	position: fixed
 	bottom: 0
 	z-index: 10
-	//background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%,rgba(255,255,255,0.5) 50%,rgba(255,255,255,0.7) 100%)
-	//box-shadow: 0 -2px 0 rgba(0,0,0,0.05) // RE-FLAT
 
 nav#float-controls .control
 	display: table-cell
@@ -643,80 +382,6 @@ nav#float-controls #button-events
 nav#float-controls #button-search
 	background-position: 44px
 
-/*	padding: 8px 15px
-	vertical-align: middle
-	width: 33%
-
-nav#float-controls .button.center
-	width: 34%
-	//background: rgba(0,0,0,0.07)
-
-nav#float-controls .button #users
-	background: url("/images/b1.png")
-	width: 20px
-	height: 24px
-	background-repeat: no-repeat
-	background-size: 100% 100%
-	//-webkit-filter: invert(1)
-	opacity: 0.2
-
-nav#float-controls .button #camera
-	background: #FFF
-	width: 28px
-	height: 28px
-	//margin: 0 auto
-	box-shadow: 0px 0px 0px 3px rgba(0,0,0,0.2)
-	border-radius: 30px
-	cursor: pointer
-
-nav#float-controls .button #events
-	background: url("/images/a.png")
-	width: 26px
-	height: 26px
-	background-repeat: no-repeat
-	background-size: 100% 100%
-	//margin: 0 0 0 auto
-	//-webkit-filter: invert(1)
-	opacity: 0.2
-*/
-/*
-nav#float-controls #main-controls
-	width: 290px
-	margin: 0 auto
-	
-nav#float-controls #main-controls .button
-	display: inline-block
-	vertical-align: middle
-	margin: 0 5px
-
-nav#float-controls #main-controls .button.control-switch
-	//width: 64px
-	width: 36px
-	//height: 32px
-	height: 36px
-	background: rgba(255,255,255,0.7)
-	//border-radius: 16px
-	border-radius: 25px
-	//padding: 0 5px
-	position: relative
-
-nav#float-controls #main-controls .button.control-switch .knob
-	//width: 24px
-	width: 32px
-	//height: 24px
-	height: 32px
-	//background: rgba(255,255,255,0.9)
-	background: #F05
-	//border-radius: 12px
-	border-radius: 20px
-	position: absolute
-	//top: 4px
-	top: 2px
-	//left: 45px
-	left: 2px
-
-nav#float-controls #main-controls #camera
-*/
 #send-post
 	background: rgba(0,0,0,0.3)
 	width: 30px
@@ -738,8 +403,6 @@ nav#float-controls #main-controls #camera
 footer
 	margin: 10px 5px
 	font-size: 12px
-	//color: #999
-	//color: #AAA // NEW MAC
 
 footer #brand
 	margin: 5px 0
@@ -821,7 +484,6 @@ body.events-view main #last
 	aside#first,
 	aside#last
 		display: none
-		//width: 33.5%
 			
 	main #wrapper
 		width: 100%
@@ -842,7 +504,6 @@ body.events-view main #last
 		padding: 0 
 	
 	nav#float-controls
-		//background-color: #303037
 		display: table
 
 @media (max-width: 329px)
@@ -856,168 +517,3 @@ body.events-view main #last
 		background-size: 97px 35px
 		width: 97px
 		height: 35px
-		/*
-	section#view section#post-list .post .bottom .post-detail .post-title
-		//font-size: 16px
-		//letter-spacing: -0.5px
-	
-	section#view section#post-list .post .bottom .post-detail .sub-info
-		//letter-spacing: -0.5px
-		*/
-/*section#view section#post-list .post // NEWLOGO
-		margin-bottom: 15px*/
-
-/*section#view #view-wrapper
-		padding: 0 // NEWLOGO*/
-
-/*
-@media (max-width: 969px) 
-	main
-		width: 870px // -100
-	section#view
-		width: 400px // -100
-	section#view section#post-list .post .media
-	section#view section#post-list .post .media img
-		width: 400px // -100
-		height: 400px // -100
-	section#view section#post-list .post .info
-		width: 380px // -100
-	section#view section#post-list .post:after 
-		width: 390px // -100
-	section#view section#post-list .post .info .post-data
-		width: 225px // -50
-	section#view section#post-list .post .info .event-data
-		width: 115px // -50
-	section#float-footer #main-controls
-		width: 430px // -100
-
-@media (max-width: 869px) 
-	main
-		width: 720px // -150
-	section#view
-		width: 300px // -100
-	section#view section#post-list .post .media
-	section#view section#post-list .post .media img
-		width: 300px // -100
-		height: 300px // -100
-	section#view section#post-list .post .info
-		width: 280px // -100
-	section#view section#post-list .post:after 
-		width: 290px // -100
-	section#view section#post-list .post .info .post-data
-		width: 175px // -50
-	section#view section#post-list .post .info .event-data
-		width: 55px // -50
-	aside#controls
-		width: 180px // Especial -20
-	aside#events
-		width: 180px  // Especial -20
-	aside#events section#events-controls .search-box input
-		width: 140px
-	section#view
-		padding: 15px 10px // Especial -5
-	section#float-footer #main-controls
-		width: 320px // -100
-
-@media (max-width: 719px)
-	main
-		width: 630px
-	aside#controls
-		width: 110px
-		position: static
-		display: inline-block
-	aside#events
-		width: 160px
-		position: static
-		display: inline-block
-	section#view
-		display: inline-block
-	aside#events section#events-controls .search-box input
-		width: 120px
-	section#float-footer #main-controls
-		width: inherit
-
-/* Anchio 100% Necesesita js
-@media (max-width: 629px)
-	main
-		width: 100%
-	aside#controls
-		display: none
-	aside#events
-		display: none
-	section#view
-		width: initial
-		display: block
-		max-width: 500px
-		margin: 0 auto
-	section#view section#post-list .post .media
-	section#view section#post-list .post .media img
-		width: 100%
-	section#view section#post-list .post .info
-		width: initial // -100
-	section#view section#post-list .post:after 
-		width: 230px // -100
-	section#view section#post-list .post .info .post-data
-		width: 45px // -50
-	section#view section#post-list .post .info .event-data
-		width: 35px // -50
-*/
-/*
-@media (max-width: 629px)
-	main
-		width: 460px
-	aside#controls
-		display: none
-	aside#events
-		display: none
-	section#view
-		width: 440px
-	section#view section#post-list .post .media
-	section#view section#post-list .post .media img
-		width: 440px
-		height: 440px
-	section#view section#post-list .post .info
-		width: 420px // -100
-	section#view section#post-list .post:after 
-		width: 430px // -100
-	section#view section#post-list .post .info .post-data
-		width: 245px // -50
-	section#view section#post-list .post .info .event-data
-		width: 135px // -50
-	/*aside#events
-		width: 150px
-	aside#events section#events-controls .search-box input
-		width: 110px*/
-	/*
-@media (max-width: 459px)
-	main
-		width: 320px
-		padding-top: 40px
-	header #title a
-		width: 70px
-		height: 30px
-		background-size: 70px
-	aside#events
-		display: none
-	section#view
-		width: 300px
-	section#view section#post-list .post .media
-	section#view section#post-list .post .media img
-		width: 300px
-		height: 300px
-	section#view section#post-list .post .info
-		width: 280px // -100
-	section#view section#post-list .post:after 
-		width: 290px // -100
-	section#view section#post-list .post .info .post-data
-		width: 175px // -50
-	section#view section#post-list .post .info .event-data
-		width: 65px // -50
-	aside#events
-		width: 150px
-	aside#events section#events-controls .search-box input
-		width: 110px
-	section#new-post
-		padding-top: 45px
-*/
-/// NEW MAQ

@@ -1,73 +1,3 @@
-// /*
-//  * Framework angular.js
-//  * --------------------
-//  */
-// function Application($scope, $http) {
-// 	$scope.attendance = false;
-
-// 	$scope.showEvents = function() {
-// 		$http.get('/events').success(function(data) {
-// 			$scope.events = data;
-// 		});
-// 	}
-
-// 	$scope.showEvents();
-
-// 	$http.get('/events?source=fb').success(function(data) {
-// 		$scope.eventsFb = data;
-// 	});
-
-// 	$scope.save = function(source) {		
-// 		var createForm = new FormData();
-
-// 		$scope.newEvent.source = source;
-
-// 		for (key in $scope.newEvent) {
-// 			createForm.append(key, $scope.newEvent[key]);
-// 		}
-
-//     $http.post('/events', createForm, {
-//         withCredentials: true,
-//         headers: {'Content-Type': undefined },
-//         transformRequest: angular.identity
-//     }).success(function(data) {
-// 				$scope.showEvents();
-// 		}).error();
-// 	}
-
-// 	$scope.join = function(eventId, joined) {
-// 		if(!joined) {
-// 			$http.put('/events/join', {eventId : eventId}).success(function(data) {
-// 				$scope.showEvents();
-// 			});
-// 		} else {	
-// 			$http.put('/events/leave', {eventId : eventId}).success(function(data) {
-// 				$scope.showEvents();
-// 			});
-// 		}
-// 	}
-
-// 	$scope.dateDetail = function(k, d) {
-// 		if($scope.events[k].date!=undefined && $scope.events[k].date!= " ") {
-// 			var str = $scope.events[k].date;
-// 			var res = str.split(" ");
-// 			var aux = res[0].split(",");
-// 			if(d=='ewd') {
-// 				var dayWeek = aux[0];
-// 				return dayWeek;
-// 			} else if (d == 'ewm') {
-// 				var dayMonth = res[1];
-// 				return dayMonth;
-// 			} else if (d == 'em'){
-// 				var month = res[2];
-// 				return month;
-// 			} else {
-// 				var time = res[4];
-// 				return time;
-// 			}
-// 		}
-// 	};
-
 // 	/*
 // 	 * Framework socket.io
 // 	 */
@@ -78,33 +8,10 @@
 // 	*/
 // }
 
-//window.location.href = 'http://juaku-dev.cloudapp.net:3000/logout';
-
-/*
- * Detección de dispositivo
- * ------------------------
- *
- * Para poder descartar al Andorid Web Browser que tiene problemas con 
- * la animación de carga de imagenes.
- * UPDATE: NO es necesario ya que se cambió a 'animation'
- */
- /*
-var navU = navigator.userAgent;
-// Android Mobile // No aparece Android en tableta WOO
-var isAndroidMobile = (navU.indexOf('Android') > -1 || navU.indexOf('Linux') > -1) && navU.indexOf('Mozilla/5.0') > -1 && navU.indexOf('AppleWebKit') > -1;
-// Android Browser (not Chrome)
-var regExAppleWebKit = new RegExp(/AppleWebKit\/([\d.]+)/);
-var resultAppleWebKitRegEx = regExAppleWebKit.exec(navU);
-var appleWebKitVersion = (resultAppleWebKitRegEx === null ? null : parseFloat(regExAppleWebKit.exec(navU)[1]));
-var isAndroidBrowser = isAndroidMobile && appleWebKitVersion !== null && appleWebKitVersion < 537;
-//var isAndroidBrowser = appleWebKitVersion !== null && appleWebKitVersion < 537;
-*/
-
 /*
  * Código de maquetación
  * ---------------------
  */
-//window.scrollTo(0, 1);
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
@@ -132,64 +39,6 @@ $(document).ready(function() {
 		}
 	});
 
-	/*$(window).on('load resize', function() {
-		resizeTask();
-	});*/
-
-	//TODO: Borrar
-	/*$('input#media-loader').click(function(event) {
-		alert('Click input#media-loader');
-	});*/
-
-	/*$('header').on('click', function() {
-		document.location = '/logout';
-	})*/
-	/*setInterval(function() {
-		$("#post-list div.media").toggleClass('animate');
-	}, 500);*/
-	
-	/*$('body').on("swipeleft", function() {
-		$('main').animate({scrollLeft: $('main').scrollLeft() + $('#view').width()}, 250);
-	});
-
-	$('body').on("swiperight", function() {
-		$('main').animate({scrollLeft: $('main').scrollLeft() - $('#view').width()}, 250);
-	});*/
-
-	// Botones TODO: Mejorar
-	/*
-	var mainScrollStatus = 0;
-	$('#btn-config').on('click', function() {
-		mainScrollStatus = $('main').scrollTop();
-		$('#first').css({'display':'block'});
-		$('#view').css({'display':'none'});
-		$('#second').css({'display':'none'});
-	});
-
-	$('#btn-posts').on('click', function() {
-		mainScrollStatus = $('main').scrollTop();
-		$('#first').css({'display':'none'});
-		$('#view').css({'display':'block'});
-		$('#second').css({'display':'none'});
-	});
-
-	$('#btn-events').on('click', function() {
-		mainScrollStatus = $('main').scrollTop();
-		$('#first').css({'display':'none'});
-		$('#view').css({'display':'none'});
-		$('#second').css({'display':'block'});
-	});
-
-	$('#btn-camera').on('click', function() {
-		$('#first').css({'display':'none'});
-		$('#view').css({'display':'block'});
-		$('#second').css({'display':'none'});
-		$('main').scrollTop(mainScrollStatus);
-	});
-*/
-
-
-
 	$('#fbButton').on('click', function() {
 		console.log("click cambiar color");
 		$('#fbButton').css("background-color", "blue");
@@ -199,7 +48,7 @@ $(document).ready(function() {
 		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
 	});
 
-	//Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
+	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
 	$("#new-event-name").bind('keypress', function(event) {
 		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
 		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
@@ -208,23 +57,7 @@ $(document).ready(function() {
 			event.preventDefault();
 		}
 	});
-	/*$('#main').scroll(function(event) {
-		$('#blurred-back').scrollTop($(this).scrollTop());
-	});*/
-
-	/*setInterval(function() {
-		//$('#blurred-back').scrollTop($('#main').offset().top);
-		$('#blurred-back').scrollTop($('#main').find('#wrapper').offset().top*-1);
-		//console.log($('#main').find('#wrapper').offset().top);
-	}, 1);*/
 });
-
-/*function resizeTask() {
-	//$('#main-controls').width($('section#view').width()); // TODO: Corregir comportamiento
-	//$('#post-list .post-detail .post-title').width(0);
-	//$('#post-list .post-detail .post-title').width($('#post-list .post-detail').first().width());
-}*/
-
 
 /*
  * Framework Angular
@@ -260,7 +93,6 @@ function Application($scope, $http) {
 			getEvents();
 		}).error();
 	}, function(errorMsg) {
-		//getPosts();
 		console.log(errorMsg);
 	});
 
@@ -282,30 +114,14 @@ function Application($scope, $http) {
 	createEmptyPosts(5);
 	askForPost();
 
-	/* TODO: Ver si es que es necesario
-	$(window).scroll(function() {
-			askForPost();
-	});*/
-
-	//var getPostsInterval = setInterval(function() { askForPost(); }, 500);
-
 	$('main').scroll(function() {
 		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
 			askForPost(filterAux, actionAux, idAux);
 		}
 	});
 	
-	function askForPost(filter, action, id) { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-		//if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
-			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
+	function askForPost(filter, action, id) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
 			getPosts(filter, action, id);
-			/*if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
-				getPostTries = 0;
-				getPosts(idAux, typeOfFilterAux);
-			} else {
-				getPostTries++;
-			}*/
-		//}
 	}
 
 	// Cargar los post originales
@@ -376,7 +192,7 @@ function Application($scope, $http) {
 	function showPosts() {
 		var numberPostsNow = $scope.posts.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
-		//TODO: No se mostrá los n>5 últimos posts.
+		//TODO EVALUAR: No se mostrá los n>5 últimos posts.
 		console.log('#1 numberPostsNow = ' + numberPostsNow + ' postShown = ' + postShown);
 		for(var i = numberPostsNow; i < postShown; i++) {
 			if(tmpPosts[i] != undefined) {
@@ -390,7 +206,6 @@ function Application($scope, $http) {
 				$scope.posts[i].class = 'real';
 			}
 		}
-		//console.log($scope.posts.length);
 		createEmptyPosts(1);
 		gettingPosts = false;
 	}
@@ -404,7 +219,6 @@ function Application($scope, $http) {
 		for (var i = 0; i < numTmpPost; i++) {
 			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif},"class":"blank"};
 		};
-		//console.log($scope.posts.length + ',' + tmpPosts.length);
 	}
 
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
@@ -511,15 +325,12 @@ function Application($scope, $http) {
 		}).error();
 	}
 
-	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
+	$scope.send = function() {/* TODO: Evaluar riesgo de ataque, Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
 		for (key in $scope.newPost) {
 			createForm.append(key, $scope.newPost[key]);
 		}
-
-		console.log(createForm);
-
 		$http.post('/post', createForm, {
 			withCredentials: true,
 			headers: {'Content-Type': undefined },
@@ -550,23 +361,7 @@ function Application($scope, $http) {
 		return timeElapsed;
 	}
 
-	$scope.picChange = function(evt) { /* No funciona para escritorio
-		var fileInput = evt.target.files;
-		if(fileInput.length>0){
-			var windowURL = window.URL || window.webkitURL;
-			var picURL = windowURL.createObjectURL(fileInput[0]);
-			console.log(picURL);
-			var photoCanvas = document.getElementById("capturedPhoto");
-			var ctx = photoCanvas.getContext("2d");
-			var photo = new Image();
-			photo.onload = function(){
-				//draw photo into canvas when ready
-				ctx.drawImage(photo, 0, 0, 500, 500);
-			};
-			photo.src = picURL;
-			windowURL.revokeObjectURL(picURL);
-		}*/
-
+	$scope.picChange = function(evt) {
 		var canvas = document.getElementById('new-media-preview');
 		var ctx = canvas.getContext('2d');
 
@@ -621,8 +416,6 @@ function Application($scope, $http) {
 					ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
 					var imgQuality = mobile?0.5:0.75;
 					var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
-					//document.write('<img src=' + canvas.toDataURL( 'image/jpeg' , 0.7 ) + '></img>');
-					//angular.element($('input#media-loader')).scope().newPost.media = newImg;
 
 					getGeo( function() {
 						$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newPost.coords.latitude + ',' + $scope.newPost.coords.longitude);
@@ -670,10 +463,6 @@ function Application($scope, $http) {
 	function getGeo(next, error) {
 		if (navigator.geolocation) {
 			var position = 0;
-      /*navigator.geolocation.getCurrentPosition( function (position) {
-        alert(position.coords.latitude);
-        alert(position.coords.longitude);
-      });*/
 			navigator.geolocation.getCurrentPosition(function(position) {
 				var coords = {};
 				coords.accuracy = position.coords.accuracy;
@@ -683,7 +472,6 @@ function Application($scope, $http) {
 				coords.latitude = position.coords.latitude;
 				coords.longitude = position.coords.longitude;
 				coords.speed = position.coords.speed;
-				//angular.element($('input#media-loader')).scope().newPost.coords = coords;
 				$scope.user.data.coords = coords;
 				$scope.newPost.coords = coords;
 				next(); 
@@ -722,10 +510,6 @@ function Application($scope, $http) {
 		$http.get('/list/event').success(function(data) {
 			$scope.events = data.events;
 			$scope.limit = 7;
-			/*for (var i = 0; i < $scope.posts.length; i++) {
-				$scope.events[i].media = 'uploads/' + $scope.posts[i].media;
-				$scope.events[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
-			};*/
 		});
 	}
 
@@ -750,19 +534,10 @@ angular.module('Juaku', [])
 		link: function(scope, element, attrs) {
 			element.bind('load', function() {
 				loadedImgs++;
-				/* TODO: No necesario usando hack transform: translate3d(0,0,0)
-				if(mobile) {
-					$(element).css('transition-duration', '0s');
-				}*/
 				if(!$(element).hasClass('blank')) {
 					$(element).parent().find('.preloader').remove();
-					// Fantasma android // No es necesario debido a que se cambió a 'animation'
-					/*if (isAndroidMobile) {
-						$(element).addClass('raw');
-					}*/
 					$(element).addClass('show');
 				}
-				//$(element).css('opacity', 1);
 			});
 		}
 	};
@@ -774,7 +549,6 @@ angular.module('Juaku', [])
 });
 
 function postsLoaded() {
-	//resizeTask();
 	$('.like-svg').off();
 	$('.like-svg').on('click', function() {
 		$(this).parent().toggleClass('selected');

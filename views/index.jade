@@ -20,7 +20,7 @@ block content
         input(type='submit', value='Seguir' ng-click="followRelation(usuario)")
       input(type='submit', value='Followers' ng-click="getFollowers(1)")
       input(type='submit', value='Following' ng-click="getFollowers(2)")
-      a.mostrarPostDeSeguidos(href='#' ng-click="getMediaByFilter('post', 'following')")
+      a.mostrarPostDeSeguidos(href='' ng-click="getMediaByFilter('post', 'following')")
         span.seguidos MostrarPostsDeLasPersonasQueSigues
     //label(for='singleSelect')
     //br
@@ -40,8 +40,6 @@ block content
                 span.profile-firstname #{user.firstName}
                 br
                 span.profile-lastname #{user.lastName}
-            //section#friends
-            //  .friend #{__('Friend activity')}
       section#view
         //input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
         //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
@@ -61,7 +59,6 @@ block content
           #load-media-again
           #cancel-post
           #send-post(ng-click="send()")
-        //section#view-controls
         section#post-list
           //p.post(ng-repeat="usuario in usuarios")
           //  span.amigo-firstName(ng-click="addListToFollow(usuario)") {{ usuario.name }}
@@ -71,7 +68,6 @@ block content
               .preloader
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
               img(ng-src='{{ post.media }}' class='{{ post.class }}' image-on-load).media
-              //img(ng-src='http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x200&markers=color:red|{{ post.location.latitude }},{{ post.location.longitude }}')
             .bottom
               .info
                 .info-wrapper
@@ -80,24 +76,20 @@ block content
                   .post-detail
                     .post-title
                       span.author-name
-                        //span.author-firstName {{ post.author.firstName }}
-                        a.author-firstName(href='#' ng-click="getMediaByFilter('post', 'author', post.id)") {{ post.author.firstName }}
+                        a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post.id)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      a.event-posted(href='#' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
+                      a.event-posted(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
                         span.at-simbol @
-                        //span.event-name {{ post.event }}
-                        span.event-name() {{ post.event }}
-                      //a.shareOnFb(href='#' ng-click="share(post.file)")
+                        span.event-name {{ post.event }}
+                      //a.shareOnFb(href='' ng-click="share(post.file)")
                         span.share compartirEnfB
                       //.enviarUbicacion
-                        a#enviar(href='#' ng-click="askLocation(post.id)") #{__('Pedir ubicación')}
+                        a#enviar(href='' ng-click="askLocation(post.id)") #{__('Pedir ubicación')}
                     .sub-info
                       .time(ng-if="post.timeElapsed.type  == 's' ") #{__('Just now')}
                       .time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
                       .time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
                       .time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
-                      //.separator ·
-                      //.friends 24 #{__('friends')}
               .like(ng-click="likeClick(post)")
                 object(ng-class="{selected: post.like}")
                   svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
@@ -106,7 +98,8 @@ block content
       aside#last
         section#events-side
           section#events-controls
-            // .search-box // Moverlo a header
+            // TODO: Moverlo a header
+            // .search-box
             // input(type="text", placeholder="#{__('Search events')}") 
             .promoted
               .promoted-title.title #{__('Promoted')}
@@ -125,7 +118,6 @@ block content
           footer 
             nav Términos y condiciones · Más
             #brand Juaku © 2015
-  //main#blurred-back
   nav#float-controls
     .control.first
       #button-config.button
@@ -137,8 +129,3 @@ block content
       #button-events.button
     .control.last
       #button-search.button
-    //#main-controls
-    //.button.hot #{__('')}
-    //.button.control-switch
-    //  .knob
-    //.button.recent #{__('')}
