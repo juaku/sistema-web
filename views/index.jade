@@ -14,6 +14,22 @@ block content
         h1 #{title}
   //main#main
   main
+    //section#post-list
+      p.post(ng-repeat="usuario in usuario")
+        span.amigo-firstName {{ usuario.firstName }} {{ usuario.following }}
+        input(type='submit', value='Seguir' ng-click="followRelation(usuario)")
+      input(type='submit', value='Followers' ng-click="getFollowers(1)")
+      input(type='submit', value='Following' ng-click="getFollowers(2)")
+      a.mostrarPostDeSeguidos(href='#' ng-click="getMediaByFilter('post', 'following')")
+        span.seguidos MostrarPostsDeLasPersonasQueSigues
+    //label(for='singleSelect')
+    //br
+    //select#singleSelect(name='singleSelect', ng-model='data.singleSelect')
+      option(value='') ---Please select---
+      option(value='en') ingles
+      option(value='es') español
+    //br
+    //button(ng-click='changeLanguage(data.singleSelect)') Cambiar idioma
     #wrapper
       aside#first
         section#people-side
@@ -65,12 +81,16 @@ block content
                     .post-title
                       span.author-name
                         //span.author-firstName {{ post.author.firstName }}
-                        a.author-firstName(href='#' ng-click="getMediaByFilter(post.id, 'getMediaByAuthor')") {{ post.author.firstName }}
+                        a.author-firstName(href='#' ng-click="getMediaByFilter('post', 'author', post.id)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      a.event-posted(href='#' ng-if="post.event" ng-click="getMediaByFilter(post.id, 'getMediaByEvent')")
+                      a.event-posted(href='#' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
                         span.at-simbol @
                         //span.event-name {{ post.event }}
                         span.event-name() {{ post.event }}
+                      //a.shareOnFb(href='#' ng-click="share(post.file)")
+                        span.share compartirEnfB
+                      //.enviarUbicacion
+                        a#enviar(href='#' ng-click="askLocation(post.id)") #{__('Pedir ubicación')}
                     .sub-info
                       .time(ng-if="post.timeElapsed.type  == 's' ") #{__('Just now')}
                       .time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
@@ -95,7 +115,7 @@ block content
             .events-list
               .events-title.title #{__('Trends')}
               .event(ng-repeat="event in events | limitTo: limit")
-                a.event-name(href='#' ng-click="getMediaByFilter(event.id, 'getMediaByTrend')")
+                a.event-name(href='#' ng-click="getMediaByFilter('post', 'trend', event.id)")
                   span.at-simbol @
                   span.event-name {{ event.name }}
                 .event-people {{ event.count }} #{__('people')}

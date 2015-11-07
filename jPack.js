@@ -44,8 +44,6 @@ jPack.user = function (user) {
 	this.email = user.email;																//{string}
 	this.birthday = user.birthday;													//{date}
 	this.gender = user.gender;															//{char}
-	this.location = user.location;													//{string}
-	this.hometown = user.hometown;													//{string}
 	this.locale = user.locale;															//{object}
 	this.facebookUrl = user.facebookUrl;										//{string}
 	this.accessToken = user.accessToken;										//{string}
@@ -829,6 +827,11 @@ function savePost(req, data, user, event, next, error) {
 	});
 }
 
+/*
+ * @descrip Comparte post en facebook si el botón de compartir fue activado a la hora de subir subir una foto
+ * @par {string} data, {object} postFile, {function} next, {function} error.
+ * @return null
+ */ 
 function shareMediaOnFb(req, parseFileURL, error) {
 	var albumId = '';
 	FB.api('/' + albumId + '/photos','POST',
@@ -845,6 +848,49 @@ function shareMediaOnFb(req, parseFileURL, error) {
 				}
 			}
 	);
+}
+
+
+/*
+ * @descrip Compartir post en facebook
+ * @par {string} data, {object} postFile, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.share = function(req, postFile, next, error) {
+	var parseFileURL = postFile._url;
+	var albumId = '';
+	FB.api('/' + albumId + '/photos','POST',
+		{
+			'url': parseFileURL,
+			'access_token': req.session.jUser.accessToken
+		},
+			function (response) {
+				if (response && !response.error) {
+					// handle the result
+					console.log('Foto compartida en facebook exitósamente');
+					next();
+				} else {
+					error(e);
+				}
+			}
+	);
+}
+
+/*
+ * @descrip Cambia el idioma
+ * @par {string} data, {object} data, {function} next, {function} error.
+ * @return null
+ */
+jPack.user.prototype.changeLanguage = function(req, res, next, error) {
+	var locale = req.body.language;
+	if(locale == req.cookies.locale) {
+		console.log('no cambio nada');
+		next();
+	} else {
+		console.log('cambio de idioma exitoso');
+		res.cookie('locale', locale, { maxAge: 1000*60*60*24*15, httpOnly: true });
+		next();
+	}
 }
 
 /*
@@ -965,8 +1011,8 @@ jPack.getAllPosts = function(req, next, error) {
 	var queryNumber = 0;
 	var queryTimeLimitStep = 24*20;
 
-	if(req.params.postQueryCount!=undefined) {
-		queryNumber = parseInt(req.params.postQueryCount);
+	if(req.params.i!=undefined) {
+		queryNumber = parseInt(req.params.i);
 	} else {
 		req.session.queryTimeLimit = queryTimeLimitStep;
 	}
@@ -1171,7 +1217,7 @@ jPack.getAllPosts = function(req, next, error) {
 			var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
 			var relation = user.relation('blockedUsers');
 			relation.query().find().then(function(listOfBlockedUsers) {
-				if(req.params.filter == 'getAllPosts') {
+				if(req.params.action == undefined) {
 					// listOfBlockedUsers contains the users that the current user blocks.
 					var query = new Parse.Query(Post);
 					if(listOfBlockedUsers.length != 0) {
@@ -1190,7 +1236,7 @@ jPack.getAllPosts = function(req, next, error) {
 					//console.log('Skip Number: ' + (resultsLimit * queryNumber));
 					query.skip(resultsLimit * queryNumber);
 					next(query);
-				} else if(req.params.filter == 'getMediaByEvent') {
+				} else if(req.params.action == 'event') {
 					var postQuery = new Parse.Query(Post);
 
 					var postId = req.params.id;
@@ -1213,7 +1259,7 @@ jPack.getAllPosts = function(req, next, error) {
 						console.length('error');
 						error(e);
 					});
-				} else if(req.params.filter == 'getMediaByAuthor') {
+				} else if(req.params.action == 'author') {
 					var postQuery = new Parse.Query(Post);
 
 					var postId = req.params.id;
@@ -1235,7 +1281,7 @@ jPack.getAllPosts = function(req, next, error) {
 					}, function(e) {
 						error(e);
 					});
-				} else if(req.params.filter == 'getMediaByTrend') {
+				} else if(req.params.action == 'trend') {
 					var Event = Parse.Object.extend("Event");
 					var eventQuery = new Parse.Query(Event);
 					var postQuery = new Parse.Query(Post);
@@ -1252,6 +1298,30 @@ jPack.getAllPosts = function(req, next, error) {
 						postQuery.limit(resultsLimit);
 						postQuery.skip(resultsLimit * queryNumber);
 						postQuery.equalTo('event', chosenEvent[0]);
+						next(postQuery);
+					}, function(e) {
+						error(e);
+					});
+				} else if(req.params.action == 'following') {
+					var usersFollowed = [];
+					var postQuery = new Parse.Query(Post);
+					var Follow = Parse.Object.extend("Follow");
+					var queryFollow = new Parse.Query(Follow);
+					queryFollow.include('to');
+					queryFollow.equalTo('from', user);
+					queryFollow.find().then(function(users) {
+						for(var i = 0; i<users.length; i++) {
+							usersFollowed[i] = users[i].get("to");
+						}
+						if(listOfBlockedUsers.length != 0) {
+							postQuery.notContainedIn('author', listOfBlockedUsers);
+						}
+						postQuery.descending('createdAt');
+						postQuery.include('author');
+						postQuery.include('event');
+						postQuery.limit(resultsLimit);
+						postQuery.skip(resultsLimit * queryNumber);
+						postQuery.containedIn('author', usersFollowed);
 						next(postQuery);
 					}, function(e) {
 						error(e);

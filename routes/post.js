@@ -10,21 +10,6 @@ var jPack = require('../jPack');
 var Parse = require('../parseConnect').Parse;
 
 var request = require('request');
-// TODO: Ver si :action sirve
-// router.get('/:action/:filter/:id?/:postQueryCount?', ensureAuthenticated, function(req, res) {
-router.get('/:filter/:id?/:postQueryCount?', ensureAuthenticated, function(req, res) {
-	console.log('GET media');
-	jPack.getAllPosts(req, function(result) {
-		if(result.length == 0) {
-			res.status(204).end();
-		} else {
-			res.json(result);
-		}
-	}, function(error) {
-		console.log(error);
-		res.status(400).end();
-	});
-});
 
 router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media');
@@ -48,6 +33,13 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 			});
 		} else if (req.params.action=='new') {
 			jUser.newPost(req, req.body, function() {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
+		} else if (req.params.action=='share') {
+			jUser.share(req, req.body, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);

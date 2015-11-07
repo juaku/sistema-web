@@ -235,7 +235,8 @@ function Application($scope, $http) {
 	});
 
 	var idAux;
-	var typeOfFilterAux;
+	var filterAux;
+	var actionAux;
 	var gettingPosts = false;
 	var firstPostsLoad = true;
 	var postQueryCount = 0;
@@ -260,14 +261,14 @@ function Application($scope, $http) {
 
 	$('main').scroll(function() {
 		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
-			askForPost();
+			askForPost(filterAux, actionAux, idAux);
 		}
 	});
 	
-	function askForPost() { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+	function askForPost(filter, action, id) { // TODO: UPDATE: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
 		//if($('main').scrollTop() + $(document).height() > $('#wrapper').height() -  $(document).height()) {
 			//console.log(loadedImgs + ' ' + postShown + ' ' + tmpLoadingPostsNumber);
-			getPosts(idAux, typeOfFilterAux);
+			getPosts(filter, action, id);
 			/*if(loadedImgs >= postShown || getPostTries >= getPostTriesLimit) {
 				getPostTries = 0;
 				getPosts(idAux, typeOfFilterAux);
@@ -278,15 +279,16 @@ function Application($scope, $http) {
 	}
 
 	// Cargar los post originales
-	function getPosts(id, typeOfFilter) {
+	function getPosts(filter, action, id) {
+		filterAux = filter;
+		actionAux = action;
 		idAux = id;
-		typeOfFilterAux = typeOfFilter;
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
 			//
 			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
-				postsQuery(id, typeOfFilter, function(data) {
+				postsQuery(filter, action, id, function(data) {
 					if(data!=undefined) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
@@ -306,27 +308,40 @@ function Application($scope, $http) {
 		}
 	}
 
-	function postsQuery(id, typeOfFilter, next, error) {
-		var postId = id;
-		var filter = typeOfFilter;
-		if(id == undefined && filter == undefined) {
-			postId = 0;
-			filter = 'getAllPosts';
-		}
-		$http.get('/post/' + filter + '/' + postId + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
-			if(status == 204) {
-				clearInterval(getPostsInterval);
-			} else {
-				if(data.posts != undefined) {
-					postQueryCount++;
-					next(data.posts);
+	function postsQuery(filter, action, id, next, error) {
+		if(id == undefined && filter == undefined && action == undefined) {
+			$http.get('/list/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+				if(status == 204) {
+					clearInterval(getPostsInterval);
 				} else {
-					next();
+					if(data.posts != undefined) {
+						postQueryCount++;
+						next(data.posts);
+					} else {
+						next();
+					}
 				}
-			}
-		}).error(function(e) {
-			error(e);
-		});
+			}).error(function(e) {
+				console.log('error!!');
+				//error(e);
+			});
+		} else {
+			$http.get('/list/' + filter + '/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+				if(status == 204) {
+					clearInterval(getPostsInterval);
+				} else {
+					if(data.posts != undefined) {
+						postQueryCount++;
+						next(data.posts);
+					} else {
+						next();
+					}
+				}
+			}).error(function(e) {
+				console.log('error!!');
+				//error(e);
+			});
+		}
 	}
 
 	function showPosts() {
@@ -384,11 +399,11 @@ function Application($scope, $http) {
 	// Obtiene a las personas que te siguen o que sigues
 	$scope.getFollowers = function(i) {
 		if (i==1) {
-			$http.get('/user/getFollowers', $scope.user).success(function(data) {
+			$http.get('/list/user/followers/0', $scope.user).success(function(data) {
 				$scope.followers = data;
 			}).error();
 		} else if (i==2) {
-			$http.get('/user/getFollowing', $scope.user).success(function(data) {
+			$http.get('/list/user/following/0', $scope.user).success(function(data) {
 				$scope.following = data;
 			}).error();
 		}
@@ -451,6 +466,18 @@ function Application($scope, $http) {
 			$scope.newPost.shareOnFb = false;
 		}
 		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
+	}
+
+	$scope.share = function(postFile) {
+		$scope.post = postFile;
+		$http.post('/post/share', $scope.post).success(function(data) {
+		}).error();
+	}
+
+	$scope.changeLanguage = function(language) {
+		$scope.user.language = language;
+		$http.post('/user/change-language', $scope.user).success(function(data) {
+		}).error();
 	}
 
 	$scope.send = function() {/* Crear post para form Multi - Riesgo de ataque
@@ -588,10 +615,11 @@ function Application($scope, $http) {
 			console.log("No hay más eventos en tu ciudad");
 	}
 
-	$scope.getMediaByFilter = function(id, filter) {
+	$scope.getMediaByFilter = function(filter, action, id) {
 		loadedImgs = 0;
 		gettingPosts = false;
-		firstPostsLoad = true;		postQueryCount = 0;
+		firstPostsLoad = true;
+		postQueryCount = 0;
 		postLoadStep = 10;
 		postShown = 0;
 		tmpLoadingPostsNumber;
@@ -602,7 +630,7 @@ function Application($scope, $http) {
 		//$scope.events = [];
 		createEmptyPosts(5);
 
-		getPosts(id, filter);
+		getPosts(filter, action, id);
 	}
 
 	/*
@@ -660,7 +688,7 @@ function Application($scope, $http) {
 		 */
 
 		// Cargar eventos
-		$http.get('/event').success(function(data) {
+		$http.get('/list/event').success(function(data) {
 			$scope.events = data.events;
 			$scope.limit = 7;
 			/*for (var i = 0; i < $scope.posts.length; i++) {

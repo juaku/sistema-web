@@ -16,20 +16,9 @@ router.get('/:action', ensureAuthenticated, function(req, res) {
 			}, function(error) {
 				res.status(400).end();
 			});
-		} else if (req.params.action=='getFollowers') {
-			jUser.getFollowers(req, function(followers) {
-				res.json(followers);
-			}, function(error) {
-				res.status(400).end();
-				console.log(error);
-			});
-		} else if (req.params.action=='getFollowing') {
-			jUser.getFollowing(req, function(following) {
-				res.json(following);
-			}, function(error) {
-				res.status(400).end();
-				console.log(error);
-			});
+		} else if(req.params.action=='session') {
+			var parseSessionToken = {}
+			res.json({parseSessionToken:req.session.jUser.parseSessionToken});
 		}
 	}
 });
@@ -75,6 +64,13 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 			});
 		} else if (req.params.action=='askLocation') {
 			jUser.askLocation(req.body.postToAskLocation, function() {
+				res.status(201).end();
+			}, function(error) {
+				res.status(400).end();
+				console.log(error);
+			});
+		} else if (req.params.action=='change-language') {
+			jUser.changeLanguage(req, res, function() {
 				res.status(201).end();
 			}, function(error) {
 				res.status(400).end();
