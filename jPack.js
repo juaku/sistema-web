@@ -263,11 +263,27 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 			console.log('J1');
 			var Event = Parse.Object.extend("Event");
 			var query = new Parse.Query(Event);
-			query.equalTo("name", newPost.eventName);
+			var eventNameSimple = newPost.eventName;
+			var diacritics =[
+				/[\300-\306]/g, /[\340-\346]/g,  // A, a
+				/[\310-\313]/g, /[\350-\353]/g,  // E, e
+				/[\314-\317]/g, /[\354-\357]/g,  // I, i
+				/[\322-\330]/g, /[\362-\370]/g,  // O, o
+				/[\331-\334]/g, /[\371-\374]/g,  // U, u
+				/[\321]/g, /[\361]/g, // N, n
+				/[\307]/g, /[\347]/g, // C, c
+			];
+			var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+			for (var i = 0; i < diacritics.length; i++) {
+				eventNameSimple = eventNameSimple.replace(diacritics[i],chars[i]);
+			}
+			eventNameSimple = eventNameSimple.toLowerCase();
+
+			query.equalTo("name", eventNameSimple);
 			query.find().then(function(results) {
 				if(results.length > 0) {
 					console.log('J2');
-					savePost(req, newPost, user, results[0], function() {
+					savePost(req, eventNameSimple, newPost, user, results[0], function() {
 						next();
 					}, function(e) {
 						error(e);
@@ -275,9 +291,10 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 				} else {
 					console.log('J3');
 					var event = new Event();
-					event.set('name', newPost.eventName);
+					event.set('name', eventNameSimple);
+					event.set('eventName', newPost.eventName);
 					event.save().then(function(newEvent) {
-						savePost(req, newPost, user, newEvent, function() {
+						savePost(req, eventNameSimple, newPost, user, newEvent, function() {
 							console.log('J4');
 							next();
 						}, function(e) {
@@ -339,6 +356,65 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 			error(e);
 		});
 		next();
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*D
+ * @descrip Almacena los reportes que se le hacen a un post en específico
+ * @param {object} post, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.report = function(post, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var Post = Parse.Object.extend('Post');
+		var postQuery = new Parse.Query(Post);
+		postQuery.equalTo('publicId', post.id);
+		postQuery.find().then(function(postReported) {
+			var post = postReported[0];
+			var relation = post.relation('report');
+			relation.query().find().then(function(users) {
+				for(var i = 0; i<users.length; i++) {
+					if(user.id == users[i].id) {
+						console.log('ya reportó este post');
+						next();
+					}
+				}
+				relation.add(user);
+				post.save().then(function () {
+					next();
+				}, function(e) {
+					error(e);
+				});
+			}, function(e) {
+				error(e);
+			});
+		}, function(e) {
+			error(e);
+		});
+	}, function(e) {
+		error(e);
+	});
+}
+
+jPack.getReportCount = function(post, next, error) {
+	Parse.User.become(this.parseSessionToken).then(function (user) {
+		var Post = Parse.Object.extend('Post');
+		var postQuery = new Parse.Query(Post);
+		postQuery.equalTo('publicId', post.id);
+		postQuery.find().then(function(result) {
+			var post = result[0];
+			var relation = post.relation('report');
+			relation.query().count().then(function(count) {
+				console.log('personas que reportaron este post: ' + count);
+				next();
+			}, function(e) {
+				error(e);
+			});
+		}, function(e) {
+			error(e);
+		});
 	}, function(e) {
 		error(e);
 	});
@@ -743,7 +819,7 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
  * @par {string} data, {object} user, {object} event, {function} next, {function} error.
  * @return null
  */ 
-function savePost(req, data, user, event, next, error) {
+function savePost(req, eventNameSimple, data, user, event, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
 	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
@@ -760,6 +836,7 @@ function savePost(req, data, user, event, next, error) {
 			post.set('media', mediaName + '.' + mediaExt);
 			post.set('author', user);
 			post.set('event', event);
+			post.set('eventKey', data.eventName);
 			console.log(data.coords);
 			post.set('coords', data.coords);
 			var point = new Parse.GeoPoint({latitude: data.coords.latitude, longitude: data.coords.longitude});
@@ -987,7 +1064,7 @@ jPack.getAllPosts = function(req, next, error) {
 						for(var i in results) {
 							posts[i] = {};
 							posts[i].id = results[i].get('publicId');
-							posts[i].event = results[i].get('event').get('name');
+							posts[i].event = results[i].get('eventKey')// results[i].get('event').get('name');
 							posts[i].time = results[i].createdAt;
 							posts[i].file = results[i].get('file');
 							posts[i].media = posts[i].file.url(); //posts[i].file.url
@@ -1232,7 +1309,7 @@ jPack.getAllEvents = function(req, next, error) {
 					for (var i = 0; i < response.length; i++) {
 						events[i] = {};
 						events[i].id = response[i].id;
-						events[i].name = response[i].get("name");
+						events[i].name = response[i].get("eventName");
 						events[i].count = 0;
 					}
 					for (var i = 0; i < events.length; i++) {

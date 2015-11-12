@@ -98,6 +98,10 @@ block content
                       a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
                         span.at-simbol @
                         span.event-name {{ post.event }}
+                      //a.reportPost(href='' ng-click="report(post)")
+                        span.report ReportarPost
+                      //a.reportPost(href='' ng-click="getReportCount(post)")
+                        span.report getReportCount
                       //a.shareOnFb(href='' ng-click="share(post.file)")
                         span.share compartirEnfB
                       //.enviarUbicacion
