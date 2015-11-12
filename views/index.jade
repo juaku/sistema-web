@@ -46,19 +46,36 @@ block content
         input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
         section#new-post
           canvas(id="new-media-preview")
-          #recomendedEvents
+          #new-post-controls
+            #event-name-input.event
+              span.at-simbol @
+              input.event-name(type="text" id="new-event-name" ng-model="newPost.eventName" placeholder="#{__('Event')}")
+            #share-new-post
+              a#share-fb.share(href="" ng-click="shareOnFb()")
+                object
+                  svg(version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve")
+                    path(id="change-color" fill="#3B5998"  d="M22.675,24C23.407,24,24,23.407,24,22.675V1.325C24,0.593,23.407,0,22.675,0H1.325C0.593,0,0,0.593,0,1.325v21.351C0,23.407,0.593,24,1.325,24H22.675z")
+                    path(id="f" fill="#FFFFFF" d="M16.56,24v-9.294h3.12l0.467-3.622H16.56V8.771c0-1.049,0.291-1.763,1.795-1.763l1.918-0.001v-3.24c-0.332-0.044-1.47-0.143-2.795-0.143c-2.765,0-4.659,1.688-4.659,4.788v2.671H9.692v3.622h3.128V24H16.56z")
+            a#send-post(href="" ng-click="sendNewPost()") #{__('Send')}
+          #suggested-events
             ul
-              li @Aura
-              li @Kaos
-              li @Help
-          #createNewEvent
-            input(type="text" id="new-event-name" ng-model="newPost.eventName")
-            #fbButton(ng-click="shareOnfB()")
-          #positionMap
-            img(src="")
+              li.suggested-event.event
+                a.event-link(href="")
+                  span.at-simbol @
+                  span.event-name Aura
+              li.suggested-event.event
+                a.event-link(href="")
+                  span.at-simbol @
+                  span.event-name Kaos
+              li.suggested-event.event
+                a.event-link(href="")
+                  span.at-simbol @
+                  span.event-name Help
+          //#positionMap
+          //  img(src="")
           #load-media-again
           #cancel-post
-          #send-post(ng-click="send()")
+          
         section#post-list
           //p.post(ng-repeat="usuario in usuarios")
           //  span.amigo-firstName(ng-click="addListToFollow(usuario)") {{ usuario.name }}
@@ -78,7 +95,7 @@ block content
                       span.author-name
                         a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post.id)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      a.event-posted(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
+                      a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
                         span.at-simbol @
                         span.event-name {{ post.event }}
                       //a.shareOnFb(href='' ng-click="share(post.file)")
@@ -104,12 +121,13 @@ block content
             .promoted
               .promoted-title.title #{__('Promoted')}
               .event.promoted-event
-                .event-name.promoted-event-name @Aura
+                span.at-simbol @
+                span.event-name.promoted-event-name Aura
                 .event-people.promoted-event-people 1280 #{__('people')}
             .events-list
               .events-title.title #{__('Trends')}
               .event(ng-repeat="event in events | limitTo: limit")
-                a.event-name(href='#' ng-click="getMediaByFilter('post', 'trend', event.id)")
+                a.event-link(href='#' ng-click="getMediaByFilter('post', 'trend', event.id)")
                   span.at-simbol @
                   span.event-name {{ event.name }}
                 .event-people {{ event.count }} #{__('people')}

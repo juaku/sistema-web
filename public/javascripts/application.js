@@ -15,7 +15,7 @@
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
-	$('#float-controls .button').click( function() {
+	$('#float-controls .button').on('tapone', function() {
 		$('#float-controls .button').removeClass('selected');
 		$(this).addClass('selected');
 		$('body').removeClass('config-view posts-view new-post-view events-view search-view');
@@ -39,12 +39,11 @@ $(document).ready(function() {
 		}
 	});
 
-	$('#fbButton').on('click', function() {
-		console.log("click cambiar color");
-		$('#fbButton').css("background-color", "blue");
+	$('#share-new-post .share').on('tapone', function() {
+		$(this).toggleClass('selected');
 	});
 
-	$('.show-more').on('click', function() {
+	$('.show-more').on('tapone', function() {
 		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
 	});
 
@@ -304,12 +303,8 @@ function Application($scope, $http) {
 	$scope.newPost = {};
 	$scope.newPost.shareOnFb = false;
 
-	$scope.shareOnfB = function() {
-		if(!$scope.newPost.shareOnFb) {
-			$scope.newPost.shareOnFb = true;
-		} else {
-			$scope.newPost.shareOnFb = false;
-		}
+	$scope.shareOnFb = function() {
+		$scope.newPost.shareOnFb = !$scope.newPost.shareOnFb;
 		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
 	}
 
@@ -325,7 +320,7 @@ function Application($scope, $http) {
 		}).error();
 	}
 
-	$scope.send = function() {/* TODO: Evaluar riesgo de ataque, Crear post para form Multi - Riesgo de ataque
+	$scope.sendNewPost = function() {/* TODO: Evaluar riesgo de ataque, Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
 		for (key in $scope.newPost) {
@@ -549,9 +544,24 @@ angular.module('Juaku', [])
 });
 
 function postsLoaded() {
-	$('.like-svg').off();
-	$('.like-svg').on('click', function() {
+	$('.like-svg').off('tapone');
+	$('.like-svg').on('tapone', function() {
 		$(this).parent().toggleClass('selected');
+	});
+
+	// Avanza a la siguiente foto haciendo click
+
+	$('#post-list img.media').off('tapone');
+	$('#post-list img.media').on('tapone', function() {
+		console.log($(this).parents('.post').next('.post').length != 0);
+		// if($(this).parents('.post').next('.post').length != 0) {
+			var scrollIncrement = $('#post-list img.media:eq(1)').parents('.post').position().top;
+			var nextScroll = $('main').scrollTop() + $('#post-list img.media:eq(1)').parents('.post').position().top;
+			var preciseNextScroll = nextScroll - (nextScroll % scrollIncrement);
+			$('main').animate({
+				scrollTop: preciseNextScroll
+			}, 125);
+		// }
 	});
 }
 
