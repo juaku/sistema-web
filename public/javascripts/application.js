@@ -25,6 +25,7 @@ $(document).ready(function() {
 				break;
 			case 1:
 				$('body').addClass('posts-view');
+				assistedScroll(-1);
 				break;
 			case 2:
 				$('body').addClass('new-post-view');
@@ -307,6 +308,7 @@ function Application($scope, $http) {
 		console.log("$scope.user.postToAskLocation: "+$scope.user.postToAskLocation)
 		$http.post('/user/askLocation', $scope.user).success(function() {
 		}).error();
+
 	}
 
 	/*
@@ -563,18 +565,21 @@ function postsLoaded() {
 
 	// Avanza a la siguiente foto haciendo click
 
-	$('#post-list img.media').off('tapone');
+	// Parpadeo cuando se hace scroll hacia abajo
+	/*$('#post-list img.media').off('tapone');
 	$('#post-list img.media').on('tapone', function() {
-		console.log($(this).parents('.post').next('.post').length != 0);
-		// if($(this).parents('.post').next('.post').length != 0) {
-			var scrollIncrement = $('#post-list img.media:eq(1)').parents('.post').position().top;
-			var nextScroll = $('main').scrollTop() + $('#post-list img.media:eq(1)').parents('.post').position().top;
-			var preciseNextScroll = nextScroll - (nextScroll % scrollIncrement);
-			$('main').animate({
-				scrollTop: preciseNextScroll
-			}, 125);
-		// }
-	});
+		assistedScroll();
+	});*/
+}
+
+function assistedScroll(modifier) {
+	modifier = modifier == undefined ? 1 : modifier;
+	var scrollIncrement = $('#post-list img.media:eq(1)').parents('.post').position().top;
+		var nextScroll = $('main').scrollTop() + ($('#post-list img.media:eq(1)').parents('.post').position().top * modifier);
+		var preciseNextScroll = nextScroll - (nextScroll % scrollIncrement);
+		$('main').animate({
+			scrollTop: preciseNextScroll
+		}, 100);
 }
 
 function reduceString(str) {
@@ -585,3 +590,7 @@ function reduceString(str) {
 	}
 	return newString;
 }
+
+/*if(window.innerHeight > window.innerWidth){
+    document.getElementsByTagName("body").style.transform = "rotate(90deg)";
+}*/

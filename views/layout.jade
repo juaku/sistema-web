@@ -4,6 +4,8 @@ html(lang="#{locale}" ng-app="Juaku")
     meta(charset="utf-8")
     meta(name="viewport" content="width=device-width, user-scalable=no, minimal-ui")
     meta(name="apple-mobile-web-app-capable" content="yes")
+    // No tap resaltado en IE10, IE11 y Windows Phone
+    meta(meta name="msapplication-tap-highlight" content="no") 
     //meta(name="mobile-web-app-capable" content="yes") TODO: Chrome Android
     //meta(name="apple-mobile-web-app-status-bar-style" content="black") TODO: iPhone 4
     link(rel="apple-touch-icon" href="/images/touch-icon-iphone-retina.png")
@@ -11,6 +13,7 @@ html(lang="#{locale}" ng-app="Juaku")
     link(rel="icon" type="image/png" href="/images/favicon.png")
     link(rel="stylesheet", href="/stylesheets/style.css")
     script(src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script(src="/javascripts/jgestures.min.js")
     block head
   body(ng-controller="Application")
     block content

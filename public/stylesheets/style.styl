@@ -12,7 +12,7 @@ icoColor 		=	#D3D3D5	=	rgba(0, 0, 0, .20)
 fontColor		= #333		= rgba(0, 0, 0, .80)
 accentColor = #F05		= #F05
 hardColor		= #555		= rgba(0, 0, 0, .70)
-softColor		= #AAA		= rgba(0, 0, 0, .35) // No se ve claro en Chrome en Windows
+softColor		= #AAA		= rgba(0, 0, 0, .35) // El textp no se ve claro en Chrome en Windows
 */
 
 backColor 	= #FFF
@@ -22,6 +22,7 @@ fontColor		= #333
 accentColor = #F05
 hardColor		= #555
 softColor		= #AAA
+fbColor			= #3b5998
 
 /* 
  * Estilos generales
@@ -30,7 +31,7 @@ softColor		= #AAA
 body
 	//background-color: #EAEAEE // Cálido: #EEEEE7, Original: #DDE0EA
 	//background-color: #F3F3F5 // NEW MAC
-	background-color: backColor
+	//background-color: backColor
 	color: fontColor
 	font-family: Arial, sans-serif
 	font-size: 14px
@@ -48,6 +49,27 @@ a
 
 a:hover
 	color: inherit
+
+a
+input
+div // TODO: Evaluar elementos a los que se aplica
+	-webkit-tap-highlight-color: transparent
+
+#wrapper .event
+	font-size: 17px
+	color: accentColor
+	letter-spacing: -0.5px
+
+#wrapper .event .at-simbol
+	font-family: Verdana, Arial, sans-serif
+
+#wrapper .event .event-name
+	overflow: hidden
+	white-space: nowrap
+	text-overflow: ellipsis
+	
+#wrapper .event .event-people
+	letter-spacing: initial
 
 /*
  * Estilos específicos: /index
@@ -68,8 +90,8 @@ header
 header #title a
 	background-image: url('/images/juaku.svg?v=1005')
 	background-repeat: no-repeat
-	background-size: 125px 45px
-	width: 125px
+	background-size: 120px 45px
+	width: 120px
 	height: 45px
 	display: block
 	margin: 0 auto
@@ -91,6 +113,7 @@ main
 	-webkit-overflow-scrolling: touch
 
 main #wrapper
+	background-color: backColor
 	width: 100%
 	max-width: 940px
 	margin: 0 auto
@@ -169,7 +192,7 @@ section#view section#post-list .post div.media
 
 section#view section#post-list .post div.media img
 	width: 100%
-	display: block // En lugar de font-size: 0;
+	display: block // En lugar de font-size: 0
 
 section#view section#post-list .post div.media img.media // Muestra espacio de img
 	position: absolute
@@ -228,13 +251,13 @@ section#view section#post-list .post .bottom .author-img img
 	width: 55px
 	height: 55px
 	background-color: backColor //#EEE
-	display: block //En lugar de font-size: 0;
+	display: block //En lugar de font-size: 0
 
 section#view section#post-list .post .bottom .post-detail
 	display: table
 	table-layout: fixed
 	width: 100%
-	padding: 6px 0 5px 0
+	padding: 12px 0 0 0
 	letter-spacing: -0.5px
 
 section#view section#post-list .post .bottom .post-detail .post-title
@@ -248,7 +271,7 @@ section#view section#post-list .post .bottom .post-detail .post-title
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
-	margin-top: -1px;
+	margin-top: -1px
 
 section#view section#post-list .post .bottom .post-detail .post-title .author-name
 	color: hardColor
@@ -261,14 +284,10 @@ section#view section#post-list .post .bottom .post-detail .post-title .author-na
 section#view section#post-list .post .bottom .post-detail .post-title .event-posted
 	max-width: 70%
 
-section#view section#post-list .post .bottom .post-detail .post-title .event-posted .at-simbol
-	font-family: Verdana, Arial, sans-serif
-	letter-spacing: -1px
-
 section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 12px
 	color: softColor
-	margin-top: 5px
+	margin-top: 1px
 
 section#view section#post-list .post .bottom .post-detail .sub-info .time
 	display: inline-block	
@@ -286,7 +305,7 @@ section#view section#post-list .post .bottom .like .like-svg
 	width: 55px
 	height: 55px
 	cursor: pointer
-	display: block // En lugar de font-size: 0;
+	display: block // En lugar de font-size: 0
 
 section#view section#post-list .post .bottom .like .like-svg #inner
 	fill: icoColor
@@ -315,17 +334,6 @@ aside section#events-controls .events-title
 
 aside section#events-controls .event
 	margin: 5px 0
-
-aside section#events-controls .event .event-name
-	font-size: 17px
-	letter-spacing: -0.5px
-	color: accentColor
-	overflow: hidden
-	white-space: nowrap
-	text-overflow: ellipsis
-
-aside section#events-controls .event .event-name .at-simbol
-	font-family: Verdana, Arial, sans-serif
 
 aside section#events-controls .event .event-name.small
 	font-size: 14px
@@ -382,25 +390,11 @@ nav#float-controls #button-events
 nav#float-controls #button-search
 	background-position: 44px
 
-#send-post
-	background: rgba(0,0,0,0.3)
-	width: 30px
-	height: 30px
-	display: inline-block
-	vertical-align: middle
-	float: right
-#fbButton
-	background: rgba(0,0,0,0.3)
-	width: 30px
-	height: 30px
-	display: inline-block
-	vertical-align: middle
-	float: right
-
 /*
  * Pie
  */
 footer
+	color: softColor
 	margin: 10px 5px
 	font-size: 12px
 
@@ -425,6 +419,103 @@ section#new-post canvas#new-media-preview
 
 section#new-post #positionMap img
 	width: 100%
+
+section#new-post canvas#new-media-preview
+	width: 100%
+	height: 100vw
+	display: block
+
+section#new-post #new-post-controls
+	background-color: backColor
+	width: 100%
+	height: 44px
+	display: table
+
+section#new-post #new-post-controls #event-name-input
+section#new-post #new-post-controls #share-new-post
+section#new-post #new-post-controls #send-post
+	display: table-cell
+	vertical-align: middle
+
+section#new-post #new-post-controls #event-name-input
+	display: table
+	width: 100%
+
+section#new-post #new-post-controls #event-name-input *
+	font-size: 17px
+	color: accentColor
+	letter-spacing: -0.5px
+
+section#new-post #new-post-controls #event-name-input span.at-simbol
+section#new-post #new-post-controls #event-name-input input#new-event-name
+	display: table-cell
+	vertical-align: middle
+	height: 24px
+
+section#new-post #new-post-controls #event-name-input span.at-simbol
+	// text-align: right
+	padding: 10px 0 10px 10px
+	width: 1px
+
+section#new-post #new-post-controls #event-name-input input#new-event-name
+	width: 95%
+	border: none
+	padding: 10px 0
+	margin: 0
+	display: block
+	outline: none
+	border-radius: 0
+
+placeholder()
+	&::-webkit-input-placeholder
+		{block}
+	&:-moz-placeholder
+		{block}
+	&::-moz-placeholder
+		{block}
+	&:-ms-input-placeholder
+		{block}
+
+section#new-post #new-post-controls #event-name-input input#new-event-name
+	+placeholder()
+		color: icoColor
+		border-bottom: 1px solid layerColor
+
+section#new-post #new-post-controls #share-new-post
+	width: 24px
+	// background-color: layerColor
+
+section#new-post #new-post-controls #share-new-post .share
+	width: 24px
+	height: 24px
+	margin: 8px
+	display: block
+
+section#new-post #new-post-controls #share-new-post .share #change-color
+	fill: softColor
+
+section#new-post #new-post-controls #share-new-post .share.selected #change-color 
+	fill: fbColor
+	
+section#new-post #new-post-controls #send-post
+	text-align: center
+	text-transform: uppercase
+	font-weight: bold
+	font-size: 11px
+	padding: 2px 15px 0 15px
+
+/*section#new-post #suggested-events
+	text-align: center*/
+
+section#new-post #suggested-events ul
+	margin: 0
+	padding: 0 0 5px 0
+	
+section#new-post #suggested-events ul li.suggested-event
+	background-color: rgba(255, 255, 255, 0.5)
+	margin: 1px 0
+	padding: 4px 10px
+	list-style: none
 
 /*
  * Control de vistas
@@ -477,6 +568,10 @@ body.events-view main #last
 		width: 110px
 
 @media (max-width: 669px) 
+	body
+		user-select: none // TODO: Pasar a un detector real de dispositivos
+		background-color: layerColor
+		
 	main
 		min-width: 290px
 		bottom: 44px
@@ -506,14 +601,20 @@ body.events-view main #last
 	nav#float-controls
 		display: table
 
-@media (max-width: 329px)
+@media (max-width: 375px)
 	main
 		top: 44px
 	
 	header
-		padding: 4px 0 5px 0;
+		padding: 4px 0 5px 0
 
 	header #title a
-		background-size: 97px 35px
-		width: 97px
+		background-size: 93px 35px
+		width: 93px
 		height: 35px
+	
+	/* Control de vistas */
+	body.new-post-view header
+		display: none
+	body.new-post-view main
+		top: 0
