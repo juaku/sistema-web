@@ -12,7 +12,7 @@ icoColor 		=	#D3D3D5	=	rgba(0, 0, 0, .20)
 fontColor		= #333		= rgba(0, 0, 0, .80)
 accentColor = #F05		= #F05
 hardColor		= #555		= rgba(0, 0, 0, .70)
-softColor		= #AAA		= rgba(0, 0, 0, .35) // El textp no se ve claro en Chrome en Windows
+softColor		= #AAA		= rgba(0, 0, 0, .35) // El texto no se ve claro en Chrome en Windows
 */
 
 backColor 	= #FFF
@@ -131,7 +131,7 @@ aside
 aside#first
 	transition: width 500ms
 
-aside #people-side
+aside #options-side
 aside #events-side
 	width: inherit
 	display: inline-block
@@ -141,34 +141,37 @@ aside #events-side
 /*
  * Controles
  */
-section#people-side
+section#options-side
 	text-align: right
 
-section#people-controls section#profile
+section#options-side .side-block
 	background-color: backColor
+
+section#account-controls section#profile
 	width: 100px
 	height: 170px
 	text-align: left
 	display: inline-block
 
-section#people-controls section#profile img
+section#account-controls section#profile img
 	background-color: layerColor
 	width: 100px
 	height: 100px
 
-section#people-controls section#profile h2.profile-name
-	margin: 5px
+section#account-controls section#profile h2.profile-name
+	margin: 0
+	padding: 5px
 	font-size: 14px
 	line-height: 14px
 	overflow: hidden
 	text-overflow: ellipsis
 	font-weight: normal
 
-section#people-controls section#profile h2.profile-name .profile-firstname
+section#account-controls section#profile h2.profile-name .profile-firstname
 	font-size: 13px
 	font-weight: bold
 
-section#people-controls section#profile h2.profile-name .profile-lastname
+section#account-controls section#profile h2.profile-name .profile-lastname
 	font-size: 12px
 	font-weight: normal
 
@@ -292,26 +295,28 @@ section#view section#post-list .post .bottom .post-detail .sub-info
 section#view section#post-list .post .bottom .post-detail .sub-info .time
 	display: inline-block	
 
-section#view section#post-list .post .bottom .like object // Para que no se corte el texto
+main #wrapper .like object // Para que no se corte el texto
 	width: 55px
 	height: 55px
 
-section#view section#post-list .post .bottom .like
+main #wrapper .like
 	width: 55px // Firefox, Android Browser
 	display: table-cell
 	vertical-align: bottom
 
-section#view section#post-list .post .bottom .like .like-svg
+main #wrapper .like object
+	display: block // En lugar de font-size: 0, para evitar el espacio debajo
+	
+main #wrapper .like object .like-svg
 	width: 55px
 	height: 55px
 	cursor: pointer
-	display: block // En lugar de font-size: 0
 
-section#view section#post-list .post .bottom .like .like-svg #inner
+main #wrapper .like object .like-svg #inner
 	fill: icoColor
 	transition: fill 250ms
 
-section#view section#post-list .post .bottom .like .selected .like-svg #inner
+main #wrapper .like.selected object .like-svg #inner
 	fill: accentColor
 
 /*
@@ -349,7 +354,7 @@ aside section#events-controls .show-more
 /*
  * Controles flotantes
  */
-nav#float-controls
+nav#view-menu
 	background-color: backColor
 	transition: background-color 250ms linear
 	width: 100%
@@ -359,16 +364,16 @@ nav#float-controls
 	bottom: 0
 	z-index: 10
 
-nav#float-controls .control
+nav#view-menu .view-button
 	display: table-cell
 	height: 44px
 
-nav#float-controls .control.first
-nav#float-controls .control.middle
-nav#float-controls .control.last
+nav#view-menu .view-button.first
+nav#view-menu .view-button.middle
+nav#view-menu .view-button.last
 	width: 44px
 
-nav#float-controls .control .button
+nav#view-menu .view-button .button
 	background-image: url('/images/sprite.svg')
 	background-size: auto cover
 	width: 44px
@@ -376,18 +381,18 @@ nav#float-controls .control .button
 	margin: 0 auto
 	cursor: pointer
 
-nav#float-controls .control .button.selected
+nav#view-menu .view-button .button.selected
 	background-color: layerColor
 
-nav#float-controls #button-options
+nav#view-menu #button-options
 	background-position: 0px
-nav#float-controls #button-posts
+nav#view-menu #button-posts
 	background-position: 176px
-nav#float-controls #button-camera
+nav#view-menu #button-camera
 	background-position: 132px
-nav#float-controls #button-events
+nav#view-menu #button-events
 	background-position: 88px
-nav#float-controls #button-search
+nav#view-menu #button-search
 	background-position: 44px
 
 /*
@@ -430,6 +435,7 @@ section#new-post #new-post-controls
 	width: 100%
 	height: 44px
 	display: table
+	margin-bottom: 5px
 
 section#new-post #new-post-controls #event-name-input
 section#new-post #new-post-controls #share-new-post
@@ -482,13 +488,14 @@ section#new-post #new-post-controls #event-name-input input#new-event-name
 		border-bottom: 1px solid layerColor
 
 section#new-post #new-post-controls #share-new-post
-	width: 24px
-	// background-color: layerColor
+	width: 44px
+	height: 44px
+	background-color: layerColor
 
 section#new-post #new-post-controls #share-new-post .share
 	width: 24px
 	height: 24px
-	margin: 8px
+	margin: 10px
 	display: block
 
 section#new-post #new-post-controls #share-new-post .share #change-color
@@ -510,6 +517,7 @@ section#new-post #new-post-controls #send-post
 section#new-post #suggested-events ul
 	margin: 0
 	padding: 0 0 5px 0
+	text-align: center
 	
 section#new-post #suggested-events ul li.suggested-event
 	background-color: rgba(255, 255, 255, 0.5)
@@ -575,19 +583,144 @@ body.events-view main #last
 	main
 		min-width: 290px
 		bottom: 44px
-
-	aside#first,
-	aside#last
-		display: none
-			
+		
 	main #wrapper
+		background-color: layerColor
 		width: 100%
 		max-width: inherit
 	
 	aside
-		padding: 10px 0
+		padding: 0
+
+	aside#first,
+	aside#last
+		display: none
 	
-	aside #people-side,
+	aside#first
+		width: 100%
+	
+	section#options-side
+		text-align: left
+	
+	section#options-side .side-block
+		margin: 10px 0
+		
+	aside#first section#profile
+		width: 100%
+		height: 100px
+		display: table
+	
+	aside#first section#profile img,
+	aside#first section#profile h2
+		display: table-cell
+		vertical-align: top
+	
+	aside#first section#account-controls section#profile h2.profile-name
+		width: 100%
+		padding: 10px
+		line-height: inherit
+	
+	aside#first section#account-controls section#profile h2.profile-name .profile-firstname
+		font-size: 16px
+	
+	aside#first section#account-controls section#profile h2.profile-name .profile-lastname
+		font-size: 14px
+		
+	aside#first section#user-relation #relation-tabs
+		display: table
+		width: 100%
+		text-align: center
+		
+	aside#first section#user-relation #relation-tabs .relation-tab
+		display: table-cell
+		color: softColor
+		width: 50%
+		height: 43px
+		padding: 5px
+		border-top: 2px solid backColor
+		vertical-align: top
+
+	#relation-tabs .relation-tab .people-number
+		font-size: 21px
+		height: 24px
+		
+	#relation-tabs .relation-tab .follow-type
+		font-size: 12px
+		line-height: 10px
+
+	#relation-views ul.relation-view
+		margin: 0
+		padding: 0
+		display: none
+
+	#relation-views ul.relation-view li
+		list-style: none
+		display: table
+		height: 55px
+		width: 100%
+		background: layerColor
+
+	#relation-views ul.relation-view li .user-picture
+	#relation-views ul.relation-view li .user-info
+	#relation-views ul.relation-view li .user-relation
+		display: table-cell
+		vertical-align: top
+
+	#relation-views ul.relation-view li .user-picture img.picture
+		width: 55px
+		height: 55px
+		display: block
+		
+	#relation-views ul.relation-view li .user-picture
+	#relation-views ul.relation-view li .user-relation
+		width: 55px
+		height: 55px
+	
+	#relation-views ul.relation-view li .user-info
+		padding: 5px 10px 0 10px
+
+	#relation-views ul.relation-view li .user-firstName
+		font-weight: bold
+		
+	#relation-views ul li .user-lastName
+		line-height: 14px
+
+	#relation-views ul li .user-followerNumber
+		font-size: 11px
+		color: softColor
+		margin-top: 2px
+	
+	aside#first section#user-relation.viewing-followers #relation-tabs #followers-tab
+	aside#first section#user-relation.viewing-following #relation-tabs #following-tab
+		border-top-color: accentColor
+		color: fontColor
+
+	aside#first section#user-relation.viewing-followers #followers
+	aside#first section#user-relation.viewing-following #following
+		display: block
+	
+	section#account-controls #general-controls
+		background: inherit
+	
+	section#account-controls .account-control
+		background-color: backColor
+		margin-bottom: 1px
+		text-align: center
+		
+	section#account-controls .account-control a.button
+		height: 15px
+		padding: 10px
+		display: block
+	
+	section#account-controls .account-control a.button .bold
+		font-weight: bold
+
+	/*aside
+		padding: 10px 0*/
+	
+	// account-controls
+	
+	aside #options-side,
 	aside #events-side
 		position: inherit
 
@@ -598,8 +731,14 @@ body.events-view main #last
 	section#view // NEWLOGO
 		padding: 0 
 	
-	nav#float-controls
+	nav#view-menu
 		display: table
+	
+	/*body.view-menu-hidden main
+		bottom: 0*/
+		
+	body.view-menu-hidden nav#view-menu
+		display: none
 
 @media (max-width: 375px)
 	main

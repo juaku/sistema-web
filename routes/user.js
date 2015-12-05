@@ -17,7 +17,7 @@ router.get('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if(req.params.action=='session') {
-			var parseSessionToken = {}
+			var parseSessionToken = {};
 			res.json({parseSessionToken:req.session.jUser.parseSessionToken});
 		}
 	}
@@ -27,7 +27,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
-		if(req.params.action=='getGeo') {
+		if(req.params.action=='setGeo') {
 			jUser.setGenericData(req, function() {
 				res.status(201).end();
 			}, function(error) {

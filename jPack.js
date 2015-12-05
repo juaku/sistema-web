@@ -50,6 +50,7 @@ jPack.user = function (user) {
 	this.expires = user.expires;														// {string}
 	this.parseSessionToken = user.parseSessionToken;				// {string}
 	this.profilePicture = user.profilePicture;							// {url}
+	this.coords = user.coords;
 }
 
 /*
@@ -509,11 +510,12 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 			if(users.length != 0) {
 				followersItemCount = users.length;
 				console.log("Te siguen: " + users.length + " personas.");
+				var userResult, columnTo, date, fbUserId;
 				for(var i = 0; i<users.length; i++) {
-					var userResult = users[i];
-					var columnTo = userResult.get("from");
-					var fbUserId = crip.deco(columnTo.get("username"));
-					var date = userResult.get("date");
+					userResult = users[i];
+					columnTo = userResult.get("from");
+					date = userResult.get("date");
+					fbUserId = crip.deco(columnTo.get("username"));
 					getFBInfo(i, fbUserId);
 				}
 				function getFBInfo(i, fbUserId) {
@@ -531,7 +533,9 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 				function triggerNext() {
 					followersItemCount--;
 					if(followersItemCount===0) {
-						next();
+						console.log("followers : ");
+						console.log(followers);
+						next(followers);
 					}
 				}
 			} else { 
@@ -809,6 +813,7 @@ jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
  * @return null
  */ 
 jPack.user.prototype.setGenericData = function(req, next, error) {
+	// TODO: Evaluar
 	this.coords = req.body.data.coords;
 	req.session.jUser.coords = this.coords;
 	next();
@@ -822,6 +827,18 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
 function savePost(req, eventNameSimple, data, user, event, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
+
+	if( data.coords == undefined ) {
+		data.coords = {};
+		data.coords.latitude = -16.3989;
+		data.coords.longitude = -71.535;
+	}
+	// TODO: Evaluar ¿qué hacer? si la integridad de la información de cliente no es la que se esperaba
+	/*if( data.coords == undefined ) {
+		error();
+		return;
+	}*/
+
 	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
 		var base64data = imgBase64;
 		var namePhoto = mediaName;
@@ -1367,7 +1384,98 @@ jPack.getAllEvents = function(req, next, error) {
 	});
 }
 
-/*D
+/*
+ * @descrip Obtiene eventos sugeridos en ese momento y lugar, ademas de a través de 'queries'
+ * @param {string} query, {function} next, {function} error.
+ * @return null
+*/
+jPack.user.prototype.getSuggestedEvents = function(query, req, next, error) {
+if(query != undefined) {
+		Parse.User.become(this.parseSessionToken).then(function (user) {
+			var point = {};
+			// TODO: Globalizar la elección del punto GPS
+			if(req.session.jUser.coords != undefined) {
+				point.latitude = req.session.jUser.coords.latitude;
+				point.longitude = req.session.jUser.coords.longitude;
+			} else { // Arequipa
+				point.latitude = -16.3989; 
+				point.longitude = -71.535;
+			}
+			var userGeoPoint = new Parse.GeoPoint({latitude: point.latitude, longitude: point.longitude});
+			var Post = Parse.Object.extend("Post");
+			var eventQuery = new Parse.Query(Post);
+			eventQuery.select('eventKey');
+			eventQuery.withinKilometers('location', userGeoPoint, 3);
+			eventQuery.limit(100);
+			eventQuery.find().then(function(posts) {
+				var suggestedEvents = [];
+				for( var i in posts ) {
+					suggestedEvents[i] = {};
+					suggestedEvents[i].name = posts[i].get('eventKey');
+					suggestedEvents[i].distance = parseInt(i);
+					suggestedEvents[i].count = 1;
+					suggestedEvents[i].value = 1;
+				};
+
+				var suggestedEventsSorted = [];
+				var eventCount = suggestedEvents.length;
+
+				for( var i in suggestedEvents) {
+					countDuplicate(suggestedEvents[i]);
+				};
+
+				function countDuplicate(suggestedEvent) {
+					var finded = false;
+					for (var i = 0; i < suggestedEventsSorted.length; i++) {
+						if(suggestedEventsSorted[i].name == suggestedEvent.name) {
+							finded = true;
+							suggestedEventsSorted[i].count++;
+							if(suggestedEvent.distance < suggestedEventsSorted[i].closestDistance) {
+								suggestedEventsSorted[i].closestDistance = suggestedEvent.distance;
+							}
+							suggestedEventsSorted[i].groupDispertion = (suggestedEventsSorted[i].groupDispertion + (suggestedEvent.distance - suggestedEventsSorted[i].lastDistance - 1))/2;
+							suggestedEventsSorted[i].lastDistance = suggestedEvent.distance;
+							suggestedEventsSorted[i].value = setValue(suggestedEventsSorted[i]);
+						}
+					}
+					if(!finded) {
+						var i = suggestedEventsSorted.length;
+						suggestedEventsSorted[i] = {}
+						suggestedEventsSorted[i].name = suggestedEvent.name;
+						suggestedEventsSorted[i].count = 1;
+						suggestedEventsSorted[i].lastDistance = suggestedEvent.distance;
+						suggestedEventsSorted[i].closestDistance = suggestedEvent.distance;
+						suggestedEventsSorted[i].groupDispertion = 0;
+						suggestedEventsSorted[i].value = setValue(suggestedEventsSorted[i]);
+					}
+				}
+
+				function setValue(suggestedEvent) {
+					return (1-(suggestedEvent.closestDistance / eventCount)) * 0.6 +
+						(suggestedEvent.count / eventCount) * 0.4;
+				}
+
+				suggestedEventsSorted.sort( function(a,b) {
+					if (a.value > b.value)
+						return -1;
+					if (a.value < b.value)
+				 		return 1;
+					return 0;
+				});
+
+				next(suggestedEventsSorted.slice(0,3));
+			}, function(e) {
+				error(e);
+			});
+		}, function(e) {
+			error(e);
+		});
+	} else {
+		
+	}
+}
+
+/*
  * @descrip Envía push notification, pide tu ubicación
  * @param {object} postToAskLocationId, {function} next, {function} error.
  * @return null

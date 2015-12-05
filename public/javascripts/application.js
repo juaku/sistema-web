@@ -15,11 +15,11 @@
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
-	$('#float-controls .button').on('tapone', function() {
-		$('#float-controls .button').removeClass('selected');
+	$('#view-menu .button').on('tapone', function() {
+		$('#view-menu .button').removeClass('selected');
 		$(this).addClass('selected');
 		$('body').removeClass('config-view posts-view new-post-view events-view search-view');
-		switch($('#float-controls .button').index(this)) {
+		switch($('#view-menu .button').index(this)) {
 			case 0:
 				$('body').addClass('config-view');
 				break;
@@ -57,6 +57,19 @@ $(document).ready(function() {
 			event.preventDefault();
 		}
 	});
+
+	$('input.event-name').on('focus', function() {
+		$('body').addClass('view-menu-hidden');
+	});
+	$('input.event-name').on('focusout', function() {
+		$('body').removeClass('view-menu-hidden');
+	});
+
+	// Vista de seguidores y seguidos
+	$('#relation-tabs .relation-tab').on('tapone', function() {
+		$('#user-relation').removeClass('viewing-followers viewing-following');
+		$(this).parents('#user-relation').addClass('viewing-' + $(this).attr('viewing'));
+	});
 });
 
 /*
@@ -88,9 +101,11 @@ function Application($scope, $http) {
 	//$scope.user.peopleToFollow = [];
 
 	getGeo(function() {
-		$http.post('/user/getGeo', $scope.user).success(function(data) {
+		$http.post('/user/setGeo', $scope.user).success(function(data) {
 			getPosts();
 			getEvents();
+			$scope.user.getFollowers();
+			$scope.user.getFollowing();
 		}).error();
 	}, function(errorMsg) {
 		console.log(errorMsg);
@@ -121,7 +136,7 @@ function Application($scope, $http) {
 	});
 	
 	function askForPost(filter, action, id) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-			getPosts(filter, action, id);
+		getPosts(filter, action, id);
 	}
 
 	// Cargar los post originales
@@ -212,7 +227,7 @@ function Application($scope, $http) {
 
 	// Crear n post vacios mientras carga los post originales
 	function createEmptyPosts(numTmpPost) {
-		tmpLoadingPostsNumber = numTmpPost;;
+		tmpLoadingPostsNumber = numTmpPost;
 		loadedImgs -= numTmpPost;
 		var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 		var lastPostPosition = $scope.posts.length;
@@ -224,8 +239,38 @@ function Application($scope, $http) {
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
 	$http.get('/user/getAllUsers').success(function(data) {
 		//$scope.user.fbFriends = data;
-		$scope.usuario = data;
+		$scope.usuarios = data;
 	});
+
+	// Obtiene a las personas que te siguen o que sigues
+	$scope.user.getFollowers = function(type) {
+		$http.get('/list/user/followers/0', $scope.user).success(function(data) {
+			$scope.user.followers = data;
+		}).error();
+	}
+	$scope.user.getFollowing = function(type) {
+		$http.get('/list/user/following/0', $scope.user).success(function(data) {
+			$scope.user.following = data;
+		}).error();
+	}
+
+	$scope.askForSuggestedEvents = function(query) {
+		getSuggestedEvents(query);
+	}
+
+	function getSuggestedEvents(query) {
+		var status;
+		$http.get('/list/event/suggested/a').success(function(data, status) {
+			$scope.suggestedEvents = [];
+			for(i in data) {
+				$scope.suggestedEvents[i] = {};
+				$scope.suggestedEvents[i].name = data[i].name;
+			}
+			console.log($scope.suggestedEvents);
+		}).error(function(e) {
+			console.log('Error al obtener suggestedEvents');
+		});
+	};
 
 	// Envía un objeto con los datos de la persona que deseas seguir o dejar de seguir mediante un post 
 	$scope.followRelation = function(userToFollow) {
@@ -237,19 +282,6 @@ function Application($scope, $http) {
 		} else {
 			$scope.user.userToFollow.following = false;
 			$http.post('/user/unfollow', $scope.user).success(function(data) {
-			}).error();
-		}
-	}
-
-	// Obtiene a las personas que te siguen o que sigues
-	$scope.getFollowers = function(i) {
-		if (i==1) {
-			$http.get('/list/user/followers/0', $scope.user).success(function(data) {
-				$scope.followers = data;
-			}).error();
-		} else if (i==2) {
-			$http.get('/list/user/following/0', $scope.user).success(function(data) {
-				$scope.following = data;
 			}).error();
 		}
 	}
@@ -483,6 +515,7 @@ function Application($scope, $http) {
 				coords.speed = position.coords.speed;
 				$scope.user.data.coords = coords;
 				$scope.newPost.coords = coords;
+				console.log('coords: ' + coords.latitude);
 				next(); 
 			}, function(errorObj) {
 				var errorMsg = "";
@@ -555,12 +588,13 @@ angular.module('Juaku', [])
     return function(input) {
       return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
     }
-});
+})
+//.module('app', ['ngTouch']);
 
 function postsLoaded() {
 	$('.like-svg').off('tapone');
 	$('.like-svg').on('tapone', function() {
-		$(this).parent().toggleClass('selected');
+		$(this).parents().toggleClass('selected');
 	});
 
 	// Avanza a la siguiente foto haciendo click
