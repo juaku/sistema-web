@@ -75,9 +75,9 @@ if($('html').attr('lang') == 'es') {
 // Controlador
 
 var loadedImgs = 0;
+var getPostsBool = true;
 var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
 function Application($scope, $http) {
-
 	/*
 	 * User
 	 */
@@ -87,14 +87,64 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
 
-	getGeo(function() {
-		$http.post('/user/getGeo', $scope.user).success(function(data) {
-			getPosts();
-			getEvents();
-		}).error();
-	}, function(errorMsg) {
-		console.log(errorMsg);
-	});
+	if(url != '') {
+		if(reqType == 'event'){
+			var res = url.split('@');
+			var eventNameSimple = res[1].toLowerCase();
+
+			$.getJSON('http://juaku-dev.cloudapp.net:5000/list/event', function(data){
+				$.each(data, function(key, value){
+					for(var i=0; i<value.length; i++) {
+						console.log(eventNameSimple + ' ' + value[i].name);
+						if(eventNameSimple == value[i].name) {
+							getTrends();
+							getEvents();
+							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
+							break;
+						}
+					}
+				});
+			});
+		} else if(reqType == 'user') {
+			//var res = location.hash.split('#');
+			var res = url.split('-');
+			var firstName = res[0].toLowerCase();
+			var colorHexLowerCase = res[1].toLowerCase();
+			var commonNames = [];
+			var countCommonNames = 0;
+
+			$.getJSON('http://juaku-dev.cloudapp.net:5000/user/getAllUsers', function(data){
+				$.each(data, function(key, value){
+					for(var i=0; i<value.length; i++) {
+						if(firstName == value[i].firstName.toLowerCase()) {
+							commonNames[countCommonNames] = value[i];
+							countCommonNames++;
+							break;
+						}
+					}
+					for(var i=0; i<commonNames.length; i++) {
+						if(colorHexLowerCase == commonNames[i].idKey) {
+							getTrends();
+							getEvents();
+							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
+							break;
+						}
+					}
+				});
+			});
+		}
+	} else {
+		getGeo(function() {
+			$http.post('/user/getGeo', $scope.user).success(function(data) {
+				getPosts();
+				getTrends();
+				getEvents();
+			}).error();
+		}, function(errorMsg) {
+			console.log(errorMsg);
+		});
+	}
+
 
 	var idAux;
 	var filterAux;
@@ -109,10 +159,11 @@ function Application($scope, $http) {
 	var getPostTries = 0;
 	var getPostTriesLimit = 20;
 	$scope.posts = [];
+	$scope.trends = [];
 	$scope.events = [];
 
 	createEmptyPosts(5);
-	askForPost();
+	//askForPost();
 
 	$('main').scroll(function() {
 		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
@@ -224,7 +275,7 @@ function Application($scope, $http) {
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
 	$http.get('/user/getAllUsers').success(function(data) {
 		//$scope.user.fbFriends = data;
-		$scope.usuario = data;
+		$scope.usuarios = data.users;
 	});
 
 	// Envía un objeto con los datos de la persona que deseas seguir o dejar de seguir mediante un post 
@@ -442,13 +493,13 @@ function Application($scope, $http) {
 
 	$scope.showMoreEvents = function(oldLimit) {
 		$scope.limit = oldLimit;
-		if($scope.limit <= $scope.events.length)
+		if($scope.limit <= $scope.trends.length)
 			$scope.limit = $scope.limit+3;
 		else
 			console.log("No hay más eventos en tu ciudad");
 	}
 
-	$scope.getMediaByFilter = function(filter, action, id) {
+	$scope.getMediaByFilter = function(filter, action, object) {
 		loadedImgs = 0;
 		gettingPosts = false;
 		firstPostsLoad = true;
@@ -460,10 +511,25 @@ function Application($scope, $http) {
 		getPostTries = 0;
 		getPostTriesLimit = 20;
 		$scope.posts = [];
-		//$scope.events = [];
+		//$scope.trends = [];
 		createEmptyPosts(5);
 
-		getPosts(filter, action, id);
+		if(object == undefined) {
+			history.pushState( {}, null, '/personasQueSigues');
+			getPosts(filter, action);
+		} else if(object.author != undefined && action == 'author') {//cuando se hace click en un nombre
+			history.pushState( {}, null, '/' + object.author.firstName + '-' + object.author.idKey);
+			getPosts(filter, action, object.author.idKey);
+		} else if(object.author == undefined && action == 'author') {//cuando se pide por url ex:http://juaku-dev.cloudapp.net:5000/Rodrigo#ff0055
+			history.pushState( {}, null, '/' + object.firstName + '-' + object.idKey);
+			getPosts(filter, action, object.idKey);
+		} else if (object.event != undefined && action == 'event') {
+			history.pushState( {}, null, '/@' + object.event);
+			getPosts(filter, action, object.id);
+		} else if (action == 'trend') {
+			history.pushState( {}, null, '/@' + object.name);
+			getPosts(filter, action, object.id);
+		}
 	}
 
 	/*
@@ -509,16 +575,22 @@ function Application($scope, $http) {
 		}
 	}
 
-	function getEvents () {
+	function getTrends () {
 		// TODO: Evaluar remoción
 		/*
 		 * Events
 		 */
 
 		// Cargar eventos
+		$http.get('/list/trend').success(function(data) {
+			$scope.trends = data.trends;
+			$scope.limit = 7;
+		});
+	}
+
+	function getEvents () {
 		$http.get('/list/event').success(function(data) {
 			$scope.events = data.events;
-			$scope.limit = 7;
 		});
 	}
 

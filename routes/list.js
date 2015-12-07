@@ -23,6 +23,17 @@ router.get('/:filter/:i?', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
+		} else if(req.params.filter=='trend') {
+			jPack.getTrends(req, function(result) {
+				if(result.length == 0) {
+					res.status(204).end();
+				} else {
+					res.json(result);
+				}
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
 		} else if(req.params.filter=='event') {
 			jPack.getAllEvents(req, function(result) {
 				if(result.length == 0) {

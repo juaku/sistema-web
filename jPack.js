@@ -531,7 +531,7 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 				function triggerNext() {
 					followersItemCount--;
 					if(followersItemCount===0) {
-						next();
+						next(followers);
 					}
 				}
 			} else { 
@@ -677,13 +677,14 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 		var User = Parse.Object.extend("User");
 		var relation = user.relation("blockedUsers");
 		var queryUser = new Parse.Query(User);
-		queryUser.notEqualTo("objectId", user.id);
+		//queryUser.notEqualTo("objectId", user.id);
 		queryUser.find().then(function(users) {
 			relation.query().find().then(function(listOfBlockedUsers) {
 			// listOfBlockedUsers contiene los usuarios que el usuario actual bloqueó
 				for(var i = 0; i<users.length; i++) {
 						allUsers[i] = {};
 						allUsers[i].username = users[i].attributes.username;
+						allUsers[i].idKey = users[i].attributes.idKey;
 						getFBInfo(i, crip.deco(users[i].attributes.username));
 				}
 				function getFBInfo(i, fbUserId) {
@@ -707,7 +708,9 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 							isFollowing(allUsers[i], function() {
 								aux = aux + 1;
 								if(aux == allUsers.length) {
-									next(allUsers);
+									var response = {users: allUsers};
+									next(response);
+									//next(allUsers);
 								}
 							}, function(e) {
 								error(e);
@@ -1085,11 +1088,12 @@ jPack.getAllPosts = function(req, next, error) {
 							posts[i].location.latitude = results[i].get('location').latitude;
 							posts[i].location.longitude = results[i].get('location').longitude;
 							//
-							getFBInfo(i,crip.deco(results[i].get('author').get('username')));
+							getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));
 						}
-						function getFBInfo(i, fbUserId) {
+						function getFBInfo(i, fbUserId, idKey) {
 							FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
 								posts[i].author = {};
+								posts[i].author.idKey = idKey;
 								posts[i].author.firstName = profile.first_name;
 								posts[i].author.lastName = profile.last_name;
 								FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
@@ -1168,24 +1172,22 @@ jPack.getAllPosts = function(req, next, error) {
 						error(e);
 					});
 				} else if(req.params.action == 'author') {
-					var postQuery = new Parse.Query(Post);
-
-					var postId = req.params.id;
-
-					postQuery.include('author');
-					postQuery.equalTo('publicId', postId);
-					postQuery.find().then(function(post) {
-						var postQuery2 = new Parse.Query(Post);
+					var User = Parse.Object.extend('User');
+					var queryUser = new Parse.Query(User);
+					var idKey = req.params.id;
+					queryUser.equalTo('idKey', idKey);
+					queryUser.find().then(function(userResult) {
+						var postQuery = new Parse.Query(Post);
 						if(listOfBlockedUsers.length != 0) {
-							postQuery2.notContainedIn('author', listOfBlockedUsers);
+							postQuery.notContainedIn('author', listOfBlockedUsers);
 						}
-						postQuery2.descending('createdAt');
-						postQuery2.include('author');
-						postQuery2.include('event');
-						postQuery2.limit(resultsLimit);
-						postQuery2.skip(resultsLimit * queryNumber);
-						postQuery2.equalTo('author', post[0].get('author'));
-						next(postQuery2);
+						postQuery.descending('createdAt');
+						postQuery.include('author');
+						postQuery.include('event');
+						postQuery.limit(resultsLimit);
+						postQuery.skip(resultsLimit * queryNumber);
+						postQuery.equalTo('author', userResult[0]);
+						next(postQuery);
 					}, function(e) {
 						error(e);
 					});
@@ -1245,11 +1247,11 @@ jPack.getAllPosts = function(req, next, error) {
 }
 
 /*
- * @descrip Método para obtener todos los eventos de la DB
+ * @descrip Método para obtener los eventos en tendencia
  * @param {object} req, {function} next, {function} error
  * @return null
  */
-jPack.getAllEvents = function(req, next, error) {
+jPack.getTrends = function(req, next, error) {
 	Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 		var events = [];
 		var eventPost = [];
@@ -1329,7 +1331,7 @@ jPack.getAllEvents = function(req, next, error) {
 							}
 						}
 					}
-					var response = {events: events};
+					var response = {trends: events};
 					next(response);
 				});
 			}, function(e) {
@@ -1362,6 +1364,34 @@ jPack.getAllEvents = function(req, next, error) {
 				return milliSeconds;
 			}
 		}
+	}, function(e) {
+		error(e);
+	});
+}
+
+/*
+ * @descrip Método para obtener todos los eventos de la DB
+ * @param {object} req, {function} next, {function} error
+ * @return null
+ */
+jPack.getAllEvents = function(req, next, error) {
+	Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+		var events = [];
+		var Event = Parse.Object.extend('Event');
+		var eventQuery = new Parse.Query(Event);
+		eventQuery.ascending('name');
+		eventQuery.find().then(function(response) {
+			console.log('response.length: ' + response.length);
+			for (var i = 0; i < response.length; i++) {
+				events[i] = {};
+				events[i].id = response[i].id;
+				events[i].index = i;
+				events[i].name = response[i].get('name');
+			}
+			var response = {events: events};
+			next(response);
+		});
+
 	}, function(e) {
 		error(e);
 	});

@@ -13,4 +13,20 @@ router.get('/', function(req, res) {
 	}
 });
 
+router.get('/:event(@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+)', function(req, res) {
+	if (req.isAuthenticated()) {
+		res.render('index', { user: req.session.jUser, locale: req.getLocale(), url: req.params.event, reqType: 'event'});
+	} else {
+		res.render('login');
+	}
+});
+
+router.get('/:user([a-zA-Z]+-+[0-9a-fA-F]{6})', function(req, res) {
+	if (req.isAuthenticated()) {
+		res.render('index', { user: req.session.jUser, locale: req.getLocale(), url: req.params.user, reqType: 'user'});
+	} else {
+		res.render('login');
+	}
+});
+
 module.exports = router;

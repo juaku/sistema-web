@@ -15,7 +15,7 @@ block content
   //main#main
   main
     //section#post-list
-      p.post(ng-repeat="usuario in usuario")
+      p.post(ng-repeat="usuario in usuarios")
         span.amigo-firstName {{ usuario.firstName }} {{ usuario.following }}
         input(type='submit', value='Seguir' ng-click="followRelation(usuario)")
       input(type='submit', value='Followers' ng-click="getFollowers(1)")
@@ -93,9 +93,9 @@ block content
                   .post-detail
                     .post-title
                       span.author-name
-                        a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post.id)") {{ post.author.firstName }}
+                        a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post.id)")
+                      a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post)")
                         span.at-simbol @
                         span.event-name {{ post.event }}
                       //a.reportPost(href='' ng-click="report(post)")
@@ -130,11 +130,11 @@ block content
                 .event-people.promoted-event-people 1280 #{__('people')}
             .events-list
               .events-title.title #{__('Trends')}
-              .event(ng-repeat="event in events | limitTo: limit")
-                a.event-link(href='#' ng-click="getMediaByFilter('post', 'trend', event.id)")
+              .event(ng-repeat="trend in trends | limitTo: limit")
+                a.event-link(href='' ng-click="getMediaByFilter('post', 'trend', trend)")
                   span.at-simbol @
-                  span.event-name {{ event.name }}
-                .event-people {{ event.count }} #{__('people')}
+                  span.event-name {{ trend.name }}
+                .event-people {{ trend.count }} #{__('people')}
             .show-more
               a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
           footer 
@@ -151,3 +151,6 @@ block content
       #button-events.button
     .control.last
       #button-search.button
+  script(type='text/javascript').
+    var url = '#{url}'
+    var reqType = '#{reqType}'
