@@ -11,6 +11,7 @@ var jPack = require('../jPack');
  */
 
 router.get('/:filter/:i?', ensureAuthenticated, function(req, res) {
+	console.log('Ingreso a enrutador simple')
 	if(req.params.filter!=undefined) {
 		if(req.params.filter=='post') {
 			jPack.getAllPosts(req, function(result) {
@@ -50,6 +51,7 @@ router.get('/:filter/:i?', ensureAuthenticated, function(req, res) {
 });
 
 router.get('/:filter/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
+	console.log('Ingreso a enrutador avanzado')
 	if(req.params.filter!=undefined && req.params.action!=undefined) {
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
@@ -64,7 +66,7 @@ router.get('/:filter/:action/:id?/:i?', ensureAuthenticated, function(req, res) 
 		//EVENT
 		} else if (req.params.filter=='event') {
 			if(req.params.action=='suggested') {
-				jPack.getMediaSuggested(req, function(result) {
+				jUser.getSuggestedEvents('', req, function(result) {
 					res.json(result);
 				}, function(error) {
 					console.log(error);
@@ -91,6 +93,5 @@ router.get('/:filter/:action/:id?/:i?', ensureAuthenticated, function(req, res) 
 		}
 	}
 });
-
 
 module.exports = router;
