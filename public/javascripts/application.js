@@ -112,6 +112,8 @@ function Application($scope, $http) {
 						if(eventNameSimple == value[i].name) {
 							getTrends();
 							getEvents();
+							$scope.user.getFollowers();
+							$scope.user.getFollowing();
 							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
 							break;
 						}
@@ -139,6 +141,8 @@ function Application($scope, $http) {
 						if(colorHexLowerCase == commonNames[i].idKey) {
 							getTrends();
 							getEvents();
+							$scope.user.getFollowers();
+							$scope.user.getFollowing();
 							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
 							break;
 						}
@@ -148,10 +152,12 @@ function Application($scope, $http) {
 		}
 	} else {
 		getGeo(function() {
-			$http.post('/user/getGeo', $scope.user).success(function(data) {
+			$http.post('/user/setGeo', $scope.user).success(function(data) {
 				getPosts();
 				getTrends();
 				getEvents();
+				$scope.user.getFollowers();
+				$scope.user.getFollowing();
 			}).error();
 		}, function(errorMsg) {
 			console.log(errorMsg);
