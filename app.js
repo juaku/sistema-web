@@ -19,6 +19,11 @@ var nib = require('nib');
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
 
+// Concección con MongoDB
+var mongoose = require('mongoose');
+require('./models/user');
+mongoose.connect('mongodb://localhost:27017/test');
+
 //Sesion permanente
 var redisStore = require('connect-redis')(session);
 var utils = require('./utils');
@@ -62,19 +67,42 @@ passport.use(new FacebookStrategy({
 	clientID: FACEBOOK_APP_ID,
 	clientSecret: FACEBOOK_APP_SECRET,
 	callbackURL: 'http://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
+	passReqToCallback: true
 },
-function(accessToken, refreshToken, profile, done) {
+function(req, accessToken, refreshToken, profile, done) {
+    // TODO: Ver si sirve nextTick
     // verificación asíncrona, para el efecto de ... 
-    process.nextTick(function () {
+
+    /*process.nextTick(function () {
     	profile.accessToken = accessToken;
       // Para mantener el ejemplo sencillo, el perfil de Facebook del usuario se devuelve para
       // representar al usuario logueado. En una aplicación típica que quieras 
       // asociar la cuenta de Facebook con un registro de usuario en su base de datos,
       // y devolver ese usuario en su lugar.
       return done(null, profile);
-  });
-}
-));
+    });*/
+	
+	req.session.accessToken = accessToken;
+	
+	var User = mongoose.model('User');
+
+	User.findOne({providerId: profile.id}, function(err, user) {
+		if(err) throw(err);
+		if(!err && user!= null) return done(null, user);
+
+		var user = new User({
+			providerId: profile.id,
+			provider: profile.provider,
+			name: profile.displayName,
+			//photo: profile.photos[0].value
+		});
+		
+		user.save(function(err) {
+			if(err) throw err;
+			done(null, user);
+		});
+	});
+}));
 
 // TODO: Verificar si este bloque es necesario
 /*

@@ -16,13 +16,23 @@ softColor		= #AAA		= rgba(0, 0, 0, .35) // El texto no se ve claro en Chrome en 
 */
 
 backColor 	= #FFF
-layerColor	= #F3F3F5
+layerColor	= #000
 icoColor		=	rgba(0, 0, 0, .20)
-fontColor		= #333
+fontColor		= #000
 accentColor = #F05
 hardColor		= #555
 softColor		= #AAA
 fbColor			= #3b5998
+
+/*
+*/
+
+whiteColor	= #FFF
+lightColor	= #EEE
+midColor		= #888
+darkColor		= #111
+blackColor	= #000
+mainColor		= #F05
 
 /* 
  * Estilos generales
@@ -31,8 +41,8 @@ fbColor			= #3b5998
 body
 	//background-color: #EAEAEE // Cálido: #EEEEE7, Original: #DDE0EA
 	//background-color: #F3F3F5 // NEW MAC
-	//background-color: backColor
-	color: fontColor
+	background-color: lightColor
+	color: midColor
 	font-family: Arial, sans-serif
 	font-size: 14px
 	margin: 0
@@ -56,9 +66,12 @@ div // TODO: Evaluar elementos a los que se aplica
 	-webkit-tap-highlight-color: transparent
 
 #wrapper .event
-	font-size: 17px
-	color: accentColor
+	font-size: 24px
 	letter-spacing: -0.5px
+	color: blackColor
+
+#wrapper .post .event
+	color: whiteColor
 
 #wrapper .event .at-simbol
 	font-family: Verdana, Arial, sans-serif
@@ -80,23 +93,12 @@ div // TODO: Evaluar elementos a los que se aplica
  * Cabecera
  */
 header
-	background-color: backColor
+	background-color: whiteColor
 	width: 100%
 	padding: 10px 0
 	position: fixed
 	z-index: 10
 	top: 0
-
-header #title a
-	background-image: url('/images/juaku.svg?v=1005')
-	background-repeat: no-repeat
-	background-size: 120px 45px
-	width: 120px
-	height: 45px
-	display: block
-	margin: 0 auto
-
-header #title a h1
 	display: none
 
 /*
@@ -104,16 +106,17 @@ header #title a h1
  */
 main
 	width: 100%
-	top: 65px
+	top: 0
 	//bottom: 44px TODO: Evaluar si es necesario
-	bottom: 0px
-	position: absolute
+	//bottom: 0px
 	overflow: auto
 	overflow-x: hidden
-	-webkit-overflow-scrolling: touch
+	position: absolute
+	-webkit-overflow-scrolling: touch // Necesita position absolute
+	bottom: 0 // Necesario para scroll asistido
 
 main #wrapper
-	background-color: backColor
+	//background-colors: backColor
 	width: 100%
 	max-width: 940px
 	margin: 0 auto
@@ -125,73 +128,114 @@ section#view
 	vertical-align: top
 
 aside
-	width: 200px
-	padding: 10px
+	width: 340px
 
 aside#first
 	transition: width 500ms
+	text-align: right
+
+aside#first #fixed-controls
+	//position: fixed
+	width: 280px
+	padding: 240px 40px 20px 20px
 
 aside #options-side
 aside #events-side
-	width: inherit
-	display: inline-block
-	position: fixed
-	top: 65px // Android Web Browser
+	//width: inherit
+	//display: inline-block
+	//position: fixed
+	//top: 65px // Android Web Browser
 
 /*
  * Controles
  */
 section#options-side
 	text-align: right
+	width: 100%
 
-section#options-side .side-block
-	background-color: backColor
+/*section#options-side .side-block
+	background-color: backColor*/
 
 section#account-controls section#profile
-	width: 100px
-	height: 170px
-	text-align: left
-	display: inline-block
+	width: 100%
+	display: table
+	margin-bottom: 40px
 
 section#account-controls section#profile img
-	background-color: layerColor
-	width: 100px
-	height: 100px
+section#account-controls section#profile h2
+	display: table-cell
+	vertical-align: middle
+
+section#account-controls section#profile img
+	width: 80px
+	height: 80px
+	border-radius: 40px
+	background-color: whiteColor
 
 section#account-controls section#profile h2.profile-name
+	width: 100%
 	margin: 0
-	padding: 5px
-	font-size: 14px
-	line-height: 14px
+	padding: 5px 10px 0 0
+	font-size: 21px
+	line-height: 24px
 	overflow: hidden
 	text-overflow: ellipsis
 	font-weight: normal
+	letter-spacing: -0.5px
 
 section#account-controls section#profile h2.profile-name .profile-firstname
-	font-size: 13px
-	font-weight: bold
-
-section#account-controls section#profile h2.profile-name .profile-lastname
-	font-size: 12px
-	font-weight: normal
+	font-size: 24px
+	color: blackColor
 
 /*
  * Vista
  */
 
 section#view
-	background-color: layerColor
-	padding-bottom: 50px
-	max-width: 530px
-	height: 100%
-	position: relative // MAC X Scroll
-	z-index: 1 // MAC X Scroll
+	//background-color: layerColor
+	//max-width: 640px
+	height: 100% // Evaluar
+	position: relative // MAC OSX Scroll
+	z-index: 1 // MAC OSX Scroll
+	padding-right: 20px
+
+section#view #title
+	position: relative
+	background-color: whiteColor
+
+section#view #title img
+	width: 100%
+	display: block
+
+section#view #title a
+	// background-image: url('/images/juaku.svg?v=1005')
+	//background-repeat: no-repeat
+	//background-position: 50%
+	//background-size: 66.608px 90px
+	display: block
+	//margin: 0 auto
+	position: absolute
+	left: 50%
+	top: 50%
+	transform: translate(-50%,-50%)
+	cursor: default
+
+section#view #title a h1
+	display: none
+
+section#view #title a svg#logo
+	width: 66.608px
+	height: 90px 
+
+section#view #title a svg#logo #logo-icon
+	cursor: pointer
 
 section#view section#post-list .post
-	margin-bottom: 20px // NEWLOGO
+	margin-bottom: 64px // NEWLOGO
 
 section#view section#post-list .post div.media
 	position: relative // Muestra espacio de img
+	background-color: midColor
 
 section#view section#post-list .post div.media img
 	width: 100%
@@ -205,7 +249,7 @@ section#view section#post-list .post div.media img.media // Muestra espacio de i
 	transition: opacity 500ms linear
 	//transition: opacity 1000ms // TODO: Fantasmas en Android e IE
 	
-section#view section#post-list .post div.media img.media.show
+section#view section#post-list .post.show div.media img.media
 	opacity: 1
 
 section#view section#post-list .post div.media .preloader
@@ -227,9 +271,9 @@ section#view section#post-list .post div.media .preloader
 		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
 
 section#view section#post-list .post .bottom
-	background-color: backColor
+	background-color: blackColor
 	width: 100%
-	height: 30px
+	height: 80px
 	display: table
 	table-layout: fixed // Andorid
 
@@ -242,44 +286,56 @@ section#view section#post-list .post .bottom .info .info-wrapper
 	width: 100%
 	table-layout: fixed // Android
 
+section#view section#post-list .post .bottom .author-color-circle
+	width: 12px
+	height: 12px
+	border-radius: 6px
+	background-color: blackColor
+	display: inline-block
+	margin: 2px 4px
+
 section#view section#post-list .post .bottom .author-img
 section#view section#post-list .post .bottom .post-detail
 	vertical-align: top
 
 section#view section#post-list .post .bottom .author-img
 	display: table-cell
-	width: 55px // Android
+	width: 80px // Android
+	padding: 24px
 
 section#view section#post-list .post .bottom .author-img img
-	width: 55px
-	height: 55px
-	background-color: backColor //#EEE
+	width: 80px
+	height: 80px
 	display: block //En lugar de font-size: 0
+	border-radius: 40px
+	background-color: blackColor
+
+section#view section#post-list .post.show .bottom .author-img img
+	background-color: blackColor
 
 section#view section#post-list .post .bottom .post-detail
 	display: table
 	table-layout: fixed
 	width: 100%
-	padding: 12px 0 0 0
+	padding: 40px 0
 	letter-spacing: -0.5px
 
-section#view section#post-list .post .bottom .post-detail .post-title
+/*section#view section#post-list .post .bottom .post-detail .post-title
 section#view section#post-list .post .bottom .post-detail .sub-info
 	padding-left: 10px
-	padding-right: 5px
+	padding-right: 5px*/
 
 section#view section#post-list .post .bottom .post-detail .post-title
 	font-size: 18px
-	color: accentColor
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 	margin-top: -1px
+	color: whiteColor
 
 section#view section#post-list .post .bottom .post-detail .post-title .author-name
-	color: hardColor
-	font-size: 16px
-	font-weight: bold
+	font-size: 24px
+	//font-weight: bold
 	
 section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName
 	display: none
@@ -289,56 +345,63 @@ section#view section#post-list .post .bottom .post-detail .post-title .event-pos
 
 section#view section#post-list .post .bottom .post-detail .sub-info
 	font-size: 12px
-	color: softColor
-	margin-top: 1px
+	margin-top: 4px
+	font-family: Verdana, sans-serif
 
 section#view section#post-list .post .bottom .post-detail .sub-info .time
 	display: inline-block	
 
-main #wrapper .like object // Para que no se corte el texto
-	width: 55px
-	height: 55px
-
-main #wrapper .like
-	width: 55px // Firefox, Android Browser
+main #wrapper .like // Para que no se corte el texto
+	width: 96px // Firefox, Android Browser
+	/* height: 128px */
 	display: table-cell
-	vertical-align: bottom
+	vertical-align: middle
 
-main #wrapper .like object
-	display: block // En lugar de font-size: 0, para evitar el espacio debajo
+/*main #wrapper .like object
+	display: block // En lugar de font-size: 0, para evitar el espacio debajo*/
 	
-main #wrapper .like object .like-svg
-	width: 55px
-	height: 55px
+main #wrapper .like .like-point
+	width: 40px
+	height: 40px
 	cursor: pointer
+	background: blackColor
+	border-radius: 20px
+	margin: 0 auto
 
-main #wrapper .like object .like-svg #inner
+/*main #wrapper .like object .like-svg #inner
 	fill: icoColor
 	transition: fill 250ms
 
 main #wrapper .like.selected object .like-svg #inner
-	fill: accentColor
+	fill: accentColor*/
 
 /*
  * Eventos
  */
-aside section#events-controls
-	background-color: backColor
+/*aside section#events-controls
+	background-color: backColor*/
 
 aside section#events-controls .promoted
 aside section#events-controls .events-list
 aside section#events-controls .show-more
-	padding: 10px
+	margin: 10px
+
+aside section#events-controls .events-list.show-more
+	overflow: none
+	position: relative
+	overflow-y: scroll
+	overflow-x: hidden
 
 aside section#events-controls .title
 	font-size: 11px
 	color: softColor
+	//margin: 10px 0
 		
 aside section#events-controls .events-title
 	font-size: 14px
 
 aside section#events-controls .event
-	margin: 5px 0
+	padding: 8px 0
 
 aside section#events-controls .event .event-name.small
 	font-size: 14px
@@ -399,7 +462,6 @@ nav#view-menu #button-search
  * Pie
  */
 footer
-	color: softColor
 	margin: 10px 5px
 	font-size: 12px
 
@@ -533,7 +595,6 @@ section#new-post #suggested-events ul li.suggested-event
 
 body.config-view main #new-post
 body.config-view main #post-list
-body.config-view main #last
 	display: none
 body.config-view main #first
 	display: block
@@ -542,7 +603,6 @@ body.config-view main #first
 
 body.posts-view main #first
 body.posts-view main #new-post
-body.posts-view main #last
 	display: none
 body.posts-view main #post-list
 	display: block
@@ -550,7 +610,6 @@ body.posts-view main #post-list
 // .new-post-view
 
 body.new-post-view main #first
-body.new-post-view main #last
 body.new-post-view main #post-list
 	display: none
 body.new-post-view main #new-post
@@ -562,38 +621,91 @@ body.events-view main #first
 body.events-view main #new-post
 body.events-view main #post-list
 	display: none
-body.events-view main #last
-	display: block
+	
+/*body.events-view main #last
+	display: block*/
+	
+#svg-library
+	display: none
+
+/*
+ * Temas blanco y negro
+ *
+ */
+
+body
+body section#view #title
+body section#view section#post-list .post div.media
+body section#view section#post-list .post .bottom
+body main #wrapper .like .like-point
+body section#view section#post-list .post .bottom .author-img img
+body section#view section#post-list .post .bottom .author-color-circle
+body section#account-controls section#profile img
+	transition: background-color 200ms ease
+	
+body #wrapper .event
+body #wrapper .post .event
+body section#view section#post-list .post .bottom .post-detail .post-title
+body section#account-controls section#profile h2.profile-name .profile-firstname
+	transition: color 200ms ease
+
+/*
+*/
+
+body.dark
+	background-color: darkColor
+
+body.dark section#view #title
+	background-color: blackColor
+
+body.dark section#account-controls section#profile img
+body.dark main #wrapper .like .like-point
+body.dark section#view section#post-list .post .bottom
+body.dark section#view section#post-list .post .bottom .author-color-circle
+body.dark section#view section#post-list .post.show .bottom .author-img img
+body.dark section#view section#post-list .post .bottom .author-img img
+	background-color: whiteColor
+	
+body.dark section#view section#post-list .post .bottom .post-detail .post-title
+body.dark #wrapper .post .event
+	color: blackColor
+
+body.dark section#account-controls section#profile h2.profile-name .profile-firstname
+body.dark #wrapper .event
+	color: whiteColor
+
+body.dark section#view section#post-list .post div.media
+	background-color: midColor
 
 /*
  * Responsive
  */ 
 
-@media (max-width: 779px) 
+
+/*@media (max-width: 779px) 
 	main
 		min-width: 650px
 	aside#first
 		width: 110px
-
+*/
 @media (max-width: 669px) 
 	body
 		user-select: none // TODO: Pasar a un detector real de dispositivos
-		background-color: layerColor
+		//background-color: layerColor
 		
 	main
 		min-width: 290px
-		bottom: 44px
+		//bottom: 44px
 		
 	main #wrapper
-		background-color: layerColor
+		//background-color: layerColor
 		width: 100%
 		max-width: inherit
 	
 	aside
 		padding: 0
 
-	aside#first,
-	aside#last
+	aside#first
 		display: none
 	
 	aside#first
@@ -602,12 +714,10 @@ body.events-view main #last
 	section#options-side
 		text-align: left
 	
-	section#options-side .side-block
-		margin: 10px 0
+	/*section#options-side .side-block
+		margin: 10px 0*/
 		
 	aside#first section#profile
-		width: 100%
-		height: 100px
 		display: table
 	
 	aside#first section#profile img,
@@ -622,6 +732,7 @@ body.events-view main #last
 	
 	aside#first section#account-controls section#profile h2.profile-name .profile-firstname
 		font-size: 16px
+		color: blackColor
 	
 	aside#first section#account-controls section#profile h2.profile-name .profile-lastname
 		font-size: 14px
@@ -739,10 +850,30 @@ body.events-view main #last
 		
 	body.view-menu-hidden nav#view-menu
 		display: none
+		
+	/* Eventos */
+
+	section#events-controls
+		background: initial
+	
+	section#events-controls .event .event-people
+		margin: 0
+	
+	section#events-controls .promoted
+	section#events-controls .events-list
+		margin: 5px 0
+	
+	section#events-controls .promoted .title
+		margin: 5px 0
+	
+	section#events-controls .event
+		background: #FFF
+		margin-bottom: 1px
+		padding: 10px 0
 
 @media (max-width: 375px)
-	main
-		top: 44px
+	/*main
+		top: 44px*/
 	
 	header
 		padding: 4px 0 5px 0

@@ -9,10 +9,6 @@ block head
 
 block content
   header
-    #title
-      //a(href="/?ref=logo", target="_self")
-      a(href="/", target="_self")
-        h1 #{title}
   //main#main
   main
     //section#post-list
@@ -33,78 +29,109 @@ block content
     //button(ng-click='changeLanguage(data.singleSelect)') Cambiar idioma
     #wrapper
       aside#first
-        section#options-side
-          section#account-controls
-            section#profile.side-block
-              img(src=user.profilePicture)
-              h2.profile-name
-                span.profile-firstname #{user.firstName}
-                br
-                span.profile-lastname #{user.lastName}
-            section#user-relation.side-block.viewing-followers
-              #relation-tabs
-                #followers-tab.relation-tab(viewing='followers')
-                  .people-number {{ user.followers.length }}
-                  .follow-type Seguidores
-                #following-tab.relation-tab(viewing='following')
-                  .people-number {{ user.following.length }}
-                  .follow-type Siguiendo
-              #relation-views
-                ul#followers.relation-view
-                  li(ng-repeat="follower in user.followers")
-                    .user-picture
-                      img.picture(ng-src="{{ follower.picture }}")
-                    .user-info
-                      .user-firstName {{ follower.firstName}}
-                      .user-lastName {{ follower.lastName }}
-                      .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
-                    .user-relation.like(ng-click="likeClick(post)")
-                      object(ng-class="{selected: post.like}")
-                        svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-                          // fill="#DDD" 
-                          path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
+        section#fixed-controls
+          section#options-side
+            section#account-controls
+              section#profile.side-block
+                h2.profile-name
+                  span.profile-firstname #{user.name.givenName}
+                  br
+                  span.profile-lastname #{user.name.familyName}
+                img(src=user.profilePicture)
+              //section#user-relation.side-block.viewing-followers
+                #relation-tabs
+                  #followers-tab.relation-tab(viewing='followers')
+                    .people-number {{ user.followers.length }}
+                    .follow-type Seguidores
+                  #following-tab.relation-tab(viewing='following')
+                    .people-number {{ user.following.length }}
+                    .follow-type Siguiendo
+                #relation-views
+                  ul#followers.relation-view
+                    li(ng-repeat="follower in user.followers")
+                      .user-picture
+                        img.picture(ng-src="{{ follower.picture }}")
+                      .user-info
+                        .user-firstName {{ follower.firstName}}
+                        .user-lastName {{ follower.lastName }}
+                        .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
+                      .user-relation.like(ng-click="likeClick(post)")
+                        object(ng-class="{selected: post.like}")
+                          svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
+                            // fill="#DDD" 
+                            path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
 
-                ul#following.relation-view
-                  li(ng-repeat="followed in user.following")
-                    .user-picture
-                      img.picture(ng-src="{{ followed.picture }}")
-                    .user-info
-                      .user-firstName {{ followed.firstName }}
-                      .user-lastName {{ followed.lastName }}
-                      .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
-                    .user-relation.like(ng-click="likeClick(post)")
-                      object(ng-class="{selected: post.like}")
-                        svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-                          // fill="#DDD" 
-                          path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
-              //p.post(ng-repeat="usuario in usuarios")
-                span.amigo-firstName {{ usuario.firstName }} {{ usuario.following }}
-                input(type='submit', value='Seguir' ng-click="followRelation(usuario)")
-              //input(type='submit', value='Followers' ng-click="getFollowers(1)")
-              //input(type='submit', value='Following' ng-click="getFollowers(2)")
-              //a.mostrarPostDeSeguidos(href='' ng-click="getMediaByFilter('post', 'following')")
-              //  span.seguidos MostrarPostsDeLasPersonasQueSigues
-            //label(for='singleSelect')
-            //br
-            //select#singleSelect(name='singleSelect', ng-model='data.singleSelect')s
-            //  option(value='') ---Please select---
-            //  option(value='en') ingles
-            //  option(value='es') español
-            //br
-            //button(ng-click='changeLanguage(data.singleSelect)')
-            section#general-controls.side-block
-              .blocked-accounts.account-control
-                a.button(href="")
-                  span.bold 3
-                  span  #{__('Blocked accounts')}
-              .language-change.account-control
-                a.button(href="")
-                  span #{__('Language')}
-                  span.bold  Español
-            section#account-session.side-block
-              .logout.account-control
-                a.button(href="/logout") #{__('Logout')}
+                  ul#following.relation-view
+                    li(ng-repeat="followed in user.following")
+                      .user-picture
+                        img.picture(ng-src="{{ followed.picture }}")
+                      .user-info
+                        .user-firstName {{ followed.firstName }}
+                        .user-lastName {{ followed.lastName }}
+                        .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
+                      .user-relation.like(ng-click="likeClick(post)")
+                        object(ng-class="{selected: post.like}")
+                          svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
+                            // fill="#DDD" 
+                            path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
+                //p.post(ng-repeat="usuario in usuarios")
+                  span.amigo-firstName {{ usuario.firstName }} {{ usuario.following }}
+                  input(type='submit', value='Seguir' ng-click="followRelation(usuario)")
+                //input(type='submit', value='Followers' ng-click="getFollowers(1)")
+                //input(type='submit', value='Following' ng-click="getFollowers(2)")
+                //a.mostrarPostDeSeguidos(href='' ng-click="getMediaByFilter('post', 'following')")
+                //  span.seguidos MostrarPostsDeLasPersonasQueSigues
+              //label(for='singleSelect')
+              //br
+              //select#singleSelect(name='singleSelect', ng-model='data.singleSelect')s
+              //  option(value='') ---Please select---
+              //  option(value='en') ingles
+              //  option(value='es') español
+              //br
+              //button(ng-click='changeLanguage(data.singleSelect)')
+              //section#general-controls.side-block
+                .blocked-accounts.account-control
+                  a.button(href="")
+                    span.bold 3
+                    span  #{__('Blocked accounts')}
+                .language-change.account-control
+                  a.button(href="")
+                    span #{__('Language')}
+                    span.bold  Español
+              //section#account-session.side-block
+                .logout.account-control
+                  a.button(href="/logout") #{__('Logout')}
+          section#events-side
+            section#events-controls
+              // TODO: Moverlo a header
+              // .search-box
+              // input(type="text", placeholder="#{__('Search events')}") 
+              .promoted
+                .event.promoted-event
+                  span.at-simbol @
+                  span.event-name.promoted-event-name Aura
+                  //.event-people.promoted-event-people 1280 #{__('people')}
+                  .promoted-title.title #{__('Promoted')}
+              .events-list
+                //.events-title.title #{__('Trends')}
+                .event(ng-repeat="trend in trends | limitTo: limit")
+                  a.event-link(href='' ng-click="getMediaByFilter('post', 'trend', trend)")
+                    span.at-simbol @
+                    span.event-name {{ trend.name }}
+                  //.event-people {{ trend.count }} #{__('people')}
+              //.show-more
+                a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
+            footer 
+              nav Términos y condiciones | Prensa
+              #brand Juaku 2016
       section#view
+        #title
+          img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
+          //a(href="/?ref=logo", target="_self")
+          a(href="/", target="_self")
+            h1 #{title}
+            svg#logo
+              use#logo-icon(xlink:href='#logo-icon-svg')
         //input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
         //input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newPost.image = this.files[0]")
         input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
@@ -131,7 +158,6 @@ block content
           //  img(src="")
           #load-media-again
           #cancel-post
-          
         section#post-list
           .post(ng-repeat="post in posts" last-post-loaded)
             .media
@@ -146,6 +172,8 @@ block content
                   .post-detail
                     .post-title
                       span.author-name
+                        a.author-color-code(href='')
+                        a.author-color-circle(href='')
                         a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
                       a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post)")
@@ -165,34 +193,7 @@ block content
                       .time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
                       .time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
               .like(ng-click="likeClick(post)" ng-class="{ selected: post.like }")
-                object
-                  svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-                    // fill="#DDD" 
-                    path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
-      aside#last
-        section#events-side
-          section#events-controls
-            // TODO: Moverlo a header
-            // .search-box
-            // input(type="text", placeholder="#{__('Search events')}") 
-            .promoted
-              .promoted-title.title #{__('Promoted')}
-              .event.promoted-event
-                span.at-simbol @
-                span.event-name.promoted-event-name Aura
-                .event-people.promoted-event-people 1280 #{__('people')}
-            .events-list
-              .events-title.title #{__('Trends')}
-              .event(ng-repeat="trend in trends | limitTo: limit")
-                a.event-link(href='' ng-click="getMediaByFilter('post', 'trend', trend)")
-                  span.at-simbol @
-                  span.event-name {{ trend.name }}
-                .event-people {{ trend.count }} #{__('people')}
-            .show-more
-              a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
-          footer 
-            nav Términos y condiciones · Más
-            #brand Juaku © 2015
+                .like-point
   nav#view-menu
     .view-button.first
       #button-config.button
@@ -204,6 +205,9 @@ block content
       #button-events.button
     .view-button.last
       #button-search.button
+  svg#svg-library(xmlns='http://www.w3.org/2000/svg')
+    symbol#logo-icon-svg(viewBox='0 0 67 90')
+      polygon(fill='#FF0055' points='44.538,0 22.269,12.857 22.269,38.571 0,51.429 0,77.143 22.269,90 66.808,64.286 66.808,12.857')
   script(type='text/javascript').
     var url = '#{url}'
     var reqType = '#{reqType}'

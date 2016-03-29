@@ -128,6 +128,7 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
 			dest: "./public/images/profPic"+session.jUser.id+".png"
 		},function(err){
 			session.jUser.profilePicture = profilePic;
+			console.log(session.jUser.profilePicture);
 			next();
 		})
 	});
@@ -519,7 +520,7 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 					getFBInfo(i, fbUserId);
 				}
 				function getFBInfo(i, fbUserId) {
-					FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
 						followers[i] = {};
 						followers[i].firstName = profile.first_name;
 						followers[i].lastName = profile.last_name;
@@ -572,7 +573,7 @@ jPack.user.prototype.getFollowing = function(req, next, error) {
 					var date = userResult.get("date");
 					getFBInfo(i, fbUserId);
 					function getFBInfo(i, fbUserId) {
-						FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+						FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
 							following[i] = {};
 							following[i].firstName = profile.first_name;
 							following[i].lastName = profile.last_name;
@@ -612,7 +613,7 @@ jPack.user.prototype.getFriendsUsingApp = function(req, next, error) {
 	var friendsUsing = [];
 	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
 	Parse.User.become(this.parseSessionToken).then(function (user) {
-		FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: req.session.jUser.accessToken}, function(response) {
+		FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: req.session.accessToken}, function(response) {
 			if (response && !response.error) {
 				for(var i = 0; i<response.data.length; i++) {
 					if(response.data[i].installed == true && response.data[i].id != idProfile) {
@@ -690,7 +691,7 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 						getFBInfo(i, crip.deco(users[i].attributes.username));
 				}
 				function getFBInfo(i, fbUserId) {
-					FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
 						allUsers[i].firstName = profile.first_name;
 						allUsers[i].lastName = profile.last_name;
 						FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
@@ -894,7 +895,7 @@ function shareMediaOnFb(req, parseFileURL, error) {
 	FB.api('/' + albumId + '/photos','POST',
 		{
 			'url': parseFileURL,
-			'access_token': req.session.jUser.accessToken
+			'access_token': req.session.accessToken
 		},
 			function (response) {
 				if (response && !response.error) {
@@ -919,7 +920,7 @@ jPack.user.prototype.share = function(req, postFile, next, error) {
 	FB.api('/' + albumId + '/photos','POST',
 		{
 			'url': parseFileURL,
-			'access_token': req.session.jUser.accessToken
+			'access_token': req.session.accessToken
 		},
 			function (response) {
 				if (response && !response.error) {
@@ -1106,7 +1107,7 @@ jPack.getAllPosts = function(req, next, error) {
 							getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));
 						}
 						function getFBInfo(i, fbUserId, idKey) {
-							FB.api('/'+fbUserId+'/', {access_token: req.session.jUser.accessToken},  function(profile) {
+							FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
 								posts[i].author = {};
 								posts[i].author.idKey = idKey;
 								posts[i].author.firstName = profile.first_name;
@@ -1305,9 +1306,9 @@ jPack.getTrends = function(req, next, error) {
 			}
 			postQuery.include("event");
 			postQuery.select("event");
-			postQuery.lessThan("createdAt", currentDatetime);
-			postQuery.greaterThan("createdAt", limitDateTime);
-
+			// TODO: Corregir error 102 'Invalid field type for find'
+			//postQuery.lessThan("createdAt", currentDatetime);
+			//postQuery.greaterThan("createdAt", limitDateTime);
 			postQuery.find().then(function(results) {
 				console.log("results.length: " + results.length);
 				for (var i = 0; i < results.length; i++) {
@@ -1350,6 +1351,7 @@ jPack.getTrends = function(req, next, error) {
 					next(response);
 				});
 			}, function(e) {
+				console.log('2016');
 				error(e);
 			});
 		}, function(e) {

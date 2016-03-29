@@ -15,6 +15,34 @@
 $(document).ready(function() {
 	$('main').scrollLeft($('#first').width());
 
+	/*
+	 * Evitar que se ejecute clicks fuera del area del logotipo
+	 *
+	 */
+	 var clickInsideIcon = false;
+	$('#title a').on('click tapone', function(event){
+		if(!clickInsideIcon) {
+			event.preventDefault();
+			clickInsideIcon = false;
+		}
+	});
+
+	$('#title a #logo-icon').on('click tapone', function(event){
+		clickInsideIcon = true;
+		$('#title a').click();
+	});
+
+	/*
+	 * Cambiar de tema
+	 *
+	 */
+	$('#title img').on('tapone', function(event) {
+		console.log(event.target);
+		$('body').toggleClass('dark');
+	});
+
+	//
+
 	$('#view-menu .button').on('tapone', function() {
 		$('#view-menu .button').removeClass('selected');
 		$(this).addClass('selected');
@@ -25,7 +53,6 @@ $(document).ready(function() {
 				break;
 			case 1:
 				$('body').addClass('posts-view');
-				assistedScroll(-1);
 				break;
 			case 2:
 				$('body').addClass('new-post-view');
@@ -45,7 +72,8 @@ $(document).ready(function() {
 	});
 
 	$('.show-more').on('tapone', function() {
-		$('.events-list').css({'overflow':'scroll', 'position':'relative', 'height':'310px', 'overflow-y':'scroll', 'overflow-x':'hidden'});
+		// TODO: Evaluar
+		$('.events-list').addClass('show-more');
 	});
 
 	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
@@ -620,7 +648,7 @@ function Application($scope, $http) {
 		// Cargar eventos
 		$http.get('/list/trend').success(function(data) {
 			$scope.trends = data.trends;
-			$scope.limit = 7;
+			$scope.limit = 5;
 		});
 	}
 
@@ -653,7 +681,8 @@ angular.module('Juaku', [])
 				loadedImgs++;
 				if(!$(element).hasClass('blank')) {
 					$(element).parent().find('.preloader').remove();
-					$(element).addClass('show');
+					//$(element).addClass('show');
+					$(element).parents('.post').addClass('show');
 				}
 			});
 		}
@@ -672,23 +701,29 @@ function postsLoaded() {
 		$(this).parents().toggleClass('selected');
 	});
 
+	$('.post .bottom').off('tapone');
+	$('.post .bottom').on('tapone', function(event) {
+		console.log(event.target);
+		$('body').toggleClass('dark');
+	});
+
 	// Avanza a la siguiente foto haciendo click
 
 	// Parpadeo cuando se hace scroll hacia abajo
-	/*$('#post-list img.media').off('tapone');
-	$('#post-list img.media').on('tapone', function() {
-		assistedScroll();
-	});*/
+	$('#post-list .media img.media').off('tapone');
+	$('#post-list .media img.media').on('tapone', function() { 
+		assistedScroll(1, $(this).parents('.post'));
+	});
 }
 
-function assistedScroll(modifier) {
+function assistedScroll(modifier, refPost) {
 	modifier = modifier == undefined ? 1 : modifier;
-	var scrollIncrement = $('#post-list img.media:eq(1)').parents('.post').position().top;
-		var nextScroll = $('main').scrollTop() + ($('#post-list img.media:eq(1)').parents('.post').position().top * modifier);
-		var preciseNextScroll = nextScroll - (nextScroll % scrollIncrement);
-		$('main').animate({
-			scrollTop: preciseNextScroll
-		}, 100);
+	var refPostTop = $(refPost).next().position().top;
+	$('main').stop().animate({
+			'scrollTop': refPostTop
+		}, 200, 'swing', function () {
+			//window.location.hash = refPost; TODO: Actualizar hash
+	});
 }
 
 function reduceString(str) {
