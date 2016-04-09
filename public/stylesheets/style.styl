@@ -41,7 +41,6 @@ mainColor		= #F05
 body
 	//background-color: #EAEAEE // Cálido: #EEEEE7, Original: #DDE0EA
 	//background-color: #F3F3F5 // NEW MAC
-	background-color: lightColor
 	color: midColor
 	font-family: Arial, sans-serif
 	font-size: 14px
@@ -93,7 +92,6 @@ div // TODO: Evaluar elementos a los que se aplica
  * Cabecera
  */
 header
-	background-color: whiteColor
 	width: 100%
 	padding: 10px 0
 	position: fixed
@@ -118,7 +116,7 @@ main
 main #wrapper
 	//background-colors: backColor
 	width: 100%
-	max-width: 940px
+	max-width: 1240px
 	margin: 0 auto
 	display: table
 
@@ -127,8 +125,8 @@ section#view
 	display: table-cell
 	vertical-align: top
 
-aside
-	width: 340px
+/*aside
+	width: 340px*/
 
 aside#first
 	transition: width 500ms
@@ -138,6 +136,7 @@ aside#first #fixed-controls
 	//position: fixed
 	width: 280px
 	padding: 240px 40px 20px 20px
+	position: fixed
 
 aside #options-side
 aside #events-side
@@ -170,7 +169,6 @@ section#account-controls section#profile img
 	width: 80px
 	height: 80px
 	border-radius: 40px
-	background-color: whiteColor
 
 section#account-controls section#profile h2.profile-name
 	width: 100%
@@ -194,17 +192,20 @@ section#account-controls section#profile h2.profile-name .profile-firstname
 section#view
 	//background-color: layerColor
 	//max-width: 640px
+	width: 61.8%
 	height: 100% // Evaluar
 	position: relative // MAC OSX Scroll
 	z-index: 1 // MAC OSX Scroll
-	padding-right: 20px
+	// padding-right: 20px
 
 section#view #title
 	position: relative
-	background-color: whiteColor
+	width: 82vh
+	height: 82vh
+	max-width: 60vw
+	max-height: 60vw
 
 section#view #title img
-	width: 100%
 	display: block
 
 section#view #title a
@@ -231,11 +232,13 @@ section#view #title a svg#logo #logo-icon
 	cursor: pointer
 
 section#view section#post-list .post
-	margin-bottom: 64px // NEWLOGO
+	width: 82vh
+	max-width: 60vw
+	margin-bottom: 3vh
+	margin-right: 3vh
 
 section#view section#post-list .post div.media
 	position: relative // Muestra espacio de img
-	background-color: midColor
 
 section#view section#post-list .post div.media img
 	width: 100%
@@ -271,9 +274,8 @@ section#view section#post-list .post div.media .preloader
 		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
 
 section#view section#post-list .post .bottom
-	background-color: blackColor
 	width: 100%
-	height: 80px
+	height: 15vh
 	display: table
 	table-layout: fixed // Andorid
 
@@ -290,7 +292,6 @@ section#view section#post-list .post .bottom .author-color-circle
 	width: 12px
 	height: 12px
 	border-radius: 6px
-	background-color: blackColor
 	display: inline-block
 	margin: 2px 4px
 
@@ -300,24 +301,20 @@ section#view section#post-list .post .bottom .post-detail
 
 section#view section#post-list .post .bottom .author-img
 	display: table-cell
-	width: 80px // Android
-	padding: 24px
+	width: 10vh // Android
+	padding: 2.5vh
 
 section#view section#post-list .post .bottom .author-img img
-	width: 80px
-	height: 80px
+	width: 10vh
+	height: 10vh
 	display: block //En lugar de font-size: 0
-	border-radius: 40px
-	background-color: blackColor
-
-section#view section#post-list .post.show .bottom .author-img img
-	background-color: blackColor
+	border-radius: 10vh
 
 section#view section#post-list .post .bottom .post-detail
 	display: table
 	table-layout: fixed
 	width: 100%
-	padding: 40px 0
+	margin-top: 4vh
 	letter-spacing: -0.5px
 
 /*section#view section#post-list .post .bottom .post-detail .post-title
@@ -331,7 +328,7 @@ section#view section#post-list .post .bottom .post-detail .post-title
 	white-space: nowrap
 	text-overflow: ellipsis
 	margin-top: -1px
-	color: whiteColor
+	color: darkColor
 
 section#view section#post-list .post .bottom .post-detail .post-title .author-name
 	font-size: 24px
@@ -364,7 +361,7 @@ main #wrapper .like .like-point
 	width: 40px
 	height: 40px
 	cursor: pointer
-	background: blackColor
+	background: whiteColor
 	border-radius: 20px
 	margin: 0 auto
 
@@ -418,7 +415,6 @@ aside section#events-controls .show-more
  * Controles flotantes
  */
 nav#view-menu
-	background-color: backColor
 	transition: background-color 250ms linear
 	width: 100%
 	display: none
@@ -443,9 +439,6 @@ nav#view-menu .view-button .button
 	height: 44px
 	margin: 0 auto
 	cursor: pointer
-
-nav#view-menu .view-button .button.selected
-	background-color: layerColor
 
 nav#view-menu #button-options
 	background-position: 0px
@@ -493,7 +486,6 @@ section#new-post canvas#new-media-preview
 	display: block
 
 section#new-post #new-post-controls
-	background-color: backColor
 	width: 100%
 	height: 44px
 	display: table
@@ -552,7 +544,6 @@ section#new-post #new-post-controls #event-name-input input#new-event-name
 section#new-post #new-post-controls #share-new-post
 	width: 44px
 	height: 44px
-	background-color: layerColor
 
 section#new-post #new-post-controls #share-new-post .share
 	width: 24px
@@ -582,7 +573,6 @@ section#new-post #suggested-events ul
 	text-align: center
 	
 section#new-post #suggested-events ul li.suggested-event
-	background-color: rgba(255, 255, 255, 0.5)
 	margin: 1px 0
 	padding: 4px 10px
 	list-style: none
@@ -652,6 +642,35 @@ body section#account-controls section#profile h2.profile-name .profile-firstname
 /*
 */
 
+body
+	background-color: lightColor
+
+body section#view #title
+nav#view-menu .view-button .button.selected
+	background-color: whiteColor
+
+body section#account-controls section#profile img
+body main #wrapper .like .like-point
+body section#view section#post-list .post .bottom
+body section#view section#post-list .post .bottom .author-color-circle
+body section#view section#post-list .post.show .bottom .author-img img
+body section#view section#post-list .post .bottom .author-img img
+	background-color: whiteColor
+	
+body section#view section#post-list .post .bottom .post-detail .post-title
+body #wrapper .post .event
+	color: darkColor
+
+body section#account-controls section#profile h2.profile-name .profile-firstname
+body #wrapper .event
+	color: darkColor
+
+body section#view section#post-list .post div.media
+	background-color: midColor
+
+/*
+*/
+
 body.dark
 	background-color: darkColor
 
@@ -664,11 +683,11 @@ body.dark section#view section#post-list .post .bottom
 body.dark section#view section#post-list .post .bottom .author-color-circle
 body.dark section#view section#post-list .post.show .bottom .author-img img
 body.dark section#view section#post-list .post .bottom .author-img img
-	background-color: whiteColor
+	background-color: blackColor
 	
 body.dark section#view section#post-list .post .bottom .post-detail .post-title
 body.dark #wrapper .post .event
-	color: blackColor
+	color: whiteColor
 
 body.dark section#account-controls section#profile h2.profile-name .profile-firstname
 body.dark #wrapper .event
@@ -814,7 +833,6 @@ body.dark section#view section#post-list .post div.media
 		background: inherit
 	
 	section#account-controls .account-control
-		background-color: backColor
 		margin-bottom: 1px
 		text-align: center
 		
