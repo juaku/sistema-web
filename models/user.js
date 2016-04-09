@@ -2,32 +2,36 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-  name: String,
-  provider: String,
   providerId: {type: String, unique: true},
-  photo: String,
-  createdAt: {type: Date, default: Date.now},
-  blockedUsers : [{ type: Schema.Types.ObjectId, ref: 'User' }]
+  provider: String,
+  name: String,
+  familyName: String,
+  userName: String,
+  hexCode: String,
+  favUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  createdAt: {type: Date, default: Date.now}
 });
 
 var ActionSchema = new Schema({
   name: String,
   location: String,
-  photo: String,
-  createdAt: {type: Date, default: Date.now},
-  author : [{ type: Schema.Types.ObjectId, ref: 'User' }]
+  geo: { type: [Number], index: '2d'},
+  media: String,
+  active: Boolean,
+  author : [{ type: Schema.Types.ObjectId, ref: 'User' }],
+  createdAt: {type: Date, default: Date.now}
 });
 
 var TagSchema = new Schema({
   name: String,
-  eventName : String,
-  createdAt: {type: Date, default: Date.now},
-  actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }]
+  originalName : String,
+  actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
+  createdAt: {type: Date, default: Date.now}
 });
 
-
 UserSchema.methods.signUp = function signUp () {
-		
+
 }
 
 var User = mongoose.model('User', UserSchema);

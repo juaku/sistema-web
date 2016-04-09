@@ -24,6 +24,13 @@ var validate = require("validate.js")
 // Herramientas Geo - (Evaluar si es necesaria)
 //var geolib = require('geolib');
 
+// Concección con MongoDB
+var mongoose = require('mongoose');
+require('./models/user');
+mongoose.connect('mongodb://localhost:27017/test');
+var Tag = mongoose.model('Tag');
+var Action = mongoose.model('Action');
+
 var jPack = jPack || {};
 
 // Variable contador de publicaciones
@@ -255,8 +262,10 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
  * @return null
  */
 jPack.user.prototype.newPost = function(req, newPost, next, error) {
+
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
 	var flag = validate({post: newPost.eventName}, {post: {format: pattern}});
+
 	if(flag!=undefined) {
 		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
 		next();
@@ -265,7 +274,7 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 			console.log('J1');
 			var Event = Parse.Object.extend("Event");
 			var query = new Parse.Query(Event);
-			var eventNameSimple = newPost.eventName;
+			var simpleEventName = newPost.eventName;
 			var diacritics =[
 				/[\300-\306]/g, /[\340-\346]/g,  // A, a
 				/[\310-\313]/g, /[\350-\353]/g,  // E, e
@@ -277,15 +286,23 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 			];
 			var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
 			for (var i = 0; i < diacritics.length; i++) {
-				eventNameSimple = eventNameSimple.replace(diacritics[i],chars[i]);
+				simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
 			}
-			eventNameSimple = eventNameSimple.toLowerCase();
+			simpleEventName = simpleEventName.toLowerCase();
 
-			query.equalTo("name", eventNameSimple);
+			//query.equalTo("name", simpleEventName);
+			savePost(req, simpleEventName, newPost, user, function() {
+				console.log('J4');
+				next();
+			}, function(e) {
+				error(e);
+			});
+
+			/*query.equalTo("name", simpleEventName);
 			query.find().then(function(results) {
 				if(results.length > 0) {
 					console.log('J2');
-					savePost(req, eventNameSimple, newPost, user, results[0], function() {
+					savePost(req, simpleEventName, newPost, user, results[0], function() {
 						next();
 					}, function(e) {
 						error(e);
@@ -293,10 +310,10 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 				} else {
 					console.log('J3');
 					var event = new Event();
-					event.set('name', eventNameSimple);
+					event.set('name', simpleEventName);
 					event.set('eventName', newPost.eventName);
 					event.save().then(function(newEvent) {
-						savePost(req, eventNameSimple, newPost, user, newEvent, function() {
+						savePost(req, simpleEventName, newPost, user, newEvent, function() {
 							console.log('J4');
 							next();
 						}, function(e) {
@@ -308,7 +325,7 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 				}
 			}, function(e) {
 				error(e);
-			});
+			});*/
 		});
 	}
 }
@@ -826,10 +843,9 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
  * @par {string} data, {object} user, {object} event, {function} next, {function} error.
  * @return null
  */ 
-function savePost(req, eventNameSimple, data, user, event, next, error) {
+function savePost(req, simpleEventName, data, user, next, error) {
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
-
 	if( data.coords == undefined ) {
 		data.coords = {};
 		data.coords.latitude = -16.3989;
@@ -840,11 +856,14 @@ function savePost(req, eventNameSimple, data, user, event, next, error) {
 		error();
 		return;
 	}*/
-
 	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
+		console.log('mediaName + mediaExt:  ' + mediaName + '.' + mediaExt);
 		var base64data = imgBase64;
 		var namePhoto = mediaName;
-		var parseFile = new Parse.File(namePhoto+'.txt', {base64: base64data});
+		var coords = [];
+		coords[0] = data.coords.latitude;
+		coords[1] = data.coords.longitude;
+/*		var parseFile = new Parse.File(namePhoto+'.txt', {base64: base64data});
 		parseFile.save().then(function() {
 			// The file has been saved to Parse.
 			console.log('el archivo fue guardado en parse con éxito');
@@ -870,15 +889,43 @@ function savePost(req, eventNameSimple, data, user, event, next, error) {
 				}
 				postCount++;
 				if(postCount >= postUpdate) {
-					updateEventList();
-				}
-				next();
-			}, function(e) {
-				error(e);
+					updateEventList();*/
+		Tag.findOne({name: simpleEventName}, function(err, tag) {
+			var tagBool = tag;
+			if(err) throw(err);
+			console.log(coords);
+			var action = new Action({
+				name: data.eventName,
+				geo: coords,
+				media: mediaName + '.' + mediaExt,
+				active: true,
+				author: req.session.passport.user._id
 			});
-		}, function(error) {
+			action.save(function(err) {
+				if(err) throw err;
+				if(tagBool!= null) {
+					tagBool.actions.push(action._id);
+					console.log('Acción referenciada');
+					next();
+				} else {
+					var tag = new Tag({
+						name: simpleEventName,
+						originalName: data.eventName,
+						actions: action._id
+					});
+					tag.save(function (err) {
+						if (err) return handleError(err);
+						console.log('Tag guardado y acción referenciada');
+						next();
+					});
+				}
+/*				next();
+			}, function(e) {
+				 error(e);*/
+			});
+/*		}, function(error) {
 			console.log('error al guardar el archivo en parse');
-			// The file either could not be read, or could not be saved to Parse.
+			// The file either could not be read, or could not be saved to Parse.*/
 		});
 	}, function(e) {
 		error(e);
@@ -957,8 +1004,8 @@ jPack.user.prototype.changeLanguage = function(req, res, next, error) {
  */
 
 function updateEventList() {
-	var Post = Parse.Object.extend('Post');
-	var query = new Parse.Query(Post);
+	//var Post = Parse.Object.extend('Post');
+	//var query = new Parse.Query(Post);
 	var posts = [];
 	var events = [];
 }
@@ -1047,21 +1094,21 @@ jPack.getAllPosts = function(req, next, error) {
 
 	function countResults(tries, next, reCount, error) {
 		getQuery(function(query) {
-			query.count().then(function(count) {
-				if(count < resultsLimit * (queryNumber+1)) {
+			//query.count().then(function(count) {
+				if(query.length < resultsLimit * (queryNumber+1)) {
 					req.session.queryTimeLimit = req.session.queryTimeLimit + queryTimeLimitStep;
 					if (tries > 20) {
 						console.log('Tiempo Agotado'); // TODO: Manejo de errores.
-						next(count);
+						next(query.length);
 					} else {
 						reCount(++tries);
 					};
 				} else {
-					next(count);
+					next(query.length);
 				}
-			}, function(e) {
+			/*}, function(e) {
 				error(e);
-			});
+			});*/
 		}, function(e) {
 			error(e);
 		});
@@ -1071,23 +1118,25 @@ jPack.getAllPosts = function(req, next, error) {
 	function findQuery(count) {
 		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 			getQuery(function(query) {
-				var relation = user.relation('likes');
-				query.find().then(function(results) {
-					console.log('Find Results: ' + results.length);
-					if(results.length == 0) {
-						next(results);
+				//var relation = user.relation('likes');
+				/*query.find().then(function(results) {
+					console.log('Find Results: ' + results.length);*/
+					if(query.length == 0) {
+						next(query);
 					}
-					var c = results.length;
-					relation.query().find().then(function(list) {
+					var c = query.length; //results.length;
+					//relation.query().find().then(function(list) {
 						// list contiene los posts que el usuario actual likeo
-						for(var i in results) {
-							posts[i] = {};
-							posts[i].id = results[i].get('publicId');
-							posts[i].event = results[i].get('eventKey')// results[i].get('event').get('name');
-							posts[i].time = results[i].createdAt;
-							posts[i].file = results[i].get('file');
-							posts[i].media = posts[i].file.url(); //posts[i].file.url
-							if (list.length == 0) {
+						for(var i in query) {
+							posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
+							posts[i].id = query[i]._id; //results[i].get('publicId');
+							posts[i].fbId = query[i].author[0].providerId; //crip.deco(results[i].get('author').get('username'));
+							posts[i].event = query[i].name; //results[i].get('eventKey');
+							posts[i].time = query[i].createdAt; //results[i].createdAt;
+							//posts[i].file = results[i].get('file');
+							posts[i].media = query[i].media; //results[i].get('media'); //posts[i].file.url();
+							//posts[i].like = false;
+							/*if (list.length == 0) {
 								posts[i].like = false;
 							} else {
 								for(var j = 0; j<list.length; j++) {
@@ -1098,18 +1147,18 @@ jPack.getAllPosts = function(req, next, error) {
 										posts[i].like = false;
 									}
 								}
-							}
+							}*/
 							//
 							posts[i].location = {};
-							posts[i].location.latitude = results[i].get('location').latitude;
-							posts[i].location.longitude = results[i].get('location').longitude;
+							posts[i].location.latitude = query[i].geo.latitude; //results[i].get('location').latitude;
+							posts[i].location.longitude = query[i].geo.longitude; //results[i].get('location').longitude;
 							//
-							getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));
+							getFBInfo(i, posts[i].fbId); //getFBInfo(i, crip.deco(results[i].get('author').get('username'))); //getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));
 						}
-						function getFBInfo(i, fbUserId, idKey) {
+						function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)
 							FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
 								posts[i].author = {};
-								posts[i].author.idKey = idKey;
+								//posts[i].author.idKey = idKey;
 								posts[i].author.firstName = profile.first_name;
 								posts[i].author.lastName = profile.last_name;
 								FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
@@ -1125,12 +1174,12 @@ jPack.getAllPosts = function(req, next, error) {
 								next(response);
 							}
 						}
-					}, function(e) {
+					/*}, function(e) {
 						error(e);
 					});
 				}, function(e) {
 					error(e);
-				});
+				});*/
 			}, function(e) {
 				console.length('error');
 			});
@@ -1144,7 +1193,24 @@ jPack.getAllPosts = function(req, next, error) {
 	}
 
 	function getQuery(next, error) {
-		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+		var nowDate = new Date();
+		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
+		Action.find({
+			//'actions.createdAt': {$gt: queryDate}
+		})
+		.sort({createdAt: -1})
+		.populate({
+			path: 'author',
+			model: 'User',
+		})
+		.skip(resultsLimit * queryNumber)
+		.limit(resultsLimit)
+		//.select('actions')
+		.exec(function (err, action) {
+			if (err) return handleError(err);
+			next(action);
+		})
+		/*Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 			var nowDate = new Date();
 			var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
 			var relation = user.relation('blockedUsers');
@@ -1258,7 +1324,7 @@ jPack.getAllPosts = function(req, next, error) {
 			});
 		}, function(e) {
 			error(e);
-		});
+		});*/
 	}
 }
 

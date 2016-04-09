@@ -22,7 +22,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 // Concección con MongoDB
 var mongoose = require('mongoose');
 require('./models/user');
-mongoose.connect('mongodb://localhost:27017/test');
+//mongoose.connect('mongodb://localhost:27017/test');
 
 //Sesion permanente
 var redisStore = require('connect-redis')(session);
@@ -93,7 +93,9 @@ function(req, accessToken, refreshToken, profile, done) {
 		var user = new User({
 			providerId: profile.id,
 			provider: profile.provider,
-			name: profile.displayName,
+			name: profile.name.givenName,
+			familyName: profile.name.familyName,
+			userName: profile.name.givenName,
 			//photo: profile.photos[0].value
 		});
 		
