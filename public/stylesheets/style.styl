@@ -30,7 +30,7 @@ fbColor			= #3b5998
 whiteColor	= #FFF
 lightColor	= #EEE
 midColor		= #888
-darkColor		= #111
+darkColor		= #202020
 blackColor	= #000
 mainColor		= #F05
 
@@ -239,6 +239,7 @@ section#view section#post-list .post
 
 section#view section#post-list .post div.media
 	position: relative // Muestra espacio de img
+	cursor: pointer
 
 section#view section#post-list .post div.media img
 	width: 100%
@@ -431,6 +432,7 @@ nav#view-menu .view-button.first
 nav#view-menu .view-button.middle
 nav#view-menu .view-button.last
 	width: 44px
+	padding: 10px
 
 nav#view-menu .view-button .button
 	background-image: url('/images/sprite.svg')
@@ -439,6 +441,8 @@ nav#view-menu .view-button .button
 	height: 44px
 	margin: 0 auto
 	cursor: pointer
+	border-radius: 100%
+	background-color: rgba(255,255,255,0.5)
 
 nav#view-menu #button-options
 	background-position: 0px
@@ -854,12 +858,26 @@ body.dark section#view section#post-list .post div.media
 		position: inherit
 
 	section#view
+		width: 100%
 		display: block
 		margin: 0 auto
+		padding: 0
 	
-	section#view // NEWLOGO
-		padding: 0 
+	section#view #title
+    position: relative
+    width: 100%
+    height: inherit
+    max-width: inherit
+    max-height: inherit
 	
+	section#view #title img
+		width: 100%
+		
+	section#view section#post-list .post
+		width: 100%
+		max-width: inherit
+		margin-bottom: 5vh
+
 	nav#view-menu
 		display: table
 	

@@ -301,6 +301,7 @@ function Application($scope, $http) {
 				//$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
+				console.log($scope.posts[i].author);
 			}
 		}
 		createEmptyPosts(1);
@@ -495,7 +496,7 @@ function Application($scope, $http) {
 			reader.onload = function(event) {
 				var img = new Image();
 				img.onload = function() {
-					var nTam = 640;
+					var nTam = 880;
 					canvas.width = nTam;
 					canvas.height = nTam;
 					var nWidth = nTam;
@@ -718,7 +719,7 @@ function postsLoaded() {
 
 function assistedScroll(modifier, refPost) {
 	modifier = modifier == undefined ? 1 : modifier;
-	var refPostTop = $(refPost).next().position().top;
+	var refPostTop = parseInt($(refPost).next().position().top) + 2; // TODO: Arreglar correctamente
 	$('main').stop().animate({
 			'scrollTop': refPostTop
 		}, 200, 'swing', function () {

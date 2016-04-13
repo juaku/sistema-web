@@ -128,7 +128,7 @@ block content
         #title
           img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==')
           //a(href="/?ref=logo", target="_self")
-          a(href="/", target="_self")
+          a(target="_self" onclick="document.location = '/logout';") 
             h1 #{title}
             svg#logo
               use#logo-icon(xlink:href='#logo-icon-svg')
