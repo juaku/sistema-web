@@ -73,18 +73,18 @@ function(req, accessToken, refreshToken, profile, done) {
     // TODO: Ver si sirve nextTick
     // verificación asíncrona, para el efecto de ... 
 
-    /*process.nextTick(function () {
+    process.nextTick(function () {
     	profile.accessToken = accessToken;
       // Para mantener el ejemplo sencillo, el perfil de Facebook del usuario se devuelve para
       // representar al usuario logueado. En una aplicación típica que quieras 
       // asociar la cuenta de Facebook con un registro de usuario en su base de datos,
       // y devolver ese usuario en su lugar.
       return done(null, profile);
-    });*/
+    });
 	
-	req.session.accessToken = accessToken;
+	//req.session.accessToken = accessToken;
 	
-	var User = mongoose.model('User');
+	/*var User = mongoose.model('User');
 
 	User.findOne({providerId: profile.id}, function(err, user) {
 		if(err) throw(err);
@@ -103,7 +103,7 @@ function(req, accessToken, refreshToken, profile, done) {
 			if(err) throw err;
 			done(null, user);
 		});
-	});
+	});*/
 }));
 
 // TODO: Verificar si este bloque es necesario

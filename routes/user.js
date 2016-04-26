@@ -28,7 +28,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
 		if(req.params.action=='setGeo') {
-			jUser.setGenericData(req, function() {
+			jPack.setGenericData(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				res.status(400).end();

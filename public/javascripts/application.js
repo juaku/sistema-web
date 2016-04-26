@@ -138,8 +138,8 @@ function Application($scope, $http) {
 					for(var i=0; i<value.length; i++) {
 						console.log(eventNameSimple + ' ' + value[i].name);
 						if(eventNameSimple == value[i].name) {
-							getTrends();
-							getEvents();
+							//getTrends();
+							//getEvents();
 							$scope.user.getFollowers();
 							$scope.user.getFollowing();
 							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
@@ -167,8 +167,8 @@ function Application($scope, $http) {
 					}
 					for(var i=0; i<commonNames.length; i++) {
 						if(colorHexLowerCase == commonNames[i].idKey) {
-							getTrends();
-							getEvents();
+							//getTrends();
+							//getEvents();
 							$scope.user.getFollowers();
 							$scope.user.getFollowing();
 							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
@@ -182,8 +182,8 @@ function Application($scope, $http) {
 		getGeo(function() {
 			$http.post('/user/setGeo', $scope.user).success(function(data) {
 				getPosts();
-				getTrends();
-				getEvents();
+				//getTrends();
+				//getEvents();
 				$scope.user.getFollowers();
 				$scope.user.getFollowing();
 			}).error();
@@ -437,8 +437,8 @@ function Application($scope, $http) {
 		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
 	}
 
-	$scope.share = function(postFile) {
-		$scope.post = postFile;
+	$scope.share = function(post) {
+		$scope.post = post.media;
 		$http.post('/post/share', $scope.post).success(function(data) {
 		}).error();
 	}
@@ -577,19 +577,19 @@ function Application($scope, $http) {
 		$scope.posts = [];
 		//$scope.trends = [];
 		createEmptyPosts(5);
-
 		if(object == undefined) {
 			history.pushState( {}, null, '/personasQueSigues');
 			getPosts(filter, action);
 		} else if(object.author != undefined && action == 'author') {//cuando se hace click en un nombre
 			history.pushState( {}, null, '/' + object.author.firstName + '-' + object.author.idKey);
-			getPosts(filter, action, object.author.idKey);
+			getPosts(filter, action, object.author.firstName);
 		} else if(object.author == undefined && action == 'author') {//cuando se pide por url ex:http://juaku-dev.cloudapp.net:5000/Rodrigo#ff0055
 			history.pushState( {}, null, '/' + object.firstName + '-' + object.idKey);
 			getPosts(filter, action, object.idKey);
 		} else if (object.event != undefined && action == 'event') {
 			history.pushState( {}, null, '/@' + object.event);
-			getPosts(filter, action, object.id);
+			getPosts(filter, action, object.event);
+			//getPosts(filter, action, object.id);
 		} else if (action == 'trend') {
 			history.pushState( {}, null, '/@' + object.name);
 			getPosts(filter, action, object.id);

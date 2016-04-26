@@ -37,7 +37,7 @@ block content
                   span.profile-firstname #{user.name.givenName}
                   br
                   span.profile-lastname #{user.name.familyName}
-                img(src=user.profilePicture)
+                img(src=user.picture)
               //section#user-relation.side-block.viewing-followers
                 #relation-tabs
                   #followers-tab.relation-tab(viewing='followers')
@@ -183,7 +183,7 @@ block content
                         span.report ReportarPost
                       //a.reportPost(href='' ng-click="getReportCount(post)")
                         span.report getReportCount
-                      //a.shareOnFb(href='' ng-click="share(post.file)")
+                      //a.shareOnFb(href='' ng-click="share(post)")
                         span.share compartirEnfB
                       //.enviarUbicacion
                         a#enviar(href='' ng-click="askLocation(post.id)") #{__('Pedir ubicación')}

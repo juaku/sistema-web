@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var mongoose = require('mongoose');
 
 var ensureAuthenticated = require('./ensureAuth');
 
@@ -14,11 +15,15 @@ router.get('/:filter/:i?', ensureAuthenticated, function(req, res) {
 	console.log('Ingreso a enrutador simple')
 	if(req.params.filter!=undefined) {
 		if(req.params.filter=='post') {
-			jPack.getAllPosts(req, function(result) {
-				if(result.length == 0) {
+			/*jPack.getAllPosts(req, function(result) {
+				if(result.length == 0) {*/
+			var Action = mongoose.model('Action');
+			Action.getActions(req, function (actions) {
+				if(actions.length == 0) {
 					res.status(204).end();
 				} else {
-					res.json(result);
+					//res.json(result);
+					res.json(actions);
 				}
 			}, function(error) {
 				console.log(error);
@@ -57,12 +62,23 @@ router.get('/:filter/:action/:id?/:i?', ensureAuthenticated, function(req, res) 
 		var jUser = req.session.jUser;
 		//POST
 		if(req.params.filter=='post') {  //req.params.action puede ser: following, event, user, trend
-			jPack.getAllPosts(req, function(result) {
-				res.json(result);
-			}, function(error) {
-				console.log(error);
-				res.status(400).end();
-			});
+			if(req.params.action=='event') {
+				var Tag = mongoose.model('Tag');
+				Tag.getActionsByTag(req, function(actions) {
+					res.json(actions);
+				}, function(error) {
+					console.log(error);
+					res.status(400).end();
+				});
+			} else if(req.params.action=='author') {
+				var User = mongoose.model('User');
+				User.getActionsByAuthor(req, function(actions) {
+					res.json(actions);
+				}, function(error) {
+					console.log(error);
+					res.status(400).end();
+				});
+			}
 		//EVENT
 		} else if (req.params.filter=='event') {
 			if(req.params.action=='suggested') {

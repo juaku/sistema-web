@@ -9,6 +9,9 @@ var jPack = require('../jPack');
 // Conección con Parse
 var Parse = require('../parseConnect').Parse;
 
+//Conección con Mongodb
+var db = require('../mongodbConnect');
+
 var request = require('request');
 
 router.post('/:action', ensureAuthenticated, function(req, res) {
@@ -32,14 +35,21 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='new') {
-			jUser.newPost(req, req.body, function() {
-				res.status(201).end();
+			var Tag = db.model('Tag');
+			jPack.validateTagName(req.body, function(simpleEventName, mediaName, mediaExt) {
+				Tag.newAction(req, simpleEventName, mediaName, mediaExt, req.session.idMongoDb, function () {
+					res.status(201).end();
+				}, function(error) {
+					console.log(error);
+					res.status(400).end();
+				});
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		} else if (req.params.action=='share') {
-			jUser.share(req, req.body, function() {
+			var Action = db.model('Action');
+			Action.shareActionOnFb(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);

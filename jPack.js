@@ -25,11 +25,10 @@ var validate = require("validate.js")
 //var geolib = require('geolib');
 
 // Concección con MongoDB
-var mongoose = require('mongoose');
-require('./models/user');
-mongoose.connect('mongodb://localhost:27017/test');
-var Tag = mongoose.model('Tag');
-var Action = mongoose.model('Action');
+var db = require('./mongodbConnect');
+var Tag = db.model('Tag');
+var Action = db.model('Action');
+var User = db.model('User');
 
 var jPack = jPack || {};
 
@@ -67,8 +66,11 @@ jPack.user = function (user) {
 * @param {string} session, {function} next, {function} error  
 * @return null
 */
-jPack.user.prototype.signUp = function(session, next, error) {
-	var user = new Parse.User();
+jPack.signUp = function(req, next, error) {
+	/*var user = new Parse.User();
+	console.log('singn up //////////////////////////////////////////////////////////////////////////');
+	console.log(user);
+	console.log(user.getSessionToken());
 	user.set("username", crip.enco(this.id));
 	user.set("password", crip.enco(this.id));
 	var authData = {"facebook":{
@@ -94,7 +96,7 @@ jPack.user.prototype.signUp = function(session, next, error) {
 			console.log("Error: " + error.code + " " + error.message);
 			error();
 		}
-	});
+	});*/
 }
 
 /*
@@ -104,7 +106,7 @@ jPack.user.prototype.signUp = function(session, next, error) {
 * @param {session, next}   
 * @return null
 */
-jPack.user.prototype.getProfilePicture = function(session, next) {
+jPack.getProfilePicture = function(session, next) {
 	var profilePic;
 	var idProfile = session.passport.user.id;
 	FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
@@ -132,7 +134,7 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
 		}
 		getImg({
 			url: profilePic,
-			dest: "./public/images/profPic"+session.jUser.id+".png"
+			dest: "./public/images/profPic"+session.id+".png"
 		},function(err){
 			session.jUser.profilePicture = profilePic;
 			console.log(session.jUser.profilePicture);
@@ -147,7 +149,7 @@ jPack.user.prototype.getProfilePicture = function(session, next) {
  * @return null
  */
 jPack.user.prototype.getAttendance = function(next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Events = Parse.Object.extend("Events");
 		var query = new Parse.Query(Events);
 		query.equalTo("attendance", user);
@@ -158,7 +160,7 @@ jPack.user.prototype.getAttendance = function(next, error) {
 		});
 	}, function(e) {
 			error(e);
-	});
+	});*/
 }
 
 /*
@@ -167,7 +169,7 @@ jPack.user.prototype.getAttendance = function(next, error) {
  * @return null
  */
 jPack.user.prototype.createEvent = function(req, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var jEvent = new jPack.event ({
 			name : req.body.name,
 			place : req.body.place,
@@ -227,7 +229,7 @@ jPack.user.prototype.createEvent = function(req, next, error) {
 
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*
@@ -256,47 +258,49 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 	});
 }
 
+jPack.validateTagName = function(newAction, next, error) {
+	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
+	var flag = validate({post: newAction.eventName}, {post: {format: pattern}});
+
+	if(flag!=undefined) {
+		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
+		error();
+	} else {
+		var simpleEventName = simplifyName(newAction.eventName);
+		var mediaName = parseInt(Math.random(255,2)*10000);
+		var mediaExt = 'jpg';
+		if( newAction.coords == undefined ) {
+			newAction.coords = {};
+			newAction.coords.latitude = -16.3989;
+			newAction.coords.longitude = -71.535;
+		}
+		next(simpleEventName, mediaName, mediaExt);
+	}
+}
+
 /*
  * @descrip Inicia la secuencia de guradado de nuevo post
  * @param {object} newPost, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.newPost = function(req, newPost, next, error) {
+jPack.newPost = function(req, next, error) {
+	var newAction = req.body;
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
+	console.log('J1');
+	var Event = Parse.Object.extend("Event");
+	var query = new Parse.Query(Event);*/
 
-	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
-	var flag = validate({post: newPost.eventName}, {post: {format: pattern}});
-
-	if(flag!=undefined) {
-		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
+	Tag.newAction(req, simpleEventName, newAction, mediaName, mediaExt, req.session.passport.user._id, function (err, tag) {
 		next();
-	} else {
-		Parse.User.become(this.parseSessionToken).then(function (user) {
-			console.log('J1');
-			var Event = Parse.Object.extend("Event");
-			var query = new Parse.Query(Event);
-			var simpleEventName = newPost.eventName;
-			var diacritics =[
-				/[\300-\306]/g, /[\340-\346]/g,  // A, a
-				/[\310-\313]/g, /[\350-\353]/g,  // E, e
-				/[\314-\317]/g, /[\354-\357]/g,  // I, i
-				/[\322-\330]/g, /[\362-\370]/g,  // O, o
-				/[\331-\334]/g, /[\371-\374]/g,  // U, u
-				/[\321]/g, /[\361]/g, // N, n
-				/[\307]/g, /[\347]/g, // C, c
-			];
-			var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
-			for (var i = 0; i < diacritics.length; i++) {
-				simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
-			}
-			simpleEventName = simpleEventName.toLowerCase();
+	});
 
-			//query.equalTo("name", simpleEventName);
-			savePost(req, simpleEventName, newPost, user, function() {
-				console.log('J4');
-				next();
-			}, function(e) {
-				error(e);
-			});
+		//query.equalTo("name", simpleEventName);
+		/*savePost(req, simpleEventName, newAction, function() { //savePost(req, simpleEventName, newAction, user, function() {
+			console.log('J4');
+			next();
+		}, function(e) {
+			error(e);
+		});*/
 
 			/*query.equalTo("name", simpleEventName);
 			query.find().then(function(results) {
@@ -326,8 +330,25 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 			}, function(e) {
 				error(e);
 			});*/
-		});
+		//});
+}
+
+function simplifyName(eventName) {
+	var simpleEventName = eventName;
+	var diacritics =[
+		/[\300-\306]/g, /[\340-\346]/g,  // A, a
+		/[\310-\313]/g, /[\350-\353]/g,  // E, e
+		/[\314-\317]/g, /[\354-\357]/g,  // I, i
+		/[\322-\330]/g, /[\362-\370]/g,  // O, o
+		/[\331-\334]/g, /[\371-\374]/g,  // U, u
+		/[\321]/g, /[\361]/g, // N, n
+		/[\307]/g, /[\347]/g, // C, c
+	];
+	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+	for (var i = 0; i < diacritics.length; i++) {
+		simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
 	}
+	return simpleEventName.toLowerCase();
 }
 
 /*D
@@ -337,7 +358,7 @@ jPack.user.prototype.newPost = function(req, newPost, next, error) {
 */
 jPack.user.prototype.setLike = function(post, next, error) {
 	//console.log('J0 - ' + this.parseSessionToken);
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Post = Parse.Object.extend("Post");
 		var query = new Parse.Query(Post);
 		var relation = user.relation("likes");
@@ -352,7 +373,7 @@ jPack.user.prototype.setLike = function(post, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -361,7 +382,7 @@ jPack.user.prototype.setLike = function(post, next, error) {
  * @return null
 */
 jPack.user.prototype.setUnlike = function(post, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Post = Parse.Object.extend("Post");
 		var query = new Parse.Query(Post);
 		var relation = user.relation("likes");
@@ -377,7 +398,7 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 		next();
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -386,7 +407,7 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
  * @return null
 */
 jPack.user.prototype.report = function(post, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Post = Parse.Object.extend('Post');
 		var postQuery = new Parse.Query(Post);
 		postQuery.equalTo('publicId', post.id);
@@ -414,11 +435,11 @@ jPack.user.prototype.report = function(post, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 jPack.getReportCount = function(post, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var Post = Parse.Object.extend('Post');
 		var postQuery = new Parse.Query(Post);
 		postQuery.equalTo('publicId', post.id);
@@ -436,7 +457,7 @@ jPack.getReportCount = function(post, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -445,7 +466,7 @@ jPack.getReportCount = function(post, next, error) {
  * @return null
  */
 jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
 		var Follow = Parse.Object.extend("Follow");
 		follow = new Follow();
@@ -465,7 +486,7 @@ jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
 		}
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -474,7 +495,7 @@ jPack.user.prototype.setFollowRelation = function(userToFollow, next, error) {
  * @return null
  */
 jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
 		var Follow = Parse.Object.extend("Follow");
 		var queryUser = new Parse.Query(User);
@@ -507,7 +528,7 @@ jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
 		}
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -516,7 +537,7 @@ jPack.user.prototype.setUnFollowRelation = function(userToFollow, next, error) {
  * @return {array} followers
  */
 jPack.user.prototype.getFollowers = function(req, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var followers = [];
 		var followersItemCount = 0;
 		var Follow = Parse.Object.extend("Follow");
@@ -537,7 +558,7 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 					getFBInfo(i, fbUserId);
 				}
 				function getFBInfo(i, fbUserId) {
-					FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 						followers[i] = {};
 						followers[i].firstName = profile.first_name;
 						followers[i].lastName = profile.last_name;
@@ -563,7 +584,7 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -572,7 +593,7 @@ jPack.user.prototype.getFollowers = function(req, next, error) {
  * @return {array} following
  */
 jPack.user.prototype.getFollowing = function(req, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var following = [];
 		var followingItemCount = 0;
 		var Follow = Parse.Object.extend("Follow");
@@ -590,7 +611,7 @@ jPack.user.prototype.getFollowing = function(req, next, error) {
 					var date = userResult.get("date");
 					getFBInfo(i, fbUserId);
 					function getFBInfo(i, fbUserId) {
-						FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
+						FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 							following[i] = {};
 							following[i].firstName = profile.first_name;
 							following[i].lastName = profile.last_name;
@@ -617,7 +638,7 @@ jPack.user.prototype.getFollowing = function(req, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -626,11 +647,11 @@ jPack.user.prototype.getFollowing = function(req, next, error) {
  * @return {array} usingIds
  */
 jPack.user.prototype.getFriendsUsingApp = function(req, next, error) {
-	var idProfile = req.session.passport.user.id;
+	/*var idProfile = req.session.passport.user.id;
 	var friendsUsing = [];
 	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
 	Parse.User.become(this.parseSessionToken).then(function (user) {
-		FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: req.session.accessToken}, function(response) {
+		FB.api('/'+idProfile+'/friends',{fields: 'installed, name',  access_token: req.session.passport.user.accessToken}, function(response) {
 			if (response && !response.error) {
 				for(var i = 0; i<response.data.length; i++) {
 					if(response.data[i].installed == true && response.data[i].id != idProfile) {
@@ -681,7 +702,7 @@ jPack.user.prototype.getFriendsUsingApp = function(req, next, error) {
 		}
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -690,7 +711,7 @@ jPack.user.prototype.getFriendsUsingApp = function(req, next, error) {
  * @return {array} usingIds
  */
 jPack.user.prototype.getAllUsers = function(req, next, error) {
-	var idProfile = req.session.passport.user.id;
+	/*var idProfile = req.session.passport.user.id;
 	var allUsers = [];
 	var aux = 0; //variable que controla si ya asignó el atributo following a todos los usuarios
 	Parse.User.become(this.parseSessionToken).then(function (user) {
@@ -708,7 +729,7 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 						getFBInfo(i, crip.deco(users[i].attributes.username));
 				}
 				function getFBInfo(i, fbUserId) {
-					FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
+					FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 						allUsers[i].firstName = profile.first_name;
 						allUsers[i].lastName = profile.last_name;
 						FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
@@ -770,7 +791,7 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -779,7 +800,7 @@ jPack.user.prototype.getAllUsers = function(req, next, error) {
  * @return null
 */
 jPack.user.prototype.blockUser = function(userToBlock, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
+	/*Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
 		var queryUser = new Parse.Query(User);//TODO: cambiar User por Parse.User
 		var relation = user.relation("blockedUsers");
@@ -796,7 +817,7 @@ jPack.user.prototype.blockUser = function(userToBlock, next, error) {
 		}
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
@@ -805,7 +826,7 @@ jPack.user.prototype.blockUser = function(userToBlock, next, error) {
  * @return null
 */
 jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
-	console.log("unBlockUser!");
+	/*console.log("unBlockUser!");
 	Parse.User.become(this.parseSessionToken).then(function (user) {
 		var User = Parse.Object.extend("User");
 		var queryUser = new Parse.Query(User);//TODO: cambiar User por Parse.User
@@ -823,7 +844,7 @@ jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
 		}
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*
@@ -831,7 +852,7 @@ jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
  * @par {obj} data, {function} next, {function} error.
  * @return null
  */ 
-jPack.user.prototype.setGenericData = function(req, next, error) {
+jPack.setGenericData = function(req, next, error) {
 	// TODO: Evaluar
 	this.coords = req.body.data.coords;
 	req.session.jUser.coords = this.coords;
@@ -843,27 +864,28 @@ jPack.user.prototype.setGenericData = function(req, next, error) {
  * @par {string} data, {object} user, {object} event, {function} next, {function} error.
  * @return null
  */ 
-function savePost(req, simpleEventName, data, user, next, error) {
-	var mediaName = parseInt(Math.random(255,2)*10000);
+function savePost(req, simpleEventName, data, next, error) {
+	/*var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
 	if( data.coords == undefined ) {
 		data.coords = {};
 		data.coords.latitude = -16.3989;
 		data.coords.longitude = -71.535;
-	}
+	}*/
 	// TODO: Evaluar ¿qué hacer? si la integridad de la información de cliente no es la que se esperaba
 	/*if( data.coords == undefined ) {
 		error();
 		return;
 	}*/
-	saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
+	/*saveMedia(data.media, mediaName, mediaExt, function(imgBase64) {
 		console.log('mediaName + mediaExt:  ' + mediaName + '.' + mediaExt);
 		var base64data = imgBase64;
-		var namePhoto = mediaName;
-		var coords = [];
+		var namePhoto = mediaName;*/
+		/*var coords = [];
 		coords[0] = data.coords.latitude;
-		coords[1] = data.coords.longitude;
-/*		var parseFile = new Parse.File(namePhoto+'.txt', {base64: base64data});
+		coords[1] = data.coords.longitude;*/
+		//Parse
+		/*var parseFile = new Parse.File(namePhoto+'.txt', {base64: base64data});
 		parseFile.save().then(function() {
 			// The file has been saved to Parse.
 			console.log('el archivo fue guardado en parse con éxito');
@@ -890,8 +912,9 @@ function savePost(req, simpleEventName, data, user, next, error) {
 				postCount++;
 				if(postCount >= postUpdate) {
 					updateEventList();*/
-		Tag.findOne({name: simpleEventName}, function(err, tag) {
-			var tagBool = tag;
+		//Mongo
+		/*Tag.findOne({name: simpleEventName}, function(err, tag) {
+			var objectTag = tag;
 			if(err) throw(err);
 			console.log(coords);
 			var action = new Action({
@@ -899,13 +922,19 @@ function savePost(req, simpleEventName, data, user, next, error) {
 				geo: coords,
 				media: mediaName + '.' + mediaExt,
 				active: true,
-				author: req.session.passport.user._id
+				authorId: req.session.passport.user._id
 			});
 			action.save(function(err) {
 				if(err) throw err;
-				if(tagBool!= null) {
-					tagBool.actions.push(action._id);
-					console.log('Acción referenciada');
+				User.update({ _id: req.session.passport.user._id }, { $push: { actions: action._id }}, function (err, doc) {
+					if (err) return handleError(err);
+					console.log('accion referenciada a user');
+					console.log(doc);
+				});
+				if(objectTag!= null) {
+					objectTag.actions.push(action._id);
+					objectTag.save();
+					console.log('Acción referenciada a tag');
 					next();
 				} else {
 					var tag = new Tag({
@@ -918,18 +947,18 @@ function savePost(req, simpleEventName, data, user, next, error) {
 						console.log('Tag guardado y acción referenciada');
 						next();
 					});
-				}
+				}*/
 /*				next();
 			}, function(e) {
 				 error(e);*/
-			});
+			//});
 /*		}, function(error) {
 			console.log('error al guardar el archivo en parse');
 			// The file either could not be read, or could not be saved to Parse.*/
-		});
-	}, function(e) {
+		//});
+	/*}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*
@@ -937,12 +966,12 @@ function savePost(req, simpleEventName, data, user, next, error) {
  * @par {string} data, {object} postFile, {function} next, {function} error.
  * @return null
  */ 
-function shareMediaOnFb(req, parseFileURL, error) {
+function shareMediaOnFb(req, url, error) {
 	var albumId = '';
 	FB.api('/' + albumId + '/photos','POST',
 		{
-			'url': parseFileURL,
-			'access_token': req.session.accessToken
+			'url': url,
+			'access_token': req.session.passport.user.accessToken
 		},
 			function (response) {
 				if (response && !response.error) {
@@ -967,7 +996,7 @@ jPack.user.prototype.share = function(req, postFile, next, error) {
 	FB.api('/' + albumId + '/photos','POST',
 		{
 			'url': parseFileURL,
-			'access_token': req.session.accessToken
+			'access_token': req.session.passport.user.accessToken
 		},
 			function (response) {
 				if (response && !response.error) {
@@ -1032,7 +1061,7 @@ function saveMedia(data, name, ext, next, error) {
  * @return null
  */
 function updateEventAttendance(join, parseSessionToken, eventId, next, error) {
-	Parse.User.become(parseSessionToken).then(function (user) {
+	/*Parse.User.become(parseSessionToken).then(function (user) {
 		var Events = Parse.Object.extend("Events"); 
 		var query = new Parse.Query(Events);
 		query.equalTo("objectId", eventId);
@@ -1054,7 +1083,7 @@ function updateEventAttendance(join, parseSessionToken, eventId, next, error) {
 		});
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /* @descrip Método para obtener los 20 primeros posts de la BD con filtro como evento, autor, trend o sin filtro
@@ -1116,7 +1145,7 @@ jPack.getAllPosts = function(req, next, error) {
 	}
 
 	function findQuery(count) {
-		Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+		//Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 			getQuery(function(query) {
 				//var relation = user.relation('likes');
 				/*query.find().then(function(results) {
@@ -1128,13 +1157,23 @@ jPack.getAllPosts = function(req, next, error) {
 					//relation.query().find().then(function(list) {
 						// list contiene los posts que el usuario actual likeo
 						for(var i in query) {
+							//mongo
 							posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
-							posts[i].id = query[i]._id; //results[i].get('publicId');
-							posts[i].fbId = query[i].author[0].providerId; //crip.deco(results[i].get('author').get('username'));
-							posts[i].event = query[i].name; //results[i].get('eventKey');
-							posts[i].time = query[i].createdAt; //results[i].createdAt;
-							//posts[i].file = results[i].get('file');
-							posts[i].media = query[i].media; //results[i].get('media'); //posts[i].file.url();
+							posts[i].id = query[i]._id;
+							posts[i].fbId = '1400253030';//query[i].author[0].providerId;
+							posts[i].authorId = query[i].authorId;
+							posts[i].event = query[i].name;
+							posts[i].time = query[i].createdAt;
+							posts[i].media = query[i].media;
+							//parse
+							/*posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
+							posts[i].id = results[i].get('publicId');
+							posts[i].fbId = crip.deco(results[i].get('author').get('username'));
+							posts[i].event = results[i].get('eventKey');
+							posts[i].time = results[i].createdAt;
+							posts[i].file = results[i].get('file');
+							posts[i].media = results[i].get('media');
+							posts[i].timeTag = results[i].get('event').createdAt;	*/
 							//posts[i].like = false;
 							/*if (list.length == 0) {
 								posts[i].like = false;
@@ -1148,15 +1187,19 @@ jPack.getAllPosts = function(req, next, error) {
 									}
 								}
 							}*/
-							//
+							//mongo
 							posts[i].location = {};
-							posts[i].location.latitude = query[i].geo.latitude; //results[i].get('location').latitude;
-							posts[i].location.longitude = query[i].geo.longitude; //results[i].get('location').longitude;
-							//
-							getFBInfo(i, posts[i].fbId); //getFBInfo(i, crip.deco(results[i].get('author').get('username'))); //getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));
+							posts[i].location.latitude = query[i].geo[0];
+							posts[i].location.longitude = query[i].geo[1];
+							getFBInfo(i, posts[i].fbId);
+							//parse
+							/*posts[i].location = {};
+							posts[i].location.latitude = results[i].get('location').latitude;
+							posts[i].location.longitude = results[i].get('location').longitude;
+							getFBInfo(i, crip.deco(results[i].get('author').get('username'))); //getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));*/
 						}
 						function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)
-							FB.api('/'+fbUserId+'/', {access_token: req.session.accessToken},  function(profile) {
+							FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 								posts[i].author = {};
 								//posts[i].author.idKey = idKey;
 								posts[i].author.firstName = profile.first_name;
@@ -1183,9 +1226,9 @@ jPack.getAllPosts = function(req, next, error) {
 			}, function(e) {
 				console.length('error');
 			});
-		}, function(e) {
+		/*}, function(e) {
 			error(e);
-		});
+		});*/
 	}
 
 	function reCount(tries) {
@@ -1195,21 +1238,21 @@ jPack.getAllPosts = function(req, next, error) {
 	function getQuery(next, error) {
 		var nowDate = new Date();
 		var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
-		Action.find({
-			//'actions.createdAt': {$gt: queryDate}
-		})
-		.sort({createdAt: -1})
-		.populate({
-			path: 'author',
-			model: 'User',
-		})
-		.skip(resultsLimit * queryNumber)
-		.limit(resultsLimit)
-		//.select('actions')
-		.exec(function (err, action) {
-			if (err) return handleError(err);
-			next(action);
-		})
+		console.log(req.params);
+		if(req.params.action == undefined) {
+			Action.getActions(resultsLimit, queryNumber, function (err, actions) {
+				next(actions);
+			});
+		} else if(req.params.action == 'event') {
+			var tagName = simplifyName(req.params.id);
+			Tag.getActionsByTag(tagName, function (err, tag) {
+				next(tag.actions);
+			});
+		} else if(req.params.action == 'author') {
+			User.getActionsByAuthor(req.params.id, function (err, author) {
+				next(author.actions);
+			});
+		}
 		/*Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 			var nowDate = new Date();
 			var queryDate = new Date(nowDate - 1000 * 60 * 60 * req.session.queryTimeLimit);
@@ -1458,7 +1501,8 @@ jPack.getTrends = function(req, next, error) {
  * @return null
  */
 jPack.getAllEvents = function(req, next, error) {
-	Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
+	console.log('getAllEvents');
+	/*Parse.User.become(req.session.jUser.parseSessionToken).then(function (user) {
 		var events = [];
 		var Event = Parse.Object.extend('Event');
 		var eventQuery = new Parse.Query(Event);
@@ -1477,7 +1521,7 @@ jPack.getAllEvents = function(req, next, error) {
 
 	}, function(e) {
 		error(e);
-	});
+	});*/
 }
 
 /*D
