@@ -127,103 +127,110 @@ function Application($scope, $http) {
 
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
-
+//TODO: Pasar esto a servidor
 	if(url != '') {
-		if(reqType == 'event'){
+		if(reqType == 'tag'){
+			initialize();
 			var res = url.split('@');
-			var eventNameSimple = res[1].toLowerCase();
-
-			$.getJSON('http://juaku-dev.cloudapp.net:5000/list/event', function(data){
-				$.each(data, function(key, value){
-					for(var i=0; i<value.length; i++) {
-						console.log(eventNameSimple + ' ' + value[i].name);
-						if(eventNameSimple == value[i].name) {
+			var simpleEventName = res[1].toLowerCase();
+			//$.getJSON('http://juaku-dev.cloudapp.net:5000/list/event', function(data){
+				//$.each(data, function(key, value){
+					//for(var i=0; i<value.length; i++) {
+						//console.log(eventNameSimple + ' ' + value[i].name);
+						//if(eventNameSimple == value[i].name) {
 							//getTrends();
 							//getEvents();
-							$scope.user.getFollowers();
-							$scope.user.getFollowing();
-							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
-							break;
-						}
-					}
-				});
-			});
-		} else if(reqType == 'user') {
+							//$scope.user.getFollowers();
+							//$scope.user.getFollowing();
+							history.pushState( {}, null, '/@' + simpleEventName);
+							getPosts(reqType, res[1]);
+							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
+							//break;
+						//}
+					//}
+				//});
+			//});
+		} else if(reqType == 'author') {
 			//var res = location.hash.split('#');
+			initialize();
 			var res = url.split('-');
 			var firstName = res[0].toLowerCase();
 			var colorHexLowerCase = res[1].toLowerCase();
-			var commonNames = [];
-			var countCommonNames = 0;
+			//var commonNames = [];
+			//var countCommonNames = 0;
 
-			$.getJSON('http://juaku-dev.cloudapp.net:5000/user/getAllUsers', function(data){
-				$.each(data, function(key, value){
-					for(var i=0; i<value.length; i++) {
+			//$.getJSON('http://juaku-dev.cloudapp.net:5000/user/getAllUsers', function(data){
+				//$.each(data, function(key, value){
+					/*for(var i=0; i<value.length; i++) {
 						if(firstName == value[i].firstName.toLowerCase()) {
 							commonNames[countCommonNames] = value[i];
 							countCommonNames++;
 							break;
 						}
-					}
-					for(var i=0; i<commonNames.length; i++) {
-						if(colorHexLowerCase == commonNames[i].idKey) {
+					}*/
+					//for(var i=0; i<commonNames.length; i++) {
+						//if(colorHexLowerCase == commonNames[i].idKey) {
 							//getTrends();
 							//getEvents();
-							$scope.user.getFollowers();
-							$scope.user.getFollowing();
-							angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
-							break;
-						}
-					}
-				});
-			});
+							//$scope.user.getFollowers();
+							//$scope.user.getFollowing();
+							history.pushState( {}, null, '/' + firstName + '-' + colorHexLowerCase);
+							getPosts(reqType, res[0]);
+							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
+							//break;
+						//}
+					//}
+				//});
+			//});
 		}
 	} else {
+		initialize();
 		getGeo(function() {
 			$http.post('/user/setGeo', $scope.user).success(function(data) {
-				getPosts();
+				getPosts('actions');
 				//getTrends();
 				//getEvents();
-				$scope.user.getFollowers();
-				$scope.user.getFollowing();
+				//$scope.user.getFollowers();
+				//$scope.user.getFollowing();
 			}).error();
 		}, function(errorMsg) {
 			console.log(errorMsg);
 		});
 	}
 
-	var idAux;
-	var filterAux;
-	var actionAux;
-	var gettingPosts = false;
-	var firstPostsLoad = true;
-	var postQueryCount = 0;
-	var postLoadStep = 10;
-	var postShown = 0;
-	var tmpLoadingPostsNumber;
-	var tmpPosts = [];
-	var getPostTries = 0;
-	var getPostTriesLimit = 20;
-	$scope.posts = [];
-	$scope.trends = [];
-	$scope.events = [];
+	var idAux, filterAux, actionAux, gettingPosts = false, firstPostsLoad = true, postQueryCount = 0, postLoadStep = 10, postShown = 0, tmpLoadingPostsNumber, tmpPosts = [], getPostTries = 0, getPostTriesLimit = 20;
+
+	function initialize() {
+		gettingPosts = false;
+		firstPostsLoad = true;
+		postQueryCount = 0;
+		postLoadStep = 10;
+		postShown = 0;
+		tmpLoadingPostsNumber;
+		tmpPosts = [];
+		getPostTries = 0;
+		getPostTriesLimit = 20;
+		$scope.posts = [];
+		$scope.trends = [];
+		$scope.events = [];
+	}
 
 	createEmptyPosts(5);
 	//askForPost();
 
 	$('main').scroll(function() {
 		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
-			askForPost(filterAux, actionAux, idAux);
+			askForPost(actionAux, idAux);
 		}
 	});
 	
-	function askForPost(filter, action, id) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-		getPosts(filter, action, id);
+	function askForPost(action, id) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+		getPosts(action, id);
 	}
 
 	// Cargar los post originales
-	function getPosts(filter, action, id) {
-		filterAux = filter;
+	function getPosts(action, id) {
+		//filterAux = filter;
 		actionAux = action;
 		idAux = id;
 		if(!gettingPosts) {
@@ -231,7 +238,7 @@ function Application($scope, $http) {
 			var tmpPostsNumber = tmpPosts.length;
 			//
 			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
-				postsQuery(filter, action, id, function(data) {
+				postsQuery(action, id, function(data) {
 					if(data!=undefined) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
@@ -250,8 +257,9 @@ function Application($scope, $http) {
 		}
 	}
 
-	function postsQuery(filter, action, id, next, error) {
-		if(id == undefined && filter == undefined && action == undefined) {
+	function postsQuery(action, id, next, error) {
+		/*if(id == undefined && action == undefined) {
+			console.log('iffffffffff');
 			$http.get('/list/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 				if(status == 204) {
 					clearInterval(getPostsInterval);
@@ -267,8 +275,8 @@ function Application($scope, $http) {
 				console.log('error!!');
 				//error(e);
 			});
-		} else {
-			$http.get('/list/' + filter + '/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+		} else {*/
+			$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 				if(status == 204) {
 					clearInterval(getPostsInterval);
 				} else {
@@ -283,7 +291,7 @@ function Application($scope, $http) {
 				console.log('error!!');
 				//error(e);
 			});
-		}
+		//}
 	}
 
 	function showPosts() {
@@ -301,7 +309,7 @@ function Application($scope, $http) {
 				//$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
-				console.log($scope.posts[i].author);
+				//console.log($scope.posts[i].author);
 			}
 		}
 		createEmptyPosts(1);
@@ -320,13 +328,14 @@ function Application($scope, $http) {
 	}
 
 	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
-	$http.get('/user/getAllUsers').success(function(data) {
+	/*$http.get('/user/getAllUsers').success(function(data) {
 		//$scope.user.fbFriends = data;
 		$scope.usuarios = data;
-	});
+	});*/
 
+//TODO: borrar, ya no se usa
 	// Obtiene a las personas que te siguen o que sigues
-	$scope.user.getFollowers = function(type) {
+	/*$scope.user.getFollowers = function(type) {
 		$http.get('/list/user/followers/0', $scope.user).success(function(data) {
 			$scope.user.followers = data;
 		}).error();
@@ -335,9 +344,9 @@ function Application($scope, $http) {
 		$http.get('/list/user/following/0', $scope.user).success(function(data) {
 			$scope.user.following = data;
 		}).error();
-	}
+	}*/
 
-	$scope.askForSuggestedEvents = function(query) {
+	/*$scope.askForSuggestedEvents = function(query) {
 		getSuggestedEvents(query);
 	}
 
@@ -353,10 +362,11 @@ function Application($scope, $http) {
 		}).error(function(e) {
 			console.log('Error al obtener suggestedEvents');
 		});
-	};
+	};*/
 
+//TODO: borrar, ya no se usa
 	// Envía un objeto con los datos de la persona que deseas seguir o dejar de seguir mediante un post 
-	$scope.followRelation = function(userToFollow) {
+	/*$scope.followRelation = function(userToFollow) {
 		$scope.user.userToFollow = userToFollow;
 		if (!$scope.user.userToFollow.following) {
 			$scope.user.userToFollow.following = true;
@@ -374,7 +384,7 @@ function Application($scope, $http) {
 	$scope.addListToFollow = function(userToFollow) {
 		peopleToFollow[peopleToFollow.length] = userToFollow;
 		console.log(userToFollow);
-	}
+	}*/
 
 	//Asigna like a la foto que se indicó
 	$scope.likeClick = function(post) {
@@ -555,44 +565,24 @@ function Application($scope, $http) {
 		});
 	}
 
-	$scope.showMoreEvents = function(oldLimit) {
+	/*$scope.showMoreEvents = function(oldLimit) {
 		$scope.limit = oldLimit;
 		if($scope.limit <= $scope.trends.length)
 			$scope.limit = $scope.limit+3;
 		else
 			console.log("No hay más eventos en tu ciudad");
-	}
+	}*/
 
-	$scope.getMediaByFilter = function(filter, action, object) {
+	$scope.getMediaByFilter = function(action, object) {
+		initialize();
 		loadedImgs = 0;
-		gettingPosts = false;
-		firstPostsLoad = true;
-		postQueryCount = 0;
-		postLoadStep = 10;
-		postShown = 0;
-		tmpLoadingPostsNumber;
-		tmpPosts = [];
-		getPostTries = 0;
-		getPostTriesLimit = 20;
-		$scope.posts = [];
-		//$scope.trends = [];
 		createEmptyPosts(5);
-		if(object == undefined) {
-			history.pushState( {}, null, '/personasQueSigues');
-			getPosts(filter, action);
-		} else if(object.author != undefined && action == 'author') {//cuando se hace click en un nombre
+		if(object.author != undefined && action == 'author') {
 			history.pushState( {}, null, '/' + object.author.firstName + '-' + object.author.idKey);
-			getPosts(filter, action, object.author.firstName);
-		} else if(object.author == undefined && action == 'author') {//cuando se pide por url ex:http://juaku-dev.cloudapp.net:5000/Rodrigo#ff0055
-			history.pushState( {}, null, '/' + object.firstName + '-' + object.idKey);
-			getPosts(filter, action, object.idKey);
-		} else if (object.event != undefined && action == 'event') {
+			getPosts(action, object.author.firstName);
+		} else if (object.event != undefined && action == 'tag') {
 			history.pushState( {}, null, '/@' + object.event);
-			getPosts(filter, action, object.event);
-			//getPosts(filter, action, object.id);
-		} else if (action == 'trend') {
-			history.pushState( {}, null, '/@' + object.name);
-			getPosts(filter, action, object.id);
+			getPosts(action, object.event);
 		}
 	}
 
@@ -640,13 +630,13 @@ function Application($scope, $http) {
 		}
 	}
 
-	function getTrends () {
+	/*function getTrends () {
 		// TODO: Evaluar remoción
 		/*
 		 * Events
 		 */
 
-		// Cargar eventos
+	/*	// Cargar eventos
 		$http.get('/list/trend').success(function(data) {
 			$scope.trends = data.trends;
 			$scope.limit = 5;
@@ -657,7 +647,7 @@ function Application($scope, $http) {
 		$http.get('/list/event').success(function(data) {
 			$scope.events = data.events;
 		});
-	}
+	}*/
 
 } // Fin Controlador - function Application($scope, $http)
 // Directivas

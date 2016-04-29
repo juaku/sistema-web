@@ -13,17 +13,17 @@ router.get('/', function(req, res) {
 	}
 });
 
-router.get('/:event(@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+)', function(req, res) {
+router.get('/:tag(@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+)', function(req, res) {
 	if (req.isAuthenticated()) {
-		res.render('index', { user: req.session.jUser, locale: req.getLocale(), url: req.params.event, reqType: 'event'});
+		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.tag, reqType: 'tag'});
 	} else {
 		res.render('login');
 	}
 });
 
-router.get('/:user([a-zA-Z]+-+[0-9a-fA-F]{6})', function(req, res) {
+router.get('/:author([a-zA-Z]+-+[0-9a-fA-F]{3})', function(req, res) {
 	if (req.isAuthenticated()) {
-		res.render('index', { user: req.session.jUser, locale: req.getLocale(), url: req.params.user, reqType: 'user'});
+		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.author, reqType: 'author'});
 	} else {
 		res.render('login');
 	}

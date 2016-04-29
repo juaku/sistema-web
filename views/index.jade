@@ -115,7 +115,7 @@ block content
               .events-list
                 //.events-title.title #{__('Trends')}
                 .event(ng-repeat="trend in trends | limitTo: limit")
-                  a.event-link(href='' ng-click="getMediaByFilter('post', 'trend', trend)")
+                  a.event-link(href='' ng-click="getMediaByFilter('trend', trend)")
                     span.at-simbol @
                     span.event-name {{ trend.name }}
                   //.event-people {{ trend.count }} #{__('people')}
@@ -174,9 +174,9 @@ block content
                       span.author-name
                         a.author-color-code(href='')
                         a.author-color-circle(href='')
-                        a.author-firstName(href='' ng-click="getMediaByFilter('post', 'author', post)") {{ post.author.firstName }}
+                        a.author-firstName(href='' ng-click="getMediaByFilter('author', post)") {{ post.author.firstName }}
                         span.author-lastName  {{ post.author.lastName }}
-                      a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('post', 'event', post)")
+                      a.event-posted.event(href='' ng-if="post.event" ng-click="getMediaByFilter('tag', post)")
                         span.at-simbol @
                         span.event-name {{ post.event }}
                       //a.reportPost(href='' ng-click="report(post)")

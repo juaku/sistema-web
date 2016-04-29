@@ -121,22 +121,27 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
   .populate('actions')
   .exec(function (err, author) {
     if (err) return handleError(err);
-    if(author.actions.length == 0) {
-      callback(author.actions);
-    }
-    countActions = author.actions.length; //results.length;
-    for(var i in author.actions) {
-      posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
-      posts[i].id = author.actions[i]._id;
-      posts[i].fbId = author.providerId;
-      posts[i].authorId = author.actions[i].authorId;
-      posts[i].event = author.actions[i].name;
-      posts[i].time = author.actions[i].createdAt;
-      posts[i].media = author.actions[i].media;
-      posts[i].location = {};
-      posts[i].location.latitude = author.actions[i].geo[0];
-      posts[i].location.longitude = author.actions[i].geo[1];
-      getFBInfo(i, posts[i].fbId);
+    if(author != null) {
+      if(author.actions.length == 0) {
+        callback(author.actions);
+      }
+      countActions = author.actions.length; //results.length;
+      for(var i in author.actions) {
+        posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
+        posts[i].id = author.actions[i]._id;
+        posts[i].fbId = author.providerId;
+        posts[i].authorId = author.actions[i].authorId;
+        posts[i].event = author.actions[i].name;
+        posts[i].time = author.actions[i].createdAt;
+        posts[i].media = author.actions[i].media;
+        posts[i].location = {};
+        posts[i].location.latitude = author.actions[i].geo[0];
+        posts[i].location.longitude = author.actions[i].geo[1];
+        getFBInfo(i, posts[i].fbId);
+      }
+    } else {
+      console.log('NO EXISTE tal autor');
+      error();
     }
   })
   function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)

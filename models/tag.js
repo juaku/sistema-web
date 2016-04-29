@@ -62,21 +62,26 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	.populate('actions')
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
-		if(tag.actions.length == 0) {
-			callback(tag.actions);
-		}
-		countActions = tag.actions.length; //results.length;
-		for(var i in tag.actions) {
-			posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
-			posts[i].id = tag.actions[i]._id;
-			getProviderId(tag.actions[i].authorId, i);
-			posts[i].authorId = tag.actions[i].authorId;
-			posts[i].event = tag.actions[i].name;
-			posts[i].time = tag.actions[i].createdAt;
-			posts[i].media = tag.actions[i].media;
-			posts[i].location = {};
-			posts[i].location.latitude = tag.actions[i].geo[0];
-			posts[i].location.longitude = tag.actions[i].geo[1];
+		if(tag != null) {
+			if(tag.actions.length == 0) {
+				callback(tag.actions);
+			}
+			countActions = tag.actions.length; //results.length;
+			for(var i in tag.actions) {
+				posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
+				posts[i].id = tag.actions[i]._id;
+				getProviderId(tag.actions[i].authorId, i);
+				posts[i].authorId = tag.actions[i].authorId;
+				posts[i].event = tag.actions[i].name;
+				posts[i].time = tag.actions[i].createdAt;
+				posts[i].media = tag.actions[i].media;
+				posts[i].location = {};
+				posts[i].location.latitude = tag.actions[i].geo[0];
+				posts[i].location.longitude = tag.actions[i].geo[1];
+			}
+		} else {
+			console.log('NO EXISTE tal tag');
+			error();
 		}
 	})
 	function getProviderId(id, i) {
