@@ -17,7 +17,6 @@ var request = require('request');
 router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media');
 	if(req.body!=undefined && req.body!=''  && req.params.action!=undefined) {
-		console.log('H1');
 		req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
 		if(req.params.action=='like') {
@@ -47,7 +46,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
-		} else if (req.params.action=='share') {
+		} else if (req.params.action=='shareActionOnFb') {
 			var Action = db.model('Action');
 			Action.shareActionOnFb(req, function() {
 				res.status(201).end();
@@ -55,23 +54,15 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
-		} else if (req.params.action=='report') {
-			jUser.report(req.body, function() {
-				res.status(201).end();
-			}, function(error) {
-				console.log(error);
-				res.status(400).end();
-			});
-		} else if (req.params.action=='getReportCount') {
-			jPack.getReportCount(req.body, function() {
+		} else if (req.params.action=='reportAction') {
+			var Action = db.model('Action');
+			Action.reportAction(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		}
-		console.log('H2');
-
 	}
 });
 

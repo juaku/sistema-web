@@ -402,65 +402,6 @@ jPack.user.prototype.setUnlike = function(post, next, error) {
 }
 
 /*D
- * @descrip Almacena los reportes que se le hacen a un post en específico
- * @param {object} post, {function} next, {function} error.
- * @return null
-*/
-jPack.user.prototype.report = function(post, next, error) {
-	/*Parse.User.become(this.parseSessionToken).then(function (user) {
-		var Post = Parse.Object.extend('Post');
-		var postQuery = new Parse.Query(Post);
-		postQuery.equalTo('publicId', post.id);
-		postQuery.find().then(function(postReported) {
-			var post = postReported[0];
-			var relation = post.relation('report');
-			relation.query().find().then(function(users) {
-				for(var i = 0; i<users.length; i++) {
-					if(user.id == users[i].id) {
-						console.log('ya reportó este post');
-						next();
-					}
-				}
-				relation.add(user);
-				post.save().then(function () {
-					next();
-				}, function(e) {
-					error(e);
-				});
-			}, function(e) {
-				error(e);
-			});
-		}, function(e) {
-			error(e);
-		});
-	}, function(e) {
-		error(e);
-	});*/
-}
-
-jPack.getReportCount = function(post, next, error) {
-	/*Parse.User.become(this.parseSessionToken).then(function (user) {
-		var Post = Parse.Object.extend('Post');
-		var postQuery = new Parse.Query(Post);
-		postQuery.equalTo('publicId', post.id);
-		postQuery.find().then(function(result) {
-			var post = result[0];
-			var relation = post.relation('report');
-			relation.query().count().then(function(count) {
-				console.log('personas que reportaron este post: ' + count);
-				next();
-			}, function(e) {
-				error(e);
-			});
-		}, function(e) {
-			error(e);
-		});
-	}, function(e) {
-		error(e);
-	});*/
-}
-
-/*D
  * @descrip Crea la relación de seguir a una persona 
  * @param {object} userToFollow, {function} next, {function} error.
  * @return null
@@ -1615,63 +1556,7 @@ if(query != undefined) {
 	}
 }
 
-/*
- * @descrip Envía push notification, pide tu ubicación
- * @param {object} postToAskLocationId, {function} next, {function} error.
- * @return null
-*/
-jPack.user.prototype.askLocation = function(postToAskLocationId, next, error) {
-	Parse.User.become(this.parseSessionToken).then(function (user) {
-		var installationQuery = new Parse.Query(Parse.Installation);
-		var Post = Parse.Object.extend("Post");
-		var postQuery = new Parse.Query(Post);
-		var userToSendNotification;
-
-		postQuery.include("author");
-		postQuery.equalTo("publicId", postToAskLocationId);
-		postQuery.find().then(function(userToAsk) {
-			if(userToAsk.length != 0) {
-				userToSendNotification = userToAsk[0].get("author");
-				sendNotification(userToSendNotification, next, error);
-			} else {
-				console.log("error");
-				next();
-			}
-		}, function(e) {
-			error(e);
-		});
-
-		data = {
-      "alert": "Rodrigo pidió tu ubicación!!!.",
-      "sound": "cheering.caf" // default ios sound.
-    };
-
-		function sendNotification(userToSendNotification, next, error) {
-			installationQuery.equalTo("user", userToSendNotification);
-			Parse.Push.send({
-				where: installationQuery, // Set our Installation query
-				data: data
-			}, {
-				success: function() {
-					// Push was successful
-					console.log("push notification enviada con éxito");
-					next();
-				},
-				error: function(error) {
-					// Handle error
-					console.log("Error! al enviar notificación");
-					error();
-				}
-			});
-		}
-	}, function(e) {
-		error(e);
-	});
-}
-
-jPack.stadistics = function (registeredUsers, createdEvents) {
-	this.registeredUsers = registeredUsers;
-	this.createdEvents = createdEvents;
+jPack.stadistics = function () {
 }
 
 /*

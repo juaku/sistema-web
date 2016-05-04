@@ -74,7 +74,7 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 				posts[i].authorId = tag.actions[i].authorId;
 				posts[i].event = tag.actions[i].name;
 				posts[i].time = tag.actions[i].createdAt;
-				posts[i].media = tag.actions[i].media;
+				posts[i].media = './uploads/' + tag.actions[i].media;
 				posts[i].location = {};
 				posts[i].location.latitude = tag.actions[i].geo[0];
 				posts[i].location.longitude = tag.actions[i].geo[1];
@@ -113,6 +113,8 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 
 TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error
 	var newAction = req.body;
+	console.log('\x1b[1m\x1b[35m@@@ newAction @@@\x1b[0m');
+	console.log(req.body);
 	var FB = require('fb');
 	var coords = [];
 	coords[0] = newAction.coords.latitude;
@@ -155,7 +157,7 @@ TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userI
 			}
 		});
 		if(newAction.shareOnFb) {
-			var url = 'http://juaku-dev.cloudapp.net:5000/uploads/' + mediaName + '.' + mediaExt;
+			var url = 'http://juaku-dev.cloudapp.net:3000/uploads/' + mediaName + '.' + mediaExt;
 			shareMediaOnFb(req, url);
 		}
 		function shareMediaOnFb(req, url) {

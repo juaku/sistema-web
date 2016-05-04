@@ -3,54 +3,40 @@
 /*
  * Variables
  * ---------
+ *
+ *
+ *
+ * Colores
+ *
  */
- 
-/* Color puro					Trasnparencia
-backColor 	= #FFF		= #FFF
-layerColor	= #F3F3F5	= rgba(0, 0, 0, .05)
-icoColor 		=	#D3D3D5	=	rgba(0, 0, 0, .20)
-fontColor		= #333		= rgba(0, 0, 0, .80)
-accentColor = #F05		= #F05
-hardColor		= #555		= rgba(0, 0, 0, .70)
-softColor		= #AAA		= rgba(0, 0, 0, .35) // El texto no se ve claro en Chrome en Windows
-*/
-
-backColor 	= #FFF
-layerColor	= #000
-icoColor		=	rgba(0, 0, 0, .20)
-fontColor		= #000
-accentColor = #F05
-hardColor		= #555
-softColor		= #AAA
-fbColor			= #3b5998
-
-/*
-*/
-
 whiteColor	= #FFF
 lightColor	= #EEE
 midColor		= #888
 darkColor		= #202020
 blackColor	= #000
 mainColor		= #F05
+fbColor			= #3b5998
 
 /* 
  * Estilos generales
  * ------- ---------
+ *
+ * 
+ *
+ *  
  */
+html
 body
-	//background-color: #EAEAEE // Cálido: #EEEEE7, Original: #DDE0EA
-	//background-color: #F3F3F5 // NEW MAC
+	width: 100%
+	height: 100%
+
+body
+	// backgroundColor: MAC: #F3F3F5, Plomo: #EAEAEE, Cálido: #EEEEE7, Original: #DDE0EA
 	color: midColor
 	font-family: Arial, sans-serif
 	font-size: 14px
 	margin: 0
 	padding: 0
-
-html
-body
-	width: 100%
-	height: 100%
 	
 a
 	color: inherit
@@ -64,32 +50,35 @@ input
 div // TODO: Evaluar elementos a los que se aplica
 	-webkit-tap-highlight-color: transparent
 
-#wrapper .event
+
+// TODO: Reformular
+.event
 	font-size: 24px
 	letter-spacing: -0.5px
 	color: blackColor
 
-#wrapper .post .event
+.post .event
 	color: whiteColor
 
-#wrapper .event .at-simbol
+.event .at-simbol
 	font-family: Verdana, Arial, sans-serif
 
-#wrapper .event .event-name
+.event .event-name
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 	
-#wrapper .event .event-people
+.event .event-people
 	letter-spacing: initial
 
 /*
- * Estilos específicos: /index
+ * Estilos específicos
  * ------- -----------
- */
-
-/*
+ *
+ *
+ *
  * Cabecera
+ *
  */
 header
 	width: 100%
@@ -101,6 +90,7 @@ header
 
 /*
  * Principal
+ *
  */
 main
 	width: 100%
@@ -114,7 +104,6 @@ main
 	bottom: 0 // Necesario para scroll asistido
 
 main #wrapper
-	//background-colors: backColor
 	width: 100%
 	max-width: 1240px
 	margin: 0 auto
@@ -125,25 +114,14 @@ section#view
 	display: table-cell
 	vertical-align: top
 
-/*aside
-	width: 340px*/
-
 aside#first
 	transition: width 500ms
 	text-align: right
 
 aside#first #fixed-controls
-	//position: fixed
 	width: 280px
 	padding: 240px 40px 20px 20px
 	position: fixed
-
-aside #options-side
-aside #events-side
-	//width: inherit
-	//display: inline-block
-	//position: fixed
-	//top: 65px // Android Web Browser
 
 /*
  * Controles
@@ -151,9 +129,6 @@ aside #events-side
 section#options-side
 	text-align: right
 	width: 100%
-
-/*section#options-side .side-block
-	background-color: backColor*/
 
 section#account-controls section#profile
 	width: 100%
@@ -190,7 +165,6 @@ section#account-controls section#profile h2.profile-name .profile-firstname
  */
 
 section#view
-	//background-color: layerColor
 	//max-width: 640px
 	width: 61.8%
 	height: 100% // Evaluar
@@ -198,187 +172,9 @@ section#view
 	z-index: 1 // MAC OSX Scroll
 	// padding-right: 20px
 
-section#view #title
-	position: relative
-	width: 82vh
-	height: 82vh
-	max-width: 60vw
-	max-height: 60vw
-
-section#view #title img
-	display: block
-
-section#view #title a
-	// background-image: url('/images/juaku.svg?v=1005')
-	//background-repeat: no-repeat
-	//background-position: 50%
-	//background-size: 66.608px 90px
-	display: block
-	//margin: 0 auto
-	position: absolute
-	left: 50%
-	top: 50%
-	transform: translate(-50%,-50%)
-	cursor: default
-
-section#view #title a h1
-	display: none
-
-section#view #title a svg#logo
-	width: 66.608px
-	height: 90px 
-
-section#view #title a svg#logo #logo-icon
-	cursor: pointer
-
-section#view section#post-list .post
-	width: 82vh
-	max-width: 60vw
-	margin-bottom: 3vh
-	margin-right: 3vh
-
-section#view section#post-list .post div.media
-	position: relative // Muestra espacio de img
-	cursor: pointer
-
-section#view section#post-list .post div.media img
-	width: 100%
-	display: block // En lugar de font-size: 0
-
-section#view section#post-list .post div.media img.media // Muestra espacio de img
-	position: absolute
-	top: 0
-	left: 0
-	opacity: 0
-	transition: opacity 500ms linear
-	//transition: opacity 1000ms // TODO: Fantasmas en Android e IE
-	
-section#view section#post-list .post.show div.media img.media
-	opacity: 1
-
-section#view section#post-list .post div.media .preloader
-	width: 30px
-	height: 30px
-	border-radius: 30px
-	position: absolute
-	top: 50%
-	left: 50%
-	margin: -15px
-	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
-
-@keyframes preloader
-	0%
-		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
-	50%
-		box-shadow: 0 0 0 10px rgba(0,0,0,0.05)
-	100%
-		box-shadow: 0 0 0 10px rgba(0,0,0,0.01)
-
-section#view section#post-list .post .bottom
-	width: 100%
-	height: 15vh
-	display: table
-	table-layout: fixed // Andorid
-
-section#view section#post-list .post .bottom .info
-	display: table-cell
-	vertical-align: top
-	
-section#view section#post-list .post .bottom .info .info-wrapper
-	display: table
-	width: 100%
-	table-layout: fixed // Android
-
-section#view section#post-list .post .bottom .author-color-circle
-	width: 12px
-	height: 12px
-	border-radius: 6px
-	display: inline-block
-	margin: 2px 4px
-
-section#view section#post-list .post .bottom .author-img
-section#view section#post-list .post .bottom .post-detail
-	vertical-align: top
-
-section#view section#post-list .post .bottom .author-img
-	display: table-cell
-	width: 10vh // Android
-	padding: 2.5vh
-
-section#view section#post-list .post .bottom .author-img img
-	width: 10vh
-	height: 10vh
-	display: block //En lugar de font-size: 0
-	border-radius: 10vh
-
-section#view section#post-list .post .bottom .post-detail
-	display: table
-	table-layout: fixed
-	width: 100%
-	margin-top: 4vh
-	letter-spacing: -0.5px
-
-/*section#view section#post-list .post .bottom .post-detail .post-title
-section#view section#post-list .post .bottom .post-detail .sub-info
-	padding-left: 10px
-	padding-right: 5px*/
-
-section#view section#post-list .post .bottom .post-detail .post-title
-	font-size: 18px
-	overflow: hidden
-	white-space: nowrap
-	text-overflow: ellipsis
-	margin-top: -1px
-	color: darkColor
-
-section#view section#post-list .post .bottom .post-detail .post-title .author-name
-	font-size: 24px
-	//font-weight: bold
-	
-section#view section#post-list .post .bottom .post-detail .post-title .author-name .author-lastName
-	display: none
-
-section#view section#post-list .post .bottom .post-detail .post-title .event-posted
-	max-width: 70%
-
-section#view section#post-list .post .bottom .post-detail .sub-info
-	font-size: 12px
-	margin-top: 4px
-	font-family: Verdana, sans-serif
-
-section#view section#post-list .post .bottom .post-detail .sub-info .time
-	display: inline-block	
-
-main #wrapper .like // Para que no se corte el texto
-	width: 96px // Firefox, Android Browser
-	/* height: 128px */
-	display: table-cell
-	vertical-align: middle
-
-/*main #wrapper .like object
-	display: block // En lugar de font-size: 0, para evitar el espacio debajo*/
-	
-main #wrapper .like .like-point
-	width: 40px
-	height: 40px
-	cursor: pointer
-	background: whiteColor
-	border-radius: 20px
-	margin: 0 auto
-
-/*main #wrapper .like object .like-svg #inner
-	fill: icoColor
-	transition: fill 250ms
-
-main #wrapper .like.selected object .like-svg #inner
-	fill: accentColor*/
-
 /*
  * Eventos
  */
-/*aside section#events-controls
-	background-color: backColor*/
-
 aside section#events-controls .promoted
 aside section#events-controls .events-list
 aside section#events-controls .show-more
@@ -392,7 +188,6 @@ aside section#events-controls .events-list.show-more
 
 aside section#events-controls .title
 	font-size: 11px
-	color: softColor
 	//margin: 10px 0
 		
 aside section#events-controls .events-title
@@ -406,7 +201,6 @@ aside section#events-controls .event .event-name.small
 
 aside section#events-controls .event .event-people
 	font-size: 11px
-	color: softColor
 	margin-left: 15px
 
 aside section#events-controls .show-more
@@ -481,9 +275,6 @@ section#new-post
 section#new-post canvas#new-media-preview
 	width: 100%
 
-section#new-post #positionMap img
-	width: 100%
-
 section#new-post canvas#new-media-preview
 	width: 100%
 	height: 100vw
@@ -507,7 +298,6 @@ section#new-post #new-post-controls #event-name-input
 
 section#new-post #new-post-controls #event-name-input *
 	font-size: 17px
-	color: accentColor
 	letter-spacing: -0.5px
 
 section#new-post #new-post-controls #event-name-input span.at-simbol
@@ -542,8 +332,8 @@ placeholder()
 
 section#new-post #new-post-controls #event-name-input input#new-event-name
 	+placeholder()
-		color: icoColor
-		border-bottom: 1px solid layerColor
+		color: blackColor
+		border-bottom: 1px solid whiteColor
 
 section#new-post #new-post-controls #share-new-post
 	width: 44px
@@ -556,7 +346,7 @@ section#new-post #new-post-controls #share-new-post .share
 	display: block
 
 section#new-post #new-post-controls #share-new-post .share #change-color
-	fill: softColor
+	fill: midColor
 
 section#new-post #new-post-controls #share-new-post .share.selected #change-color 
 	fill: fbColor
@@ -567,19 +357,6 @@ section#new-post #new-post-controls #send-post
 	font-weight: bold
 	font-size: 11px
 	padding: 2px 15px 0 15px
-
-/*section#new-post #suggested-events
-	text-align: center*/
-
-section#new-post #suggested-events ul
-	margin: 0
-	padding: 0 0 5px 0
-	text-align: center
-	
-section#new-post #suggested-events ul li.suggested-event
-	margin: 1px 0
-	padding: 4px 10px
-	list-style: none
 
 /*
  * Control de vistas
@@ -616,112 +393,19 @@ body.events-view main #new-post
 body.events-view main #post-list
 	display: none
 	
-/*body.events-view main #last
-	display: block*/
-	
 #svg-library
 	display: none
-
-/*
- * Temas blanco y negro
- *
- */
-
-body
-body section#view #title
-body section#view section#post-list .post div.media
-body section#view section#post-list .post .bottom
-body main #wrapper .like .like-point
-body section#view section#post-list .post .bottom .author-img img
-body section#view section#post-list .post .bottom .author-color-circle
-body section#account-controls section#profile img
-	transition: background-color 200ms ease
-	
-body #wrapper .event
-body #wrapper .post .event
-body section#view section#post-list .post .bottom .post-detail .post-title
-body section#account-controls section#profile h2.profile-name .profile-firstname
-	transition: color 200ms ease
-
-/*
-*/
-
-body
-	background-color: lightColor
-
-body section#view #title
-nav#view-menu .view-button .button.selected
-	background-color: whiteColor
-
-body section#account-controls section#profile img
-body main #wrapper .like .like-point
-body section#view section#post-list .post .bottom
-body section#view section#post-list .post .bottom .author-color-circle
-body section#view section#post-list .post.show .bottom .author-img img
-body section#view section#post-list .post .bottom .author-img img
-	background-color: whiteColor
-	
-body section#view section#post-list .post .bottom .post-detail .post-title
-body #wrapper .post .event
-	color: darkColor
-
-body section#account-controls section#profile h2.profile-name .profile-firstname
-body #wrapper .event
-	color: darkColor
-
-body section#view section#post-list .post div.media
-	background-color: midColor
-
-/*
-*/
-
-body.dark
-	background-color: darkColor
-
-body.dark section#view #title
-	background-color: blackColor
-
-body.dark section#account-controls section#profile img
-body.dark main #wrapper .like .like-point
-body.dark section#view section#post-list .post .bottom
-body.dark section#view section#post-list .post .bottom .author-color-circle
-body.dark section#view section#post-list .post.show .bottom .author-img img
-body.dark section#view section#post-list .post .bottom .author-img img
-	background-color: blackColor
-	
-body.dark section#view section#post-list .post .bottom .post-detail .post-title
-body.dark #wrapper .post .event
-	color: whiteColor
-
-body.dark section#account-controls section#profile h2.profile-name .profile-firstname
-body.dark #wrapper .event
-	color: whiteColor
-
-body.dark section#view section#post-list .post div.media
-	background-color: midColor
 
 /*
  * Responsive
  */ 
 
-
-/*@media (max-width: 779px) 
-	main
-		min-width: 650px
-	aside#first
-		width: 110px
-*/
 @media (max-width: 669px) 
 	body
 		user-select: none // TODO: Pasar a un detector real de dispositivos
-		//background-color: layerColor
 		
 	main
 		min-width: 290px
-		//bottom: 44px
-		
-	main #wrapper
-		//background-color: layerColor
 		width: 100%
 		max-width: inherit
 	
@@ -736,9 +420,6 @@ body.dark section#view section#post-list .post div.media
 	
 	section#options-side
 		text-align: left
-	
-	/*section#options-side .side-block
-		margin: 10px 0*/
 		
 	aside#first section#profile
 		display: table
@@ -759,82 +440,6 @@ body.dark section#view section#post-list .post div.media
 	
 	aside#first section#account-controls section#profile h2.profile-name .profile-lastname
 		font-size: 14px
-		
-	aside#first section#user-relation #relation-tabs
-		display: table
-		width: 100%
-		text-align: center
-		
-	aside#first section#user-relation #relation-tabs .relation-tab
-		display: table-cell
-		color: softColor
-		width: 50%
-		height: 43px
-		padding: 5px
-		border-top: 2px solid backColor
-		vertical-align: top
-
-	#relation-tabs .relation-tab .people-number
-		font-size: 21px
-		height: 24px
-		
-	#relation-tabs .relation-tab .follow-type
-		font-size: 12px
-		line-height: 10px
-
-	#relation-views ul.relation-view
-		margin: 0
-		padding: 0
-		display: none
-
-	#relation-views ul.relation-view li
-		list-style: none
-		display: table
-		height: 55px
-		width: 100%
-		background: layerColor
-
-	#relation-views ul.relation-view li .user-picture
-	#relation-views ul.relation-view li .user-info
-	#relation-views ul.relation-view li .user-relation
-		display: table-cell
-		vertical-align: top
-
-	#relation-views ul.relation-view li .user-picture img.picture
-		width: 55px
-		height: 55px
-		display: block
-		
-	#relation-views ul.relation-view li .user-picture
-	#relation-views ul.relation-view li .user-relation
-		width: 55px
-		height: 55px
-	
-	#relation-views ul.relation-view li .user-info
-		padding: 5px 10px 0 10px
-
-	#relation-views ul.relation-view li .user-firstName
-		font-weight: bold
-		
-	#relation-views ul li .user-lastName
-		line-height: 14px
-
-	#relation-views ul li .user-followerNumber
-		font-size: 11px
-		color: softColor
-		margin-top: 2px
-	
-	aside#first section#user-relation.viewing-followers #relation-tabs #followers-tab
-	aside#first section#user-relation.viewing-following #relation-tabs #following-tab
-		border-top-color: accentColor
-		color: fontColor
-
-	aside#first section#user-relation.viewing-followers #followers
-	aside#first section#user-relation.viewing-following #following
-		display: block
-	
-	section#account-controls #general-controls
-		background: inherit
 	
 	section#account-controls .account-control
 		margin-bottom: 1px
@@ -847,11 +452,6 @@ body.dark section#view section#post-list .post div.media
 	
 	section#account-controls .account-control a.button .bold
 		font-weight: bold
-
-	/*aside
-		padding: 10px 0*/
-	
-	// account-controls
 	
 	aside #options-side,
 	aside #events-side
@@ -862,16 +462,6 @@ body.dark section#view section#post-list .post div.media
 		display: block
 		margin: 0 auto
 		padding: 0
-	
-	section#view #title
-    position: relative
-    width: 100%
-    height: inherit
-    max-width: inherit
-    max-height: inherit
-	
-	section#view #title img
-		width: 100%
 		
 	section#view section#post-list .post
 		width: 100%
@@ -880,9 +470,6 @@ body.dark section#view section#post-list .post div.media
 
 	nav#view-menu
 		display: table
-	
-	/*body.view-menu-hidden main
-		bottom: 0*/
 		
 	body.view-menu-hidden nav#view-menu
 		display: none
@@ -906,21 +493,3 @@ body.dark section#view section#post-list .post div.media
 		background: #FFF
 		margin-bottom: 1px
 		padding: 10px 0
-
-@media (max-width: 375px)
-	/*main
-		top: 44px*/
-	
-	header
-		padding: 4px 0 5px 0
-
-	header #title a
-		background-size: 93px 35px
-		width: 93px
-		height: 35px
-	
-	/* Control de vistas */
-	body.new-post-view header
-		display: none
-	body.new-post-view main
-		top: 0

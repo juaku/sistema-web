@@ -230,13 +230,11 @@ function Application($scope, $http) {
 
 	// Cargar los post originales
 	function getPosts(action, id) {
-		//filterAux = filter;
 		actionAux = action;
 		idAux = id;
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
-			//
 			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
 				postsQuery(action, id, function(data) {
 					if(data!=undefined) {
@@ -258,24 +256,6 @@ function Application($scope, $http) {
 	}
 
 	function postsQuery(action, id, next, error) {
-		/*if(id == undefined && action == undefined) {
-			console.log('iffffffffff');
-			$http.get('/list/post/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
-				if(status == 204) {
-					clearInterval(getPostsInterval);
-				} else {
-					if(data.posts != undefined) {
-						postQueryCount++;
-						next(data.posts);
-					} else {
-						next();
-					}
-				}
-			}).error(function(e) {
-				console.log('error!!');
-				//error(e);
-			});
-		} else {*/
 			$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 				if(status == 204) {
 					clearInterval(getPostsInterval);
@@ -327,65 +307,6 @@ function Application($scope, $http) {
 		};
 	}
 
-	// Obtiene los amigos de facebook que están usando la aplicación para luego poder elegir a quien seguir
-	/*$http.get('/user/getAllUsers').success(function(data) {
-		//$scope.user.fbFriends = data;
-		$scope.usuarios = data;
-	});*/
-
-//TODO: borrar, ya no se usa
-	// Obtiene a las personas que te siguen o que sigues
-	/*$scope.user.getFollowers = function(type) {
-		$http.get('/list/user/followers/0', $scope.user).success(function(data) {
-			$scope.user.followers = data;
-		}).error();
-	}
-	$scope.user.getFollowing = function(type) {
-		$http.get('/list/user/following/0', $scope.user).success(function(data) {
-			$scope.user.following = data;
-		}).error();
-	}*/
-
-	/*$scope.askForSuggestedEvents = function(query) {
-		getSuggestedEvents(query);
-	}
-
-	function getSuggestedEvents(query) {
-		var status;
-		$http.get('/list/event/suggested/a').success(function(data, status) {
-			$scope.suggestedEvents = [];
-			for(i in data) {
-				$scope.suggestedEvents[i] = {};
-				$scope.suggestedEvents[i].name = data[i].name;
-			}
-			console.log($scope.suggestedEvents);
-		}).error(function(e) {
-			console.log('Error al obtener suggestedEvents');
-		});
-	};*/
-
-//TODO: borrar, ya no se usa
-	// Envía un objeto con los datos de la persona que deseas seguir o dejar de seguir mediante un post 
-	/*$scope.followRelation = function(userToFollow) {
-		$scope.user.userToFollow = userToFollow;
-		if (!$scope.user.userToFollow.following) {
-			$scope.user.userToFollow.following = true;
-			$http.post('/user/follow', $scope.user).success(function(data) {
-			}).error();
-		} else {
-			$scope.user.userToFollow.following = false;
-			$http.post('/user/unfollow', $scope.user).success(function(data) {
-			}).error();
-		}
-	}
-
-	// Se almacena en un arreglo a las personas que deseas seguir para luego hacer la relación mediante seFollowRelation
-	var peopleToFollow = [];
-	$scope.addListToFollow = function(userToFollow) {
-		peopleToFollow[peopleToFollow.length] = userToFollow;
-		console.log(userToFollow);
-	}*/
-
 	//Asigna like a la foto que se indicó
 	$scope.likeClick = function(post) {
 		$scope.post = post;
@@ -400,16 +321,9 @@ function Application($scope, $http) {
 		}
 	}
 
-	$scope.report = function (post) {
+	$scope.reportAction = function (post) {
 		$scope.post = post;
-		console.log('Application.js ' + $scope.post);
-		$http.post('/post/report', $scope.post).success(function(data) {
-		}).error();
-	}
-	$scope.getReportCount = function (post) {
-		$scope.post = post;
-		console.log('Application.js ' + $scope.post);
-		$http.post('/post/getReportCount', $scope.post).success(function(data) {
+		$http.post('/post/reportAction', $scope.post).success(function(data) {
 		}).error();
 	}
 
@@ -427,15 +341,6 @@ function Application($scope, $http) {
 		}
 	}
 
-	// Envía un objeto con los datos de la persona que deseas bloquear o desbloquear mediante un post
-	$scope.askLocation = function(postId) {
-		$scope.user.postToAskLocation = postId;
-		console.log("$scope.user.postToAskLocation: "+$scope.user.postToAskLocation)
-		$http.post('/user/askLocation', $scope.user).success(function() {
-		}).error();
-
-	}
-
 	/*
 	 * Post
 	 */
@@ -447,9 +352,9 @@ function Application($scope, $http) {
 		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
 	}
 
-	$scope.share = function(post) {
+	$scope.shareActionOnFb = function(post) {
 		$scope.post = post.media;
-		$http.post('/post/share', $scope.post).success(function(data) {
+		$http.post('/post/shareActionOnFb', $scope.post).success(function(data) {
 		}).error();
 	}
 
@@ -552,12 +457,15 @@ function Application($scope, $http) {
 					var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
 
 					getGeo( function() {
-						$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newPost.coords.latitude + ',' + $scope.newPost.coords.longitude);
+						//$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newPost.coords.latitude + ',' + $scope.newPost.coords.longitude);
 					}, function(errorMsg) {
 						console.log(errorMsg);
 					});
 
 					$scope.newPost.media = newImg;
+
+					console.log('\x1b[1m\x1b[35m@@@ newImage @@@\x1b[0m');
+					console.log($scope.newPost.media);
 				}
 				img.src = event.target.result;
 			}
@@ -592,6 +500,11 @@ function Application($scope, $http) {
 	function getGeo(next, error) {
 		if (navigator.geolocation) {
 			var position = 0;
+			next(); 
+
+			// TODO: HTTPS
+
+			/*			
 			navigator.geolocation.getCurrentPosition(function(position) {
 				var coords = {};
 				coords.accuracy = position.coords.accuracy;
@@ -625,29 +538,11 @@ function Application($scope, $http) {
 				alert('Mal! ' + errorMsg);
 				error(errorMsg);
 			});
+			*/
 		} else {
 			error("Geolocation is not supported by this browser.");
 		}
 	}
-
-	/*function getTrends () {
-		// TODO: Evaluar remoción
-		/*
-		 * Events
-		 */
-
-	/*	// Cargar eventos
-		$http.get('/list/trend').success(function(data) {
-			$scope.trends = data.trends;
-			$scope.limit = 5;
-		});
-	}
-
-	function getEvents () {
-		$http.get('/list/event').success(function(data) {
-			$scope.events = data.events;
-		});
-	}*/
 
 } // Fin Controlador - function Application($scope, $http)
 // Directivas

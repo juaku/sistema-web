@@ -61,7 +61,7 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 			posts[i].authorId = action[i].authorId;
 			posts[i].event = action[i].name;
 			posts[i].time = action[i].createdAt;
-			posts[i].media = action[i].media;
+			posts[i].media = './uploads/' + action[i].media;
 			posts[i].location = {};
 			posts[i].location.latitude = action[i].geo[0];
 			posts[i].location.longitude = action[i].geo[1];
@@ -98,6 +98,7 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 	var str = req.body; //req.body es 420.jpg
 	var res = str.split(".");
+	
 	var url = 'http://juaku-dev.cloudapp.net:5000/uploads/' + res[0] + '.' + res[1];
   var albumId = '';
   FB.api('/' + albumId + '/photos','POST',
