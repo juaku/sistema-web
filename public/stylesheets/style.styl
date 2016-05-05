@@ -8,15 +8,14 @@
  *
  * Colores
  *
- */
+ 
 whiteColor	= #FFF
 lightColor	= #EEE
 midColor		= #888
 darkColor		= #202020
-blackColor	= #000
 mainColor		= #F05
 fbColor			= #3b5998
-
+*/
 /* 
  * Estilos generales
  * ------- ---------
@@ -27,17 +26,223 @@ fbColor			= #3b5998
  */
 html
 body
-	width: 100%
 	height: 100%
 
 body
-	// backgroundColor: MAC: #F3F3F5, Plomo: #EAEAEE, Cálido: #EEEEE7, Original: #DDE0EA
-	color: midColor
-	font-family: Arial, sans-serif
-	font-size: 14px
 	margin: 0
-	padding: 0
+	background-color: #333 /* EEE */
+	font-family: "Arial"
+	color: #FFF /* 111 */
+
+h2
+	font-size: 5vw
+	font-weight: normal
+	margin-top: 32vh
+	letter-spacing: -0.05em
+	overflow: hidden
+	white-space: nowrap
+	text-overflow: ellipsis
+	position: fixed
+	width: 36vw
+	padding-right: 0.05em /* Evitar corte letter-spacing negativo */
+
+h3
+	font-weight: normal
+	font-size: 2.5vmin
+	letter-spacing: -0.05em
+	margin: 0
+
+/* Estilos estructurales */
+
+#box
+	display: table
+	width: 100%
+	height: 100%
+
+#side
+	display: table-cell
+	vertical-align: top
+	text-align: right
+
+main
+	display: table-cell
+	width: 56vw
+
+
+/* Estilos modulares */
+		
+/* Globales */
+.at
+	font-family: "Verdana"
+		
+/* Grupales */
+
+h2 img
+	width: 1em
+	height: 1em
+	border-radius: 50%
+	position: relative
+	top: 0.2em
+	margin-right: 0.05em
+
+#account
+	margin-top: 46vh
+	width: 36vw
+	position: fixed
+
+#start
+	background-color: #000 /* FFF */
+	width: 82vh
+	position: relative
+	height: 82vh
+	max-width: 54vw
+	max-height: 54vw
+	min-width: 30vw
+	min-height: 30vw
+
+#start a#logo-link
+	display: block
+	position: absolute
+	left: 50%
+	top: 50%
+	transform: translate(-50%, -50%)
+
+#start #logo
+	width: calc(66.608vw / 10)
+	height: calc(90vw / 10)
+	display: block
+
+#start #logo-icon
+	cursor: pointer
+
+#start h1
+	display: none
+
+/* Action */
+.action
+	background-color: #F05
+	width: 82vh
+	max-width: 54vw
+	margin-bottom: 3vh
+	min-width: 30vw
+
+.action .media
+	background-color: #444 /* CCC */
+	width: 100%
+	height: 82vh
+	max-width: 54vw
+	max-height: 54vw
+	min-width: 30vw
+	min-height: 30vw
+	position: relative
+
+.action .media img
+	width: 100%
+	height: 100%
+	display: block
+	opacity: 0
+	transition: opacity 200ms
+
+.action.show .media img
+	opacity: 1
+
+.action .media .preloader
+	width: 10%
+	height: 10%
+	border-radius: 50%
+	position: absolute
+	left: 50%
+	top: 50%
+	transform: translate(-50%, -50%)
+	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
+
+@keyframes preloader
+	0%
+		box-shadow: 0 0 0 0 rgba(0,0,0,0)
+	50%
+		box-shadow: 0 0 0 1vw rgba(0,0,0,0.1)
+	100%
+		box-shadow: 0 0 0 1vw rgba(0,0,0,0.05)
+
+/* Action -> Info */
+
+.info
+	background-color: #000 /* FFF */
+	width: 100%
+	height: 15vmin
+	min-height: 72px
+	display: table
+	table-layout: fixed
+
+.info .author-picture,
+.info .action-info,
+.info .save-button
+	display: table-cell
+	vertical-align: middle
+
+.info .author-picture
+	width: 19%
+	padding: 2.5%
+
+.info .author-picture a.author-link,
+.info a.save-link 
+	display: block
+	border-radius: 50%
+
+.info .author-picture a.author-link img
+	display: block
+	border-radius: 50%
+	margin: 0 auto
+	width: 100%
+
+.info .action-info
+	padding-left: 0.5em
+
+.info h3.action-title
+	overflow: hidden
+	white-space: nowrap
+	text-overflow: ellipsis
+	text-align: left
+
+.info h3.action-title .author-name
+	font-weight: bold
+
+.info h3.action-title .author-name::before
+	content: ''
+	display: inline-block
+	background-color: #F05
+	border-radius: 50%
+	width: 0.7em
+	height: 0.7em
+	margin: 0 0.2em 0 0
+
+.info .action-time
+	font-size: 1.75vmin
+	color: #888
+
+.info .save-button
+	width: 18%
+	padding: 4%
+
+.info a.save-link .save
+	display: block
+	background-color: #888
+	border-radius: 50%
+	width: 100%
+
+svg#svg-library
+	display: none
+
+
+
+/*
+
 	
+	V 3.0
+
+
+*/
+
 a
 	color: inherit
 	text-decoration: none
@@ -50,27 +255,6 @@ input
 div // TODO: Evaluar elementos a los que se aplica
 	-webkit-tap-highlight-color: transparent
 
-
-// TODO: Reformular
-.event
-	font-size: 24px
-	letter-spacing: -0.5px
-	color: blackColor
-
-.post .event
-	color: whiteColor
-
-.event .at-simbol
-	font-family: Verdana, Arial, sans-serif
-
-.event .event-name
-	overflow: hidden
-	white-space: nowrap
-	text-overflow: ellipsis
-	
-.event .event-people
-	letter-spacing: initial
-
 /*
  * Estilos específicos
  * ------- -----------
@@ -80,52 +264,16 @@ div // TODO: Evaluar elementos a los que se aplica
  * Cabecera
  *
  */
-header
-	width: 100%
-	padding: 10px 0
-	position: fixed
-	z-index: 10
-	top: 0
-	display: none
 
 /*
  * Principal
  *
  */
-main
-	width: 100%
-	top: 0
-	//bottom: 44px TODO: Evaluar si es necesario
-	//bottom: 0px
-	overflow: auto
-	overflow-x: hidden
-	position: absolute
-	-webkit-overflow-scrolling: touch // Necesita position absolute
-	bottom: 0 // Necesario para scroll asistido
-
-main #wrapper
-	width: 100%
-	max-width: 1240px
-	margin: 0 auto
-	display: table
-
-aside
-section#view
-	display: table-cell
-	vertical-align: top
-
-aside#first
-	transition: width 500ms
-	text-align: right
-
-aside#first #fixed-controls
-	width: 280px
-	padding: 240px 40px 20px 20px
-	position: fixed
 
 /*
  * Controles
  */
+
 section#options-side
 	text-align: right
 	width: 100%
@@ -139,11 +287,6 @@ section#account-controls section#profile img
 section#account-controls section#profile h2
 	display: table-cell
 	vertical-align: middle
-
-section#account-controls section#profile img
-	width: 80px
-	height: 80px
-	border-radius: 40px
 
 section#account-controls section#profile h2.profile-name
 	width: 100%
@@ -164,21 +307,9 @@ section#account-controls section#profile h2.profile-name .profile-firstname
  * Vista
  */
 
-section#view
-	//max-width: 640px
-	width: 61.8%
-	height: 100% // Evaluar
-	position: relative // MAC OSX Scroll
-	z-index: 1 // MAC OSX Scroll
-	// padding-right: 20px
-
 /*
  * Eventos
  */
-aside section#events-controls .promoted
-aside section#events-controls .events-list
-aside section#events-controls .show-more
-	margin: 10px
 
 aside section#events-controls .events-list.show-more
 	overflow: none
@@ -189,7 +320,7 @@ aside section#events-controls .events-list.show-more
 aside section#events-controls .title
 	font-size: 11px
 	//margin: 10px 0
-		
+
 aside section#events-controls .events-title
 	font-size: 14px
 
@@ -253,7 +384,6 @@ nav#view-menu #button-search
  * Pie
  */
 footer
-	margin: 10px 5px
 	font-size: 12px
 
 footer #brand
@@ -364,47 +494,108 @@ section#new-post #new-post-controls #send-post
 
 // .config-view
 
-body.config-view main #new-post
-body.config-view main #post-list
+body.config-view #box #new-post
+body.config-view #box #post-list
 	display: none
-body.config-view main #first
+body.config-view #box 
 	display: block
 
 // .posts-view
 
-body.posts-view main #first
-body.posts-view main #new-post
+body.posts-view #box 
+body.posts-view #box #new-post
 	display: none
-body.posts-view main #post-list
+body.posts-view #box #post-list
 	display: block
 
 // .new-post-view
 
-body.new-post-view main #first
-body.new-post-view main #post-list
+body.new-post-view #box #side
+body.new-post-view #box #post-list
 	display: none
-body.new-post-view main #new-post
+body.new-post-view #box #new-post
 	display: block
 
 // .events-view
 
-body.events-view main #first
-body.events-view main #new-post
-body.events-view main #post-list
+body.events-view #box #side
+body.events-view #box #new-post
+body.events-view #box #post-list
 	display: none
 	
-#svg-library
+svg#svg-library
 	display: none
 
 /*
  * Responsive
- */ 
+ */
+
+@media screen and (max-width: 1000px) , screen and (max-height: 700px)
+	h3
+		font-size: 16px
+		transition: font-size 100ms
+
+	.info .action-time
+		font-size: 13px
+
+@media screen and (max-width: 480px)
+	h3
+		font-size: 5vw
+		transition: font-size 100ms
+	
+	#box
+		display: block /* Mejor control de la barra de scroll */
+	
+	#side
+		display: none
+
+	main
+		overflow-y: auto
+		overflow-x: hidden
+		-webkit-overflow-scrolling: touch
+		height: 100vh
+		display: block
+
+	main,
+	.action,
+	.action .media,
+	#start
+		width: 100%
+
+	#start #logo
+		min-width: 66.608px
+		min-height: 90px
+
+	.action
+		max-width: inherit
+
+	.action .media,
+	#start
+		height: 100vw
+		max-width: inherit
+		max-height: inherit
+
+	.info .author-name
+		margin-right: 1px 
+
+	.info h3.action-title .author-name::before
+		width: 3.5vw
+		height: 3.5vw
+		margin: 0 1vw 0 0
+
+	.info .action-time
+		font-size: 3.5vw
+	
+	nav#view-menu
+		display: table
+
+/* Old Responsive
 
 @media (max-width: 669px) 
 	body
 		user-select: none // TODO: Pasar a un detector real de dispositivos
 		
-	main
+	#box
 		min-width: 290px
 		width: 100%
 		max-width: inherit
@@ -412,33 +603,33 @@ body.events-view main #post-list
 	aside
 		padding: 0
 
-	aside#first
+	aside#side
 		display: none
 	
-	aside#first
+	aside#side
 		width: 100%
 	
 	section#options-side
 		text-align: left
 		
-	aside#first section#profile
+	aside#side section#profile
 		display: table
 	
-	aside#first section#profile img,
-	aside#first section#profile h2
+	aside#side section#profile img,
+	aside#side section#profile h2
 		display: table-cell
 		vertical-align: top
 	
-	aside#first section#account-controls section#profile h2.profile-name
+	aside#side section#account-controls section#profile h2.profile-name
 		width: 100%
 		padding: 10px
 		line-height: inherit
 	
-	aside#first section#account-controls section#profile h2.profile-name .profile-firstname
+	aside#side section#account-controls section#profile h2.profile-name .profile-firstname
 		font-size: 16px
 		color: blackColor
 	
-	aside#first section#account-controls section#profile h2.profile-name .profile-lastname
+	aside#side section#account-controls section#profile h2.profile-name .profile-lastname
 		font-size: 14px
 	
 	section#account-controls .account-control
@@ -457,13 +648,13 @@ body.events-view main #post-list
 	aside #events-side
 		position: inherit
 
-	section#view
+	main
 		width: 100%
 		display: block
 		margin: 0 auto
 		padding: 0
 		
-	section#view section#post-list .post
+	main section#post-list .post
 		width: 100%
 		max-width: inherit
 		margin-bottom: 5vh
@@ -473,8 +664,6 @@ body.events-view main #post-list
 		
 	body.view-menu-hidden nav#view-menu
 		display: none
-		
-	/* Eventos */
 
 	section#events-controls
 		background: initial
@@ -493,3 +682,5 @@ body.events-view main #post-list
 		background: #FFF
 		margin-bottom: 1px
 		padding: 10px 0
+
+*/

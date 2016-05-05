@@ -143,6 +143,7 @@ function Application($scope, $http) {
 							//$scope.user.getFollowers();
 							//$scope.user.getFollowing();
 							history.pushState( {}, null, '/@' + simpleEventName);
+							$('#tag').first().html(simpleEventName); // TODO: Mejorar
 							getPosts(reqType, res[1]);
 							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
 							//break;
@@ -218,8 +219,9 @@ function Application($scope, $http) {
 	createEmptyPosts(5);
 	//askForPost();
 
-	$('main').scroll(function() {
-		if(!($('#view').height() - $('main').scrollTop() > $(document).height())) {
+	console.log('Hola');
+	$(document).scroll(function() {
+		if(window.innerWidth + $('body').scrollTop()*1.2 >= $(document).height()) {
 			askForPost(actionAux, idAux);
 		}
 	});
@@ -487,9 +489,11 @@ function Application($scope, $http) {
 		createEmptyPosts(5);
 		if(object.author != undefined && action == 'author') {
 			history.pushState( {}, null, '/' + object.author.firstName + '-' + object.author.idKey);
+			$('#tag').html('');
 			getPosts(action, object.author.firstName);
 		} else if (object.event != undefined && action == 'tag') {
 			history.pushState( {}, null, '/@' + object.event);
+			$('#tag').html(object.event);
 			getPosts(action, object.event);
 		}
 	}
@@ -567,8 +571,7 @@ angular.module('Juaku', [])
 				loadedImgs++;
 				if(!$(element).hasClass('blank')) {
 					$(element).parent().find('.preloader').remove();
-					//$(element).addClass('show');
-					$(element).parents('.post').addClass('show');
+					$(element).parents('article').addClass('show');
 				}
 			});
 		}
@@ -596,9 +599,9 @@ function postsLoaded() {
 	// Avanza a la siguiente foto haciendo click
 
 	// Parpadeo cuando se hace scroll hacia abajo
-	$('#post-list .media img.media').off('tapone');
-	$('#post-list .media img.media').on('tapone', function() { 
-		assistedScroll(1, $(this).parents('.post'));
+	$('article .media img').off('tapone');
+	$('article .media img').on('tapone', function() { 
+		assistedScroll(1, $(this).parents('article'));
 	});
 }
 
