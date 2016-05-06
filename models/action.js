@@ -69,17 +69,18 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 		}
 	})
 	function getProviderId(id, i) {
-		User.findById(id, 'providerId', function (err, user) {
+		User.findById(id, 'providerId hexCode', function (err, user) {
 			posts[i].fbId = user.providerId;
-			getFBInfo(i, posts[i].fbId);
+			getFBInfo(i, posts[i].fbId, user.hexCode);
 		});
 	}
-	function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)
+	function getFBInfo(i, fbUserId, hexCode) {
 		FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 			posts[i].author = {};
 			//posts[i].author.idKey = idKey;
 			posts[i].author.firstName = profile.first_name;
 			posts[i].author.lastName = profile.last_name;
+			posts[i].author.hexCode = hexCode;
 			FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
 				posts[i].author.picture= picture.data.url;
 				triggerNext();

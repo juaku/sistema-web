@@ -10,7 +10,6 @@ var UserSchema = new Schema({
   provider: String,
   name: String,
   familyName: String,
-  userName: String,
   hexCode: String,
   actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
   channels: [{ type: Schema.Types.ObjectId, ref: 'User' }],
@@ -21,13 +20,14 @@ var UserSchema = new Schema({
 UserSchema.statics.signUp = function (req, callback, error) {
   this.findOne({providerId: req.user.id}, function(err, user) {
     if(err) throw(err);
+    var letters = '0123456789abcdef'.split('');
+    var color = '';
+    for (var i = 0; i < 3; i++ ) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
     if(!err && user!= null) {
       console.log('el usuario ya se enuentra logueado');
-      req.session.idMongoDb = user.id;
-      req.session.name = user.name;
-      req.session.familyName = user.familyName;
-      req.session.userName = user.userName;
-      callback();
+      fillReqSessionVariables(user, callback);
     } else {
       console.log('no esta logueado, se creara uno');
       var User = mongoose.model('User', UserSchema);
@@ -36,20 +36,23 @@ UserSchema.statics.signUp = function (req, callback, error) {
         provider: req.user.provider,
         name: req.user.name.givenName,
         familyName: req.user.name.familyName,
-        userName: req.user.name.givenName,
+        hexCode: color
         //photo: profile.photos[0].value
       });
       user.save(function(err) {
         if(err) throw err;
-        req.session.idMongoDb = user.id;
-        req.session.name = user.name;
-        req.session.familyName = user.familyName;
-        req.session.userName = user.userName;
         console.log('Se logueo al usuario satisfoctoriamente');
-        callback();
+        fillReqSessionVariables(user, callback);
       });
     }
   });
+  function fillReqSessionVariables(user, callback) {
+    req.session.idMongoDb = user.id;
+    req.session.name = user.name;
+    req.session.familyName = user.familyName;
+    req.session.hexCode = user.hexCode;
+    callback();
+  }
 }
 
 UserSchema.statics.getProfilePicture = function (req, callback) {
@@ -116,8 +119,10 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
     req.session.queryTimeLimit = queryTimeLimitStep;
   }
 
-  var nameAuthor = req.params.id;
-  this.findOne({name: nameAuthor})
+  var res = req.params.id.split('.');
+  var hexCode = res[0];
+  var nameAuthor = res[1];
+  this.findOne({hexCode: hexCode, name: nameAuthor})
   .populate('actions')
   .exec(function (err, author) {
     if (err) return handleError(err);
@@ -137,19 +142,20 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
         posts[i].location = {};
         posts[i].location.latitude = author.actions[i].geo[0];
         posts[i].location.longitude = author.actions[i].geo[1];
-        getFBInfo(i, posts[i].fbId);
+        getFBInfo(i, posts[i].fbId, author.hexCode);
       }
     } else {
       console.log('NO EXISTE tal autor');
       error();
     }
   })
-  function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)
+  function getFBInfo(i, fbUserId, hexCode) { //function getFBInfo(i, fbUserId, idKey)
     FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
       posts[i].author = {};
       //posts[i].author.idKey = idKey;
       posts[i].author.firstName = profile.first_name;
       posts[i].author.lastName = profile.last_name;
+      posts[i].author.hexCode = hexCode;
       FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
         posts[i].author.picture= picture.data.url;
         triggerNext();

@@ -128,6 +128,9 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
 //TODO: Pasar esto a servidor
+console.log('url!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+console.log('url: ' + url);
+console.log('reqType: ' + reqType);
 	if(url != '') {
 		if(reqType == 'tag'){
 			initialize();
@@ -154,9 +157,9 @@ function Application($scope, $http) {
 		} else if(reqType == 'author') {
 			//var res = location.hash.split('#');
 			initialize();
-			var res = url.split('-');
-			var firstName = res[0].toLowerCase();
-			var colorHexLowerCase = res[1].toLowerCase();
+			var res = url.split('.');
+			var hexCode = res[0].toLowerCase();
+			var firstName = res[1].toLowerCase();
 			//var commonNames = [];
 			//var countCommonNames = 0;
 
@@ -175,8 +178,11 @@ function Application($scope, $http) {
 							//getEvents();
 							//$scope.user.getFollowers();
 							//$scope.user.getFollowing();
-							history.pushState( {}, null, '/' + firstName + '-' + colorHexLowerCase);
-							getPosts(reqType, res[0]);
+							history.pushState( {}, null, '/' + hexCode + '.' + res[1]);
+							var id = {}
+							id.hexCode = hexCode;
+							id.firstName = res[1];//firstName;
+							getPosts(reqType, id);
 							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
 							//break;
 						//}
@@ -184,7 +190,16 @@ function Application($scope, $http) {
 				//});
 			//});
 		}
-	} else {
+	} /*else if(reqType == 'channel') {
+		console.log('channel!!!!!!!!');
+		initialize();
+		var separators = ['\\\.', '@'];
+		console.log(separators.join('|'));
+		var res = url.split(new RegExp(separators.join('|')));
+		console.log('res!!!!!!!!!!!!!!:');
+		console.log(res);
+		history.pushState( {}, null, '/' + res[0] + '.' + res[1] + '@' + res[2]);
+	}*/ else {
 		initialize();
 		getGeo(function() {
 			$http.post('/user/setGeo', $scope.user).success(function(data) {
@@ -258,22 +273,25 @@ function Application($scope, $http) {
 	}
 
 	function postsQuery(action, id, next, error) {
-			$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
-				if(status == 204) {
-					clearInterval(getPostsInterval);
+		//si el id está conformado por hexCod + firstName
+		if(typeof id == 'object') {
+			id = id.hexCode + '.' + id.firstName;
+		}
+		$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+			if(status == 204) {
+				clearInterval(getPostsInterval);
+			} else {
+				if(data.posts != undefined) {
+					postQueryCount++;
+					next(data.posts);
 				} else {
-					if(data.posts != undefined) {
-						postQueryCount++;
-						next(data.posts);
-					} else {
-						next();
-					}
+					next();
 				}
-			}).error(function(e) {
-				console.log('error!!');
-				//error(e);
-			});
-		//}
+			}
+		}).error(function(e) {
+			console.log('error!!');
+			//error(e);
+		});
 	}
 
 	function showPosts() {
@@ -488,9 +506,9 @@ function Application($scope, $http) {
 		loadedImgs = 0;
 		createEmptyPosts(5);
 		if(object.author != undefined && action == 'author') {
-			history.pushState( {}, null, '/' + object.author.firstName + '-' + object.author.idKey);
+			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName );
 			$('#tag').html('');
-			getPosts(action, object.author.firstName);
+			getPosts(action, object.author);
 		} else if (object.event != undefined && action == 'tag') {
 			history.pushState( {}, null, '/@' + object.event);
 			$('#tag').html(object.event);
