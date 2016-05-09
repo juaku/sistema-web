@@ -258,6 +258,56 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 	});
 }
 
+jPack.showActions = function(accessToken, actions, providerId, hexCode, next) {
+	var posts = [];
+	countActions = actions.length;
+	if(actions.length == 0) {
+		next(actions);
+	}
+	for(var i in actions) {
+		posts[i] = {};
+		posts[i].id = actions[i]._id;
+		if(providerId != undefined && hexCode	!= undefined) {
+			posts[i].fbId = providerId;
+			getFBInfo(i, posts[i].fbId, hexCode);
+		} else {
+			getProviderId(actions[i].authorId, i);
+		}
+		posts[i].authorId = actions[i].authorId;
+		posts[i].event = actions[i].name;
+		posts[i].time = actions[i].createdAt;
+		posts[i].media = './uploads/' + actions[i].media;
+		posts[i].location = {};
+		posts[i].location.latitude = actions[i].geo[0];
+		posts[i].location.longitude = actions[i].geo[1];
+	}
+	function getProviderId(id, i) {
+		User.findById(id, 'providerId hexCode', function (err, user) {
+			posts[i].fbId = user.providerId;
+			getFBInfo(i, posts[i].fbId, user.hexCode);
+		});
+	}
+	function getFBInfo(i, fbUserId, hexCode) {
+		FB.api('/'+fbUserId+'/', {access_token: accessToken}, function(profile) {
+			posts[i].author = {};
+			posts[i].author.firstName = profile.first_name;
+			posts[i].author.lastName = profile.last_name;
+			posts[i].author.hexCode = hexCode;
+			FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
+				posts[i].author.picture= picture.data.url;
+				triggerNext();
+			});
+		});
+	}
+	function triggerNext() {
+		countActions--;
+		if(countActions===0) {
+			var response = {posts: posts};
+			next(response);
+		}
+	}
+}
+
 jPack.validateTagName = function(newAction, next, error) {
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
 	var flag = validate({post: newAction.eventName}, {post: {format: pattern}});
@@ -796,7 +846,7 @@ jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
 jPack.setGenericData = function(req, next, error) {
 	// TODO: Evaluar
 	this.coords = req.body.data.coords;
-	req.session.jUser.coords = this.coords;
+	req.session.coords = this.coords;
 	next();
 }
 

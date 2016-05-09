@@ -24,9 +24,9 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 	var User = mongoose.model('User');
 	var posts = [];
 	var point = {};
-	if(req.session.jUser.coords != undefined) {
-		point.latitude = req.session.jUser.coords.latitude;
-		point.longitude = req.session.jUser.coords.longitude;
+	if(req.session.coords != undefined) {
+		point.latitude = req.session.coords.latitude;
+		point.longitude = req.session.coords.longitude;
 	} else { // Arequipa
 		point.latitude = -16.3989; 
 		point.longitude = -71.535;
@@ -49,51 +49,8 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 	.limit(resultsLimit)
 	.exec(function (err, action) {
 		if (err) return handleError(err);
-		if(action.length == 0) {
-			callback(action);
-		}
-		countActions = action.length; //results.length;
-		for(var i in action) {
-			posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
-			posts[i].id = action[i]._id;
-			//posts[i].fbId = '1400253030';
-			getProviderId(action[i].authorId, i);
-			posts[i].authorId = action[i].authorId;
-			posts[i].event = action[i].name;
-			posts[i].time = action[i].createdAt;
-			posts[i].media = './uploads/' + action[i].media;
-			posts[i].location = {};
-			posts[i].location.latitude = action[i].geo[0];
-			posts[i].location.longitude = action[i].geo[1];
-			//getFBInfo(i, posts[i].fbId);
-		}
+		callback(action);
 	})
-	function getProviderId(id, i) {
-		User.findById(id, 'providerId hexCode', function (err, user) {
-			posts[i].fbId = user.providerId;
-			getFBInfo(i, posts[i].fbId, user.hexCode);
-		});
-	}
-	function getFBInfo(i, fbUserId, hexCode) {
-		FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
-			posts[i].author = {};
-			//posts[i].author.idKey = idKey;
-			posts[i].author.firstName = profile.first_name;
-			posts[i].author.lastName = profile.last_name;
-			posts[i].author.hexCode = hexCode;
-			FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-				posts[i].author.picture= picture.data.url;
-				triggerNext();
-			});
-		});
-	}
-	function triggerNext() {
-		countActions--;
-		if(countActions===0) {
-			var response = {posts: posts};
-			callback(response);
-		}
-	}
 }
 
 ActionSchema.statics.shareActionOnFb = function (req, callback, error) {

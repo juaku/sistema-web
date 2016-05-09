@@ -25,8 +25,8 @@ router.get('/:action', ensureAuthenticated, function(req, res) {
 
 router.post('/:action', ensureAuthenticated, function(req, res) {
 	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
-		req.session.jUser = new jPack.user(req.session.jUser);
-		var jUser = req.session.jUser;
+		//req.session.jUser = new jPack.user(req.session.jUser);
+		//var jUser = req.session.jUser;
 		if(req.params.action=='setGeo') {
 			jPack.setGenericData(req, function() {
 				res.status(201).end();
@@ -34,7 +34,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 				console.log(error);
 			});
-		} else if (req.params.action=='follow') {
+		}/* else if (req.params.action=='follow') {
 			jUser.setFollowRelation(req.body.userToFollow, function() {
 				res.status(201).end();
 			}, function(error) {
@@ -62,7 +62,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 				console.log(error);
 			});
-		} /*else if (req.params.action=='askLocation') {
+		}*/ /*else if (req.params.action=='askLocation') {
 			jUser.askLocation(req.body.postToAskLocation, function() {
 				res.status(201).end();
 			}, function(error) {

@@ -24,9 +24,9 @@ var TagSchema = new Schema({
 TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	var posts = [];
 	var point = {};
-	if(req.session.jUser.coords != undefined) {
-		point.latitude = req.session.jUser.coords.latitude;
-		point.longitude = req.session.jUser.coords.longitude;
+	if(req.session.coords != undefined) {
+		point.latitude = req.session.coords.latitude;
+		point.longitude = req.session.coords.longitude;
 	} else { // Arequipa
 		point.latitude = -16.3989;
 		point.longitude = -71.535;
@@ -59,57 +59,19 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	}
 	var tagName = simpleEventName.toLowerCase();
 	this.findOne({name: tagName})
-	.populate('actions')
+	.populate({
+		path: 'actions',
+		options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+	})
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
 		if(tag != null) {
-			if(tag.actions.length == 0) {
-				callback(tag.actions);
-			}
-			countActions = tag.actions.length; //results.length;
-			for(var i in tag.actions) {
-				posts[i] = {}; //console.log('action.author.name: ' + query[0].author[0].name);
-				posts[i].id = tag.actions[i]._id;
-				getProviderId(tag.actions[i].authorId, i);
-				posts[i].authorId = tag.actions[i].authorId;
-				posts[i].event = tag.actions[i].name;
-				posts[i].time = tag.actions[i].createdAt;
-				posts[i].media = './uploads/' + tag.actions[i].media;
-				posts[i].location = {};
-				posts[i].location.latitude = tag.actions[i].geo[0];
-				posts[i].location.longitude = tag.actions[i].geo[1];
-			}
+			callback(tag.actions);
 		} else {
 			console.log('NO EXISTE tal tag');
 			error();
 		}
 	})
-	function getProviderId(id, i) {
-		User.findById(id, 'providerId hexCode', function (err, user) {
-			posts[i].fbId = user.providerId;
-			getFBInfo(i, posts[i].fbId, user.hexCode);
-		});
-	}
-	function getFBInfo(i, fbUserId, hexCode) { //function getFBInfo(i, fbUserId, idKey)
-		FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
-			posts[i].author = {};
-			//posts[i].author.idKey = idKey;
-			posts[i].author.firstName = profile.first_name;
-			posts[i].author.lastName = profile.last_name;
-			posts[i].author.hexCode = hexCode;
-			FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-				posts[i].author.picture= picture.data.url;
-				triggerNext();
-			});
-		});
-	}
-	function triggerNext() {
-		countActions--;
-		if(countActions===0) {
-			var response = {posts: posts};
-			callback(response);
-		}
-	}
 }
 
 TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error

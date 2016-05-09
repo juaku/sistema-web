@@ -17,13 +17,14 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			/*jPack.getAllPosts(req, function(result) {
 				if(result.length == 0) {*/
 			var Action = mongoose.model('Action');
-			Action.getActions(req, function (actions) {
-				if(actions.length == 0) {
-					res.status(204).end();
-				} else {
-					//res.json(result);
-					res.json(actions);
-				}
+			Action.getActions(req, function (actions, providerId, hexCode) {
+				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+					if(posts.length == 0) {
+						res.status(204).end();
+					} else {
+						res.json(posts);
+					}
+				});
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
@@ -41,8 +42,10 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			});
 		}*/ else if(req.params.action=='tag') {
 			var Tag = mongoose.model('Tag');
-			Tag.getActionsByTag(req, function(actions) {
-				res.json(actions);
+			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
+				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+					res.json(posts);
+				});
 			}, function(error) {
 				console.log(error);
 				res.status(404).end();
@@ -59,8 +62,10 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			});*/
 		} else if(req.params.action=='author') {
 			var User = mongoose.model('User');
-			User.getActionsByAuthor(req, function(actions) {
-				res.json(actions);
+			User.getActionsByAuthor(req, function(actions, providerId, hexCode) {
+				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+					res.json(posts);
+				});
 			}, function(error) {
 				console.log(error);
 				res.status(404).end();
