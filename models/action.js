@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var FB = require('fb');
-require('./user');
 
 var ActionSchema = new Schema({
 	name: String,
@@ -9,6 +8,7 @@ var ActionSchema = new Schema({
 	media: String,
 	active: Boolean,
 	authorId : String,
+	tagId: String,
 	createdAt: {type: Date, default: Date.now}
 });
 
@@ -21,8 +21,6 @@ var ActionSchema = new Schema({
 }*/
 
 ActionSchema.statics.getActions = function (req, callback, error) {
-	var User = mongoose.model('User');
-	var posts = [];
 	var point = {};
 	if(req.session.coords != undefined) {
 		point.latitude = req.session.coords.latitude;

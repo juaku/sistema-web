@@ -4,6 +4,7 @@ var FB = require('fb');
 var fs = require('fs');
 var http = require('http');
 var url = require('url');
+require('./tag');
 
 var UserSchema = new Schema({
   providerId: {type: String, unique: true},
@@ -98,7 +99,6 @@ UserSchema.statics.getProfilePicture = function (req, callback) {
 }*/
 
 UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
-  var posts = [];
   var point = {};
   if(req.session.coords != undefined) {
     point.latitude = req.session.coords.latitude;
@@ -138,7 +138,71 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
   })
 }
 
-/*var User = mongoose.model('User', UserSchema);
-var Action = mongoose.model('Action', ActionSchema);
-var Tag = mongoose.model('Tag', TagSchema);*/
+UserSchema.statics.getActionsByChannel = function (req, callback, error) {
+  var User = mongoose.model('User');
+  var Tag = mongoose.model('Tag');
+  var point = {};
+  if(req.session.coords != undefined) {
+    point.latitude = req.session.coords.latitude;
+    point.longitude = req.session.coords.longitude;
+  } else { // Arequipa
+    point.latitude = -16.3989;
+    point.longitude = -71.535;
+  }
+
+  var resultsLimit = 10;
+  var queryNumber = 0;
+  var queryTimeLimitStep = 24*20;
+  var countActions;
+
+  if(req.params.i!=undefined) {
+    queryNumber = parseInt(req.params.i);
+  } else {
+    req.session.queryTimeLimit = queryTimeLimitStep;
+  }
+
+  var res = req.params.id.split('.');
+  var hexCode = res[0];
+  var nameAuthor = res[1];
+  var tagName = res[2];
+
+  var simpleEventName = tagName;
+  var diacritics =[
+    /[\300-\306]/g, /[\340-\346]/g,  // A, a
+    /[\310-\313]/g, /[\350-\353]/g,  // E, e
+    /[\314-\317]/g, /[\354-\357]/g,  // I, i
+    /[\322-\330]/g, /[\362-\370]/g,  // O, o
+    /[\331-\334]/g, /[\371-\374]/g,  // U, u
+    /[\321]/g, /[\361]/g, // N, n
+    /[\307]/g, /[\347]/g, // C, c
+  ];
+  var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+  for (var i = 0; i < diacritics.length; i++) {
+    simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
+  }
+  tagName = simpleEventName.toLowerCase();
+  Tag.findOne({ 'name': tagName }, '_id', function (err, tag) {
+    if(tag!= null) {
+      User.findOne({hexCode: hexCode, name: nameAuthor})
+      .populate({
+        match: {tagId: tag.id},
+        path: 'actions',
+        options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+      })
+      .exec(function (err, author) {
+        if (err) return handleError(err);
+        if(author != null) {
+          callback(author.actions, author.providerId, author.hexCode);
+        } else {
+          console.log('NO EXISTE tal autor');
+          error();
+        }
+      })
+    } else {
+      console.log('NO EXISTE tal evento');
+      error();
+    }
+  });
+}
+
 module.exports = mongoose.model('User', UserSchema);

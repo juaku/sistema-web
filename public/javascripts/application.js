@@ -128,9 +128,6 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
 //TODO: Pasar esto a servidor
-console.log('url!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-console.log('url: ' + url);
-console.log('reqType: ' + reqType);
 	if(url != '') {
 		if(reqType == 'tag'){
 			initialize();
@@ -189,17 +186,18 @@ console.log('reqType: ' + reqType);
 					//}
 				//});
 			//});
+		} else if(reqType == 'channel') {
+			initialize();
+			var separators = ['\\\.', '@'];
+			var res = url.split(new RegExp(separators.join('|')));
+			history.pushState( {}, null, '/' + res[0] + '.' + res[1] + '@' + res[2]);
+			var id = {}
+			id.hexCode = res[0];
+			id.firstName = res[1];
+			id.tag = res[2];
+			getPosts(reqType, id);
 		}
-	} /*else if(reqType == 'channel') {
-		console.log('channel!!!!!!!!');
-		initialize();
-		var separators = ['\\\.', '@'];
-		console.log(separators.join('|'));
-		var res = url.split(new RegExp(separators.join('|')));
-		console.log('res!!!!!!!!!!!!!!:');
-		console.log(res);
-		history.pushState( {}, null, '/' + res[0] + '.' + res[1] + '@' + res[2]);
-	}*/ else {
+	} else {
 		initialize();
 		getGeo(function() {
 			$http.post('/user/setGeo', $scope.user).success(function(data) {
@@ -275,7 +273,11 @@ console.log('reqType: ' + reqType);
 	function postsQuery(action, id, next, error) {
 		//si el id está conformado por hexCod + firstName
 		if(typeof id == 'object') {
-			id = id.hexCode + '.' + id.firstName;
+			if(id.tag == undefined) {
+				id = id.hexCode + '.' + id.firstName;
+			} else {
+				id = id.hexCode + '.' + id.firstName + '.' + id.tag;
+			}
 		}
 		$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
 			if(status == 204) {

@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var mongoose = require('mongoose');
+//Modelos
+var User = require('../models/user');
+var Tag = require('../models/tag');
+var Action = require('../models/action');
 
 var ensureAuthenticated = require('./ensureAuth');
 
@@ -16,7 +19,6 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 		if(req.params.action=='actions') {
 			/*jPack.getAllPosts(req, function(result) {
 				if(result.length == 0) {*/
-			var Action = mongoose.model('Action');
 			Action.getActions(req, function (actions, providerId, hexCode) {
 				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					if(posts.length == 0) {
@@ -41,7 +43,6 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		}*/ else if(req.params.action=='tag') {
-			var Tag = mongoose.model('Tag');
 			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
 				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);
@@ -61,8 +62,16 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});*/
 		} else if(req.params.action=='author') {
-			var User = mongoose.model('User');
 			User.getActionsByAuthor(req, function(actions, providerId, hexCode) {
+				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+					res.json(posts);
+				});
+			}, function(error) {
+				console.log(error);
+				res.status(404).end();
+			});
+		} else if(req.params.action=='channel') {
+			User.getActionsByChannel(req, function(actions, providerId, hexCode) {
 				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);
 				});

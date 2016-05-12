@@ -20,9 +20,7 @@ var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
 
 // Concección con MongoDB
-var mongoose = require('mongoose');
-require('./models/user');
-//mongoose.connect('mongodb://localhost:27017/test');
+var db = require('./mongodbConnect');
 
 //Sesion permanente
 var redisStore = require('connect-redis')(session);

@@ -24,11 +24,10 @@ var validate = require("validate.js")
 // Herramientas Geo - (Evaluar si es necesaria)
 //var geolib = require('geolib');
 
-// Concección con MongoDB
-var db = require('./mongodbConnect');
-var Tag = db.model('Tag');
-var Action = db.model('Action');
-var User = db.model('User');
+//Modelos BD
+var Tag = require('./models/tag');
+var Action = require('./models/action');
+var User = require('./models/user');
 
 var jPack = jPack || {};
 

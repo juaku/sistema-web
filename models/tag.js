@@ -3,10 +3,8 @@ var Schema = mongoose.Schema;
 var fs = require('fs');
 var FB = require('fb');
 
-require('./user');
 require('./action');
-var User = mongoose.model('User');
-var Action = mongoose.model('Action');
+require('./user');
 
 var TagSchema = new Schema({
 	name: String,
@@ -22,7 +20,6 @@ var TagSchema = new Schema({
 }*/
 
 TagSchema.statics.getActionsByTag = function (req, callback, error) {
-	var posts = [];
 	var point = {};
 	if(req.session.coords != undefined) {
 		point.latitude = req.session.coords.latitude;
@@ -75,9 +72,9 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 }
 
 TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error
+	var Action = mongoose.model('Action');
+	var User = mongoose.model('User');
 	var newAction = req.body;
-	console.log('\x1b[1m\x1b[35m@@@ newAction @@@\x1b[0m');
-	console.log(req.body);
 	var FB = require('fb');
 	var coords = [];
 	coords[0] = newAction.coords.latitude;
@@ -102,18 +99,24 @@ TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userI
 				console.log(doc);
 			});
 			if(objectTag!= null) {
+				Action.update({ _id: action._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
+					if (err) return handleError(err);
+				});
 				objectTag.actions.push(action._id);
 				objectTag.save();
 				console.log('Acción referenciada a tag');
 				callback();
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
-				var tag = new Tag(); //TypeError: object is not a function con: this()
+				var tag = new Tag();
 				tag.name = tagName;
 				tag.originalName = newAction.eventName;
 				tag.actions = action._id;
 				tag.save(function (err) {
 					if (err) return handleError(err);
+					Action.update({ _id: action._id }, { $set: { tagId: tag._id }}, function (err, doc) {
+						if (err) return handleError(err);
+					});
 					console.log('Tag guardado y acción referenciada');
 					callback();
 				});
