@@ -13,6 +13,7 @@ var UserSchema = new Schema({
   familyName: String,
   hexCode: String,
   actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
+  savedActions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
   channels: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   createdAt: {type: Date, default: Date.now}
@@ -124,13 +125,14 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
   var nameAuthor = res[1];
   this.findOne({hexCode: hexCode, name: nameAuthor})
   .populate({
-    path: 'actions',
+    path: 'actions savedActions',
     options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
   })
   .exec(function (err, author) {
     if (err) return handleError(err);
     if(author != null) {
-      callback(author.actions, author.providerId, author.hexCode);
+      var mergedActions = author.savedActions.concat(author.actions);
+      callback(mergedActions, author.providerId, author.hexCode);
     } else {
       console.log('NO EXISTE tal autor');
       error();
