@@ -11,14 +11,14 @@ block content
   header
   #box
     aside#side
-      h2#tag-title
-        img(src=user.picture)
-        span.at @
-        span#tag
+      section#controls
+        label#title-label(for="title") /
+        input(type="search" size="1" ng-model="search" search)#title
       //
       // Side controls
       //
       section#account
+        img(src=user.picture)
         span.user-firstname #{user.name.givenName}
         span.user-lastname #{user.name.familyName}
               
@@ -99,11 +99,9 @@ block content
           footer 
             nav Términos y condiciones | Prensa
             #brand Juaku 2016
-
-
     main
       section#start
-        a#logo-link(target="_self" onclick="document.location = '/layout.html';")
+        a#logo-link(target="_self" onclick="document.location = '/';")
           h1 Juaku
           svg#logo
             use#logo-icon(xlink:href="#logo-icon-svg")
@@ -140,10 +138,11 @@ block content
           img(ng-src='{{ post.media }}' class='{{ post.class }}' image-on-load)
         .info
           .author-picture
-            a(href="" rel="author").author-link
-              img(ng-src="{{ post.author.picture }}")
+            //a(rel="author").author-link
+            img(ng-src="{{ post.author.picture }}" ng-click="getMediaByFilter('author', post)")
           .action-info
             h3.action-title
+              span(hex-code="{{ post.author.hexCode }}" ng-click="getMediaByFilter('channel', post)").author-hex-code
               span(href='' ng-click="getMediaByFilter('author', post)").author-name {{ post.author.firstName }}
               span.at @
               span(href='' ng-if="post.event" ng-click="getMediaByFilter('tag', post)").tag-name {{ post.event }}
@@ -175,7 +174,7 @@ block content
     //
     //  Flotante
     //
-    nav#view-menu
+    //nav#view-menu
       .view-button.first
         #button-config.button
       .view-button
@@ -186,7 +185,9 @@ block content
         #button-events.button
       .view-button.last
         #button-search.button
+    
 
+  //#test(style='position: fixed; background: #000; color: #FFF; bottom: 50px;') Test
 
   //
   //  Librería SVG

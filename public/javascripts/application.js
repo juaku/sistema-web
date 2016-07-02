@@ -12,7 +12,9 @@
  * Código de maquetación
  * ---------------------
  */
+
 $(document).ready(function() {
+
 	$('main').scrollLeft($('#first').width());
 
 	/*
@@ -51,9 +53,9 @@ $(document).ready(function() {
 			case 0:
 				$('body').addClass('config-view');
 				break;
-			case 1:
+			/*case 1:
 				$('body').addClass('posts-view');
-				break;
+				break;*/
 			case 2:
 				$('body').addClass('new-post-view');
 				$('input#media-loader').click(); // Petición de archivo
@@ -143,7 +145,7 @@ function Application($scope, $http) {
 							//$scope.user.getFollowers();
 							//$scope.user.getFollowing();
 							history.pushState( {}, null, '/@' + simpleEventName);
-							$('#tag').first().html(simpleEventName); // TODO: Mejorar
+							$('#title').val('@' + simpleEventName); // TODO: Mejorar
 							getPosts(reqType, res[1]);
 							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
 							//break;
@@ -176,6 +178,7 @@ function Application($scope, $http) {
 							//$scope.user.getFollowers();
 							//$scope.user.getFollowing();
 							history.pushState( {}, null, '/' + hexCode + '.' + res[1]);
+							
 							var id = {}
 							id.hexCode = hexCode;
 							id.firstName = res[1];//firstName;
@@ -191,6 +194,7 @@ function Application($scope, $http) {
 			var separators = ['\\\.', '@'];
 			var res = url.split(new RegExp(separators.join('|')));
 			history.pushState( {}, null, '/' + res[0] + '.' + res[1] + '@' + res[2]);
+			$('#title').val(res[0] + '.' + res[1] + '@' + res[2]);
 			var id = {}
 			id.hexCode = res[0];
 			id.firstName = res[1];
@@ -232,7 +236,6 @@ function Application($scope, $http) {
 	createEmptyPosts(5);
 	//askForPost();
 
-	console.log('Hola');
 	$(document).scroll(function() {
 		if(window.innerWidth + $('body').scrollTop()*1.2 >= $(document).height()) {
 			askForPost(actionAux, idAux);
@@ -312,10 +315,13 @@ function Application($scope, $http) {
 				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
 				$scope.posts[i].class = 'real';
 				//console.log($scope.posts[i].author);
+				console.log($scope.posts[i].author.hexCode);
 			}
 		}
 		createEmptyPosts(1);
 		gettingPosts = false;
+
+		// hexCode
 	}
 
 	// Crear n post vacios mientras carga los post originales
@@ -509,12 +515,20 @@ function Application($scope, $http) {
 		createEmptyPosts(5);
 		if(object.author != undefined && action == 'author') {
 			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName );
-			$('#tag').html('');
+			$('#title').val(object.author.hexCode + '.' + object.author.firstName);
 			getPosts(action, object.author);
 		} else if (object.event != undefined && action == 'tag') {
 			history.pushState( {}, null, '/@' + object.event);
-			$('#tag').html(object.event);
+			$('#title').val('@' + object.event);
 			getPosts(action, object.event);
+		} else if (object.author != undefined && object.event != undefined && action == 'channel') {
+			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.event);
+			$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.event);
+			var id = {}
+			id.hexCode = object.author.hexCode;
+			id.firstName = object.author.firstName;
+			id.tag = object.event;
+			getPosts(action, id);
 		}
 	}
 
@@ -597,10 +611,31 @@ angular.module('Juaku', [])
 		}
 	};
 })
+.directive('search', function() {
+	return {
+		require: 'ngModel',
+		link: function(scope, element, attrs, controller) {
+			function search(text) {
+				var transformedSearch = text.replace(/[^A-Z0-9a-z@.'/]/g, '');
+				
+				//console.log('FZ: ' + parseInt($(element).css('font-size')));
+				//var titleFontSize = 72;
+				//$(element).css('font-size', titleFontSize - ((text.length - 16)* 2));
+				
+				if(transformedSearch !== text) {
+					controller.$setViewValue(transformedSearch);
+					controller.$render();
+				}
+				return transformedSearch;  // or return Number(transformedInput)
+			}
+			controller.$parsers.push(search);
+		}
+	};
+})
 .filter('capitalize', function() {
-    return function(input) {
-      return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
-    }
+	return function(input) {
+		return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+	}
 })
 //.module('app', ['ngTouch']);
 
@@ -621,7 +656,14 @@ function postsLoaded() {
 	// Parpadeo cuando se hace scroll hacia abajo
 	$('article .media img').off('tapone');
 	$('article .media img').on('tapone', function() { 
-		assistedScroll(1, $(this).parents('article'));
+		//assistedScroll(1, $(this).parents('article'));
+	});
+
+	console.log('123');
+
+	$('.author-hex-code').each(function(index) {
+		console.log($(this).css('background-color') + ' ' + $(this).attr('hex-code'));
+		$(this).css('background-color', '#' + $(this).attr('hex-code'));
 	});
 }
 

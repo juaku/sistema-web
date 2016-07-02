@@ -30,11 +30,24 @@ body
 
 body
 	margin: 0
-	background-color: #333 /* EEE */
+	background-color: #F7F7F7 /* EEE */
 	font-family: "Arial"
-	color: #FFF /* 111 */
+	color: #111 /* 111 */
 
-h2
+label#title-label
+	position: fixed
+	font-size: 15px
+	/*background-color: #DDD*/
+	border-radius: 50%
+	width: 30px
+	height: 30px
+	transition: background-color 200ms
+	user-select: none
+
+/*label#title-label:hover
+	background-color: #EEE*/
+
+input#title
 	font-size: 5vw
 	font-weight: normal
 	margin-top: 32vh
@@ -45,6 +58,31 @@ h2
 	position: fixed
 	width: 36vw
 	padding-right: 0.05em /* Evitar corte letter-spacing negativo */
+	outline: 0
+	border: 0
+	border-radius: 0
+	background-color: #F7F7F7
+	display: block
+	text-align: right
+
+input[type=text]::-ms-clear
+	display: none
+	width : 0
+	height: 0
+
+input[type=text]::-ms-reveal
+	display: none
+	width : 0
+	height: 0
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration
+	display: none
+
+input#title::before
+	content: ''
 
 h3
 	font-weight: normal
@@ -77,13 +115,13 @@ main
 		
 /* Grupales */
 
-h2 img
-	width: 1em
-	height: 1em
+#account img
+	width: 2em
+	height: 2em
 	border-radius: 50%
 	position: relative
-	top: 0.2em
-	margin-right: 0.05em
+	top: 0.7em
+	margin-right: 0.5em
 
 #account
 	margin-top: 46vh
@@ -91,7 +129,7 @@ h2 img
 	position: fixed
 
 #start
-	background-color: #000 /* FFF */
+	background-color: #FFF /* FFF */
 	width: 82vh
 	position: relative
 	height: 82vh
@@ -125,9 +163,10 @@ h2 img
 	max-width: 54vw
 	margin-bottom: 3vh
 	min-width: 30vw
+	position: relative
 
 .action .media
-	background-color: #444 /* CCC */
+	background-color: #EEE /* CCC */
 	width: 100%
 	height: 82vh
 	max-width: 54vw
@@ -142,6 +181,8 @@ h2 img
 	display: block
 	opacity: 0
 	transition: opacity 200ms
+	user-select: none
+	cursor: pointer
 
 .action.show .media img
 	opacity: 1
@@ -167,7 +208,7 @@ h2 img
 /* Action -> Info */
 
 .info
-	background-color: #000 /* FFF */
+	background-color: #FFF /* FFF */
 	width: 100%
 	height: 15vmin
 	min-height: 72px
@@ -184,12 +225,11 @@ h2 img
 	width: 19%
 	padding: 2.5%
 
-.info .author-picture a.author-link,
 .info a.save-link 
 	display: block
 	border-radius: 50%
 
-.info .author-picture a.author-link img
+.info .author-picture img
 	display: block
 	border-radius: 50%
 	margin: 0 auto
@@ -207,10 +247,10 @@ h2 img
 .info h3.action-title .author-name
 	font-weight: bold
 
-.info h3.action-title .author-name::before
+.info h3.action-title .author-hex-code
 	content: ''
 	display: inline-block
-	background-color: #F05
+	background-color: #888
 	border-radius: 50%
 	width: 0.7em
 	height: 0.7em
@@ -226,7 +266,7 @@ h2 img
 
 .info a.save-link .save
 	display: block
-	background-color: #888
+	background-color: #CCC
 	border-radius: 50%
 	width: 100%
 
@@ -274,11 +314,11 @@ div // TODO: Evaluar elementos a los que se aplica
  * Controles
  */
 
-section#options-side
+/*section#options-side
 	text-align: right
 	width: 100%
-
-section#account-controls section#profile
+*/
+/*section#account-controls section#profile
 	width: 100%
 	display: table
 	margin-bottom: 40px
@@ -287,8 +327,8 @@ section#account-controls section#profile img
 section#account-controls section#profile h2
 	display: table-cell
 	vertical-align: middle
-
-section#account-controls section#profile h2.profile-name
+*/
+/*section#account-controls section#profile h2.profile-name
 	width: 100%
 	margin: 0
 	padding: 5px 10px 0 0
@@ -298,10 +338,11 @@ section#account-controls section#profile h2.profile-name
 	text-overflow: ellipsis
 	font-weight: normal
 	letter-spacing: -0.5px
+*/
 
-section#account-controls section#profile h2.profile-name .profile-firstname
+/*section#account-controls section#profile h2.profile-name .profile-firstname
 	font-size: 24px
-	color: blackColor
+	color: blackColor*/
 
 /*
  * Vista
@@ -340,6 +381,7 @@ aside section#events-controls .show-more
 /*
  * Controles flotantes
  */
+/*
 nav#view-menu
 	transition: background-color 250ms linear
 	width: 100%
@@ -379,6 +421,7 @@ nav#view-menu #button-events
 	background-position: 88px
 nav#view-menu #button-search
 	background-position: 44px
+*/
 
 /*
  * Pie
@@ -398,6 +441,7 @@ footer #brand
 input#media-loader
 	visibility: hidden
 	position: absolute
+	display: none
 
 section#new-post
 	display: none
@@ -539,23 +583,53 @@ svg#svg-library
 		font-size: 13px
 
 @media screen and (max-width: 480px)
+	label#title-label
+		bottom: 5px
+		left: 5px
+		z-index: 2
+		font-family: Verdana
+		text-align: center
+		line-height: 28px
+		font-weight: bold
+		color: #777
+	
+	input#title
+		position: fixed
+		bottom: 0
+		font-size: 15px
+		z-index: 1
+		display: block
+		margin: 0
+		height: 40px
+		background: #FFF
+		color: #000
+		padding: 0 40px 0 25px
+		-webkit-appearance: none
+		width: 100vw
+		font-family: 'Verdana'
+		box-shadow: 0 -4px 0 rgba(0,0,0,0.05)
+		text-align: left
+	
+	section#controls img
+		display: none
+
 	h3
 		font-size: 5vw
 		transition: font-size 100ms
-	
+
 	#box
 		display: block /* Mejor control de la barra de scroll */
-	
-	#side
+
+	#account
 		display: none
 
 	main
 		overflow-y: auto
 		overflow-x: hidden
 		-webkit-overflow-scrolling: touch
-		height: 100vh
+		height: calc(100vh - 40px)
 		display: block
-
+	
 	main,
 	.action,
 	.action .media,
@@ -584,10 +658,10 @@ svg#svg-library
 		margin: 0 1vw 0 0
 
 	.info .action-time
-		font-size: 3.5vw
+		font-size: 4vw
 	
-	nav#view-menu
-		display: table
+	/*nav#view-menu
+		display: table*/
 
 /* Old Responsive
 
