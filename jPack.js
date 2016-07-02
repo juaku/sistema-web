@@ -257,18 +257,26 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 	});
 }
 
-jPack.showActions = function(accessToken, actions, providerId, hexCode, next) {
+jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, next) {
 	var posts = [];
+	var savedActions;
 	countActions = actions.length;
 	if(actions.length == 0) {
 		next(actions);
 	}
+	User.findById(userId, 'savedActions', function (err, user) {
+		savedActions = user.savedActions;
+	});
 	for(var i in actions) {
 		posts[i] = {};
 		posts[i].id = actions[i]._id;
 		if(providerId != undefined && hexCode	!= undefined) {
-			posts[i].fbId = providerId;
-			getFBInfo(i, posts[i].fbId, hexCode);
+			if(actions[i].authorId != userId ) {
+				getProviderId(actions[i].authorId, i);
+			} else {
+				posts[i].fbId = providerId;
+				getFBInfo(i, posts[i].fbId, hexCode);
+			}
 		} else {
 			getProviderId(actions[i].authorId, i);
 		}
@@ -283,7 +291,12 @@ jPack.showActions = function(accessToken, actions, providerId, hexCode, next) {
 	function getProviderId(id, i) {
 		User.findById(id, 'providerId hexCode', function (err, user) {
 			posts[i].fbId = user.providerId;
-			getFBInfo(i, posts[i].fbId, user.hexCode);
+			if(savedActions.indexOf(posts[i].id) > -1) {
+				posts[i].saved = true;
+			} else {
+				posts[i].saved = false;
+			}
+			getFBInfo(i, posts[i].fbId, user.hexCode, user.savedActions);
 		});
 	}
 	function getFBInfo(i, fbUserId, hexCode) {

@@ -20,7 +20,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			/*jPack.getAllPosts(req, function(result) {
 				if(result.length == 0) {*/
 			Action.getActions(req, function (actions, providerId, hexCode) {
-				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					if(posts.length == 0) {
 						res.status(204).end();
 					} else {
@@ -44,7 +44,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			});
 		}*/ else if(req.params.action=='tag') {
 			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);
 				});
 			}, function(error) {
@@ -63,7 +63,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			});*/
 		} else if(req.params.action=='author') {
 			User.getActionsByAuthor(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);
 				});
 			}, function(error) {
@@ -72,7 +72,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			});
 		} else if(req.params.action=='channel') {
 			User.getActionsByChannel(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
+				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);
 				});
 			}, function(error) {

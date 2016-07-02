@@ -335,16 +335,16 @@ function Application($scope, $http) {
 		};
 	}
 
-	//Asigna like a la foto que se indicó
-	$scope.likeClick = function(post) {
+	//Guarda la foto que el usuario desee
+	$scope.saveClick = function(post) {
 		$scope.post = post;
-		if (!$scope.post.like) {
-			$scope.post.like = true;
-			$http.post('/post/like', $scope.post).success(function(data) {
+		if (!$scope.post.saved) {
+			$scope.post.saved = true;
+			$http.post('/post/save', $scope.post).success(function(data) {
 			}).error();
 		} else {
-			$scope.post.like = false;
-			$http.post('/post/unlike', $scope.post).success(function(data) {
+			$scope.post.saved = false;
+			$http.post('/post/unsave', $scope.post).success(function(data) {
 			}).error();
 		}
 	}

@@ -151,7 +151,7 @@ block content
             span.action-time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
             span.action-time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
           .save-button
-            a(ng-click="likeClick(post)" ng-class="{ selected: post.like }").save-link
+            a(ng-click="saveClick(post)" ng-class="{ selected: post.saved }").save-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save
 
       //- article(ng-repeat="post in posts" last-post-loaded)

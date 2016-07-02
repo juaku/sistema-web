@@ -56,22 +56,42 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 	var res = str.split(".");
 	
 	var url = 'http://juaku-dev.cloudapp.net:5000/uploads/' + res[0] + '.' + res[1];
-  var albumId = '';
-  FB.api('/' + albumId + '/photos','POST',
-    {
-      'url': url,
-      'access_token': req.session.passport.user.accessToken
-    },
-      function (response) {
-        if (response && !response.error) {
-          // handle the result
-          console.log('Foto compartida en facebook exitósamente');
-          callback();
-        } else {
-          error();
-        }
-      }
-  );
+	var albumId = '';
+	FB.api('/' + albumId + '/photos','POST',
+		{
+			'url': url,
+			'access_token': req.session.passport.user.accessToken
+		},
+			function (response) {
+				if (response && !response.error) {
+					// handle the result
+					console.log('Foto compartida en facebook exitósamente');
+					callback();
+				} else {
+					error();
+				}
+			}
+	);
+}
+
+ActionSchema.statics.saveAction = function (action, userId, callback, error) {
+	var User = mongoose.model('User');
+	User.update({ _id: userId }, { $push: { savedActions: action.id }}, function (err, doc) {
+		if (err) return handleError(err);
+		console.log('accion guardada con éxito en savedActions');
+		console.log(doc);
+		callback();
+	});
+}
+
+ActionSchema.statics.unsaveAction = function (action, userId, callback, error) {
+	var User = mongoose.model('User');
+	User.update({ _id: userId }, { $pull: { savedActions: action.id }}, function (err, doc) {
+		if (err) return handleError(err);
+		console.log('accion removida de savedActions');
+		console.log(doc);
+		callback();
+	});
 }
 
 module.exports = mongoose.model('Action', ActionSchema);
