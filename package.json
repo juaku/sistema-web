@@ -28,6 +28,8 @@
     "crypto": "0.0.3",
     "cron": "~1.0.5",
     "validate.js": "~0.7.1",
-    "mongoose": "~4.4.8"
+    "mongoose": "~4.4.8",
+    "express-jwt": "~3.4.0",
+    "jsonwebtoken": "~7.0.1"
   }
 }

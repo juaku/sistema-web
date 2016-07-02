@@ -583,8 +583,49 @@ function Application($scope, $http) {
 	}
 
 } // Fin Controlador - function Application($scope, $http)
+
+function LoginController($scope, $http, $window) {
+  $scope.saveTokenLocalStorage = function () {
+    console.log('ENTRANDO A LA FUNCION SUBMIT');
+    $http.get('/login', $scope.user).success(function (data, status, headers, config) {
+        console.log('DATA!! SUBMIT BUTTON : ' + JSON.stringify(data.token));
+        $window.localStorage.token = data.token;
+        console.log('WAAAAAAAAAAAAAAAAAA1111');
+        $window.close();
+      })
+      .error(function (data, status, headers, config) {
+        // Erase the token if the user fails to log in
+        //delete $window.localStorage.token;
+        console.log('ERROR!  SUBMIT BUTTON');
+        // Handle login errors here
+        $scope.message = 'Error: Invalid user or password';
+      });
+  };
+}
+
 // Directivas
 angular.module('Juaku', [])
+.factory('authInterceptor', function ($rootScope, $q, $window) {
+  return {
+    request: function (config) {
+      config.headers = config.headers || {};
+      if ($window.localStorage.token) {
+        config.headers.Authorization = 'Bearer ' + $window.localStorage.token;
+      }
+      return config;
+    },
+    response: function (response) {
+      if (response.status === 401) {
+        // handle the case where the user is not authenticated
+      }
+      return response || $q.when(response);
+    }
+  };
+})
+.config(function ($httpProvider) {
+  console.log('ÑAAAAAAAAAAAA CONFIG');
+  $httpProvider.interceptors.push('authInterceptor');
+})
 .directive('lastPostLoaded', function($timeout) { // Detectar la última carga de Posts
 	return {
 		restrict: 'A',

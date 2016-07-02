@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-var ensureAuthenticated = require('./ensureAuth');
+//Autenticación basada en JWT
+var config = require('../config');
+var expressJwt = require('express-jwt');
+var ensureAuthenticated = expressJwt({secret : config.tokenSecret});
 
 // Clases jPack
 var jPack = require('../jPack');

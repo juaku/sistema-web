@@ -5,7 +5,10 @@ var User = require('../models/user');
 var Tag = require('../models/tag');
 var Action = require('../models/action');
 
-var ensureAuthenticated = require('./ensureAuth');
+//Autenticación basada en JWT
+var config = require('../config');
+var expressJwt = require('express-jwt');
+var ensureAuthenticated = expressJwt({secret : config.tokenSecret});
 
 // Clases jPack
 var jPack = require('../jPack');

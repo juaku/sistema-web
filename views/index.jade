@@ -1,11 +1,7 @@
 extends layout
 
 block head
-    script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular.min.js")
-    script(src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.21/angular-touch.js")
-    script(src="/socket.io/socket.io.js")
-    script(src="/javascripts/exif.js")
-    script(src="/javascripts/application.js")
+    body(id="controller" ng-controller="Application")
 
 block content
   header

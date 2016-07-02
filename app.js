@@ -1,5 +1,6 @@
 //Predeterminado de express
 var express = require('express');
+var config = require('./config');
 var session = require('express-session');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -36,8 +37,8 @@ i18n.configure({
 });
 
 //Codigos de aplicación de Facebook
-var FACEBOOK_APP_ID = "278467565655992"
-var FACEBOOK_APP_SECRET = "57aba3bad7902b1e4c21284ad49ff4cc";
+var FACEBOOK_APP_ID = config.facebook.id;
+var FACEBOOK_APP_SECRET = config.facebook.secret;
 
 //Serialización de sesión
 passport.serializeUser(function(user, done) {
