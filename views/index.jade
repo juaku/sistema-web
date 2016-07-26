@@ -7,16 +7,20 @@ block content
   header
   #box
     aside#side
-      section#controls
-        label#title-label(for="title") /
-        input(type="search" size="1" ng-model="search" search)#title
       //
       // Side controls
       //
+      section#view-controls
+        #back
+        input(type="search" size="1" ng-model="search" search)#title
+        #take
       section#account
-        img(src=user.picture)
+        a.user-link
+          img(src=user.picture).user-picture
         span.user-firstname #{user.name.givenName}
         span.user-lastname #{user.name.familyName}
+        #account-controls
+          a(href="" onclick="window.location = '/logout' ") logout
               
             //- section#user-relation.side-block.viewing-followers
             //-   #relation-tabs
@@ -139,9 +143,9 @@ block content
           .action-info
             h3.action-title
               span(hex-code="{{ post.author.hexCode }}" ng-click="getMediaByFilter('channel', post)").author-hex-code
-              span(href='' ng-click="getMediaByFilter('author', post)").author-name {{ post.author.firstName }}
+              span(href='' ng-click="getMediaByFilter('author', post.author)").author-name {{ post.author.firstName }}
               span.at @
-              span(href='' ng-if="post.event" ng-click="getMediaByFilter('tag', post)").tag-name {{ post.event }}
+              span(href='' ng-if="post.tag" ng-click="getMediaByFilter('tag', post)").tag-name {{ post.tag }}
             span.action-time(ng-if="post.timeElapsed.type  == 's' ") #{__('Just now')}
             span.action-time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
             span.action-time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
@@ -199,3 +203,4 @@ block content
   script(type='text/javascript').
     var url = '#{url}'
     var reqType = '#{reqType}'
+    var token = '#{token}'

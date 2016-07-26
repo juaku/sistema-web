@@ -34,36 +34,45 @@ body
 	font-family: "Arial"
 	color: #111 /* 111 */
 
-label#title-label
+section#view-controls
+	margin-top: 32vh
 	position: fixed
-	font-size: 15px
-	/*background-color: #DDD*/
-	border-radius: 50%
-	width: 30px
-	height: 30px
-	transition: background-color 200ms
-	user-select: none
 
-/*label#title-label:hover
-	background-color: #EEE*/
+#back
+	width: 44px
+	height: 44px
+	position: absolute
+	left: 0
+	top: 0
+
+#back:before
+	content: ''
+	width: 12px
+	height: 12px
+	position: absolute
+	top: 15px
+	right: 10px
+	border-top: 4px solid #333
+	border-left: 4px solid #333
+	transform: rotate(-45deg)
 
 input#title
 	font-size: 5vw
 	font-weight: normal
-	margin-top: 32vh
 	letter-spacing: -0.05em
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
-	position: fixed
 	width: 36vw
 	padding-right: 0.05em /* Evitar corte letter-spacing negativo */
 	outline: 0
 	border: 0
 	border-radius: 0
 	background-color: #F7F7F7
+	color: #000
 	display: block
 	text-align: right
+	transition: color 200ms
 
 input[type=text]::-ms-clear
 	display: none
@@ -84,11 +93,61 @@ input[type="search"]::-webkit-search-results-decoration
 input#title::before
 	content: ''
 
+input#title:focus
+	color: #555
+
+#take
+	width: 44px
+	height: 44px
+	position: absolute
+	right: 0
+	top: 0
+
+#take:before
+	content: ''
+	width: 60%
+	height: 60%
+	background-color: #F05
+	position: absolute
+	margin: 20%
+	border-radius: 50%
+	right: 0
+	top: 0
+
+/* = to x Animation
+#more:before,
+#more:after
+	content: ''
+	width: 20px
+	height: 2px
+	position: absolute
+	right: 12px
+	background-color: #AAA
+	transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+				bottom 200ms cubic-bezier(0.4, 0, 0.2, 1)
+
+#more:after
+	bottom: 18px
+
+#more:before
+	bottom: 24px
+
+section#view-controls.show #more:before
+section#view-controls.show #more:after
+	bottom: 21px
+	transform: rotate(-45deg)
+	transition: transform 200ms 200ms cubic-bezier(0.4, 0, 0.2, 1),
+				bottom 200ms cubic-bezier(0.4, 0, 0.2, 1)
+
+section#view-controls.show #more:after
+	transform: rotate(45deg)
+*/
+
 h3
 	font-weight: normal
 	font-size: 2.5vmin
 	letter-spacing: -0.05em
-	margin: 0
+	margin: 0 0 0.2em 0
 
 /* Estilos estructurales */
 
@@ -115,7 +174,7 @@ main
 		
 /* Grupales */
 
-#account img
+#account img.user-picture
 	width: 2em
 	height: 2em
 	border-radius: 50%
@@ -197,14 +256,6 @@ main
 	transform: translate(-50%, -50%)
 	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
-@keyframes preloader
-	0%
-		box-shadow: 0 0 0 0 rgba(0,0,0,0)
-	50%
-		box-shadow: 0 0 0 1vw rgba(0,0,0,0.1)
-	100%
-		box-shadow: 0 0 0 1vw rgba(0,0,0,0.05)
-
 /* Action -> Info */
 
 .info
@@ -252,13 +303,14 @@ main
 	display: inline-block
 	background-color: #888
 	border-radius: 50%
-	width: 0.7em
-	height: 0.7em
-	margin: 0 0.2em 0 0
+	width: 0.8em
+	height: 0.8em
+	margin: 0 0.3em 0 0
 
 .info .action-time
 	font-size: 1.75vmin
 	color: #888
+	letter-spacing: -0.5px
 
 .info .save-button
 	width: 18%
@@ -573,7 +625,6 @@ svg#svg-library
 /*
  * Responsive
  */
-
 @media screen and (max-width: 1000px) , screen and (max-height: 700px)
 	h3
 		font-size: 16px
@@ -582,35 +633,59 @@ svg#svg-library
 	.info .action-time
 		font-size: 13px
 
+@media screen and (min-width: 481px)
+	@keyframes preloader
+		0%
+			box-shadow: 0 0 0 0 rgba(0,0,0,0)
+		50%
+			box-shadow: 0 0 0 1vw rgba(0,0,0,0.1)
+		100%
+			box-shadow: 0 0 0 1vw rgba(0,0,0,0.05)
+
 @media screen and (max-width: 480px)
-	label#title-label
-		bottom: 5px
-		left: 5px
-		z-index: 2
-		font-family: Verdana
-		text-align: center
-		line-height: 28px
-		font-weight: bold
-		color: #777
+	aside
+		z-index: 1
+		bottom: 0
+		margin-top: 0
+		transition: height 200ms cubic-bezier(0.4, 0, 0.2, 1)
+		box-shadow: 0 -4px 16px rgba(0,0,0,0.1)
+		height: 44px
+		position: absolute
+		background-color: #FFF
+		overflow: hidden
+	
+	aside.show
+		height: 176px
+	
+	aside section#view-controls,
+	aside section#account
+		margin: 0
+		position: static
+		text-align: left
+		width: 100vw
 	
 	input#title
-		position: fixed
-		bottom: 0
-		font-size: 15px
-		z-index: 1
+		font-size: 1em
 		display: block
 		margin: 0
-		height: 40px
+		height: 44px
 		background: #FFF
-		color: #000
-		padding: 0 40px 0 25px
+		padding: 0 44px
 		-webkit-appearance: none
 		width: 100vw
 		font-family: 'Verdana'
-		box-shadow: 0 -4px 0 rgba(0,0,0,0.05)
 		text-align: left
 	
-	section#controls img
+	#account a.user-link
+		position: absolute
+		left: 0
+		top: 0
+		width: 44px
+		height: 44px
+		
+	#account img.user-picture
+		margin: 0.375em
+		position: static
 		display: none
 
 	h3
@@ -620,15 +695,20 @@ svg#svg-library
 	#box
 		display: block /* Mejor control de la barra de scroll */
 
-	#account
-		display: none
+	/*#box.scrollBack main
+		height: 100vh
+	
+	#box.scrollBack section#view-controls
+		bottom: -40px
+		box-shadow-color: rgba(0,0,0,0)*/
 
 	main
 		overflow-y: auto
 		overflow-x: hidden
 		-webkit-overflow-scrolling: touch
-		height: calc(100vh - 40px)
+		height: calc(100vh - 44px)
 		display: block
+		//transition: height 200ms
 	
 	main,
 	.action,
@@ -642,6 +722,14 @@ svg#svg-library
 
 	.action
 		max-width: inherit
+	
+	@keyframes preloader
+		0%
+			box-shadow: 0 0 0 0 rgba(0,0,0,0)
+		50%
+			box-shadow: 0 0 0 3vw rgba(0,0,0,0.1)
+		100%
+			box-shadow: 0 0 0 3vw rgba(0,0,0,0.05)
 
 	.action .media,
 	#start
@@ -650,7 +738,7 @@ svg#svg-library
 		max-height: inherit
 
 	.info .author-name
-		margin-right: 1px 
+		margin-right: 2px 
 
 	.info h3.action-title .author-name::before
 		width: 3.5vw

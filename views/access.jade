@@ -2,13 +2,9 @@ extends layout
 
 block append head
   script.
-    angular.element(document).ready(function () {
-      if(window.opener == null) {
-        window.location = "/";
-      } else {
-        angular.element(document.getElementById('logincontroller')).scope().saveTokenLocalStorage();
-        window.opener.location = "/";
-        //window.close();
-      }
-    });
-  body(id="logincontroller" ng-controller="LoginController")
+    if(window.opener == null) {
+      window.location = "/";
+    } else {
+      window.opener.location = "/";
+      window.close();
+    }

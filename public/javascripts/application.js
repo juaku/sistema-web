@@ -69,6 +69,11 @@ $(document).ready(function() {
 		}
 	});
 
+	$('#take').on('click', function() {
+		$('body').addClass('new-post-view');
+		$('input#media-loader').click();
+	});
+
 	$('#share-new-post .share').on('tapone', function() {
 		$(this).toggleClass('selected');
 	});
@@ -100,6 +105,22 @@ $(document).ready(function() {
 		$('#user-relation').removeClass('viewing-followers viewing-following');
 		$(this).parents('#user-relation').addClass('viewing-' + $(this).attr('viewing'));
 	});
+	
+	$('main').previousTop = 0;
+
+	$('#account a.user-link').on('tapone', function() {
+		$('aside').toggleClass('show');
+	});
+
+	/*$('main').scroll( function () {
+		var currentTop = $('main').scrollTop();
+		if (currentTop < this.previousTop) {
+			$('#box').addClass('scrollBack')
+		} else {
+			$('#box').removeClass('scrollBack')
+		}
+		this.previousTop = currentTop;
+	});*/
 });
 
 /*
@@ -120,7 +141,7 @@ if($('html').attr('lang') == 'es') {
 var loadedImgs = 0;
 var getPostsBool = true;
 var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
-function Application($scope, $http) {
+function Application($scope, $http, $window) {
 	/*
 	 * User
 	 */
@@ -130,86 +151,55 @@ function Application($scope, $http) {
 	$scope.user.data = {};
 	//$scope.user.peopleToFollow = [];
 //TODO: Pasar esto a servidor
-	if(url != '') {
-		if(reqType == 'tag'){
-			initialize();
-			var res = url.split('@');
-			var simpleEventName = res[1].toLowerCase();
-			//$.getJSON('http://juaku-dev.cloudapp.net:5000/list/event', function(data){
-				//$.each(data, function(key, value){
-					//for(var i=0; i<value.length; i++) {
-						//console.log(eventNameSimple + ' ' + value[i].name);
-						//if(eventNameSimple == value[i].name) {
-							//getTrends();
-							//getEvents();
-							//$scope.user.getFollowers();
-							//$scope.user.getFollowing();
-							history.pushState( {}, null, '/@' + simpleEventName);
-							$('#title').val('@' + simpleEventName); // TODO: Mejorar
-							getPosts(reqType, res[1]);
-							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'trend', value[i]);
-							//break;
-						//}
-					//}
-				//});
-			//});
-		} else if(reqType == 'author') {
-			//var res = location.hash.split('#');
-			initialize();
-			var res = url.split('.');
-			var hexCode = res[0].toLowerCase();
-			var firstName = res[1].toLowerCase();
-			//var commonNames = [];
-			//var countCommonNames = 0;
-
-			//$.getJSON('http://juaku-dev.cloudapp.net:5000/user/getAllUsers', function(data){
-				//$.each(data, function(key, value){
-					/*for(var i=0; i<value.length; i++) {
-						if(firstName == value[i].firstName.toLowerCase()) {
-							commonNames[countCommonNames] = value[i];
-							countCommonNames++;
-							break;
-						}
-					}*/
-					//for(var i=0; i<commonNames.length; i++) {
-						//if(colorHexLowerCase == commonNames[i].idKey) {
-							//getTrends();
-							//getEvents();
-							//$scope.user.getFollowers();
-							//$scope.user.getFollowing();
-							history.pushState( {}, null, '/' + hexCode + '.' + res[1]);
-							
-							var id = {}
-							id.hexCode = hexCode;
-							id.firstName = res[1];//firstName;
-							getPosts(reqType, id);
-							//angular.element(document.getElementById('controller')).scope().getMediaByFilter('post', 'author', commonNames[i]);
-							//break;
-						//}
-					//}
-				//});
-			//});
-		} else if(reqType == 'channel') {
-			initialize();
-			var separators = ['\\\.', '@'];
-			var res = url.split(new RegExp(separators.join('|')));
-			history.pushState( {}, null, '/' + res[0] + '.' + res[1] + '@' + res[2]);
-			$('#title').val(res[0] + '.' + res[1] + '@' + res[2]);
+	$scope.getMediaByFilter = function(action, object) {
+		initialize();
+		loadedImgs = 0;
+		//createEmptyPosts(5);
+		console.log('getmediabyfilter 	 	');
+		if(action == 'author') {
+			history.pushState( {}, null, '/' + object.hexCode + '.' + object.firstName );
+			$('#title').val(object.hexCode + '.' + object.firstName);
+			getPosts(action, object);
+		} else if (action == 'tag') {
+			history.pushState( {}, null, '/@' + object.tag);
+			$('#title').val('@' + object.tag);
+			getPosts(action, object.tag);
+		} else if (action == 'channel') {
+			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
+			$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
 			var id = {}
-			id.hexCode = res[0];
-			id.firstName = res[1];
-			id.tag = res[2];
-			getPosts(reqType, id);
+			id.hexCode = object.author.hexCode;
+			id.firstName = object.author.firstName;
+			id.tag = object.tag;
+			getPosts(action, id);
 		}
+	}
+	if(url != '') {
+		initialize();
+		var id = {};
+		if(reqType == 'tag'){
+			var filter = url.split('@');
+			id.tag = filter[1].toLowerCase();
+		} else if(reqType == 'author') {
+			var filter = url.split('.');
+			var hexCode = filter[0].toLowerCase();
+			var firstName = filter[1].toLowerCase();
+			id.hexCode = hexCode;
+			id.firstName = filter[1]; //firstname
+		} else if(reqType == 'channel') {
+			var separators = ['\\\.', '@'];
+			var filter = url.split(new RegExp(separators.join('|')));
+			id.author = {};
+			id.author.hexCode = filter[0];
+			id.author.firstName = filter[1];
+			id.tag = filter[2];
+		}
+		angular.element(document.getElementById('controller')).scope().getMediaByFilter(reqType, id);
 	} else {
 		initialize();
 		getGeo(function() {
 			$http.post('/user/setGeo', $scope.user).success(function(data) {
 				getPosts('actions');
-				//getTrends();
-				//getEvents();
-				//$scope.user.getFollowers();
-				//$scope.user.getFollowing();
 			}).error();
 		}, function(errorMsg) {
 			console.log(errorMsg);
@@ -275,6 +265,10 @@ function Application($scope, $http) {
 
 	function postsQuery(action, id, next, error) {
 		//si el id está conformado por hexCod + firstName
+		console.log('typeof id!!!!!!!!!!!!!!!!');
+		console.log(typeof id);
+		console.log(action + '  ...   ');
+		console.log(id);
 		if(typeof id == 'object') {
 			if(id.tag == undefined) {
 				id = id.hexCode + '.' + id.firstName;
@@ -509,28 +503,6 @@ function Application($scope, $http) {
 			console.log("No hay más eventos en tu ciudad");
 	}*/
 
-	$scope.getMediaByFilter = function(action, object) {
-		initialize();
-		loadedImgs = 0;
-		createEmptyPosts(5);
-		if(object.author != undefined && action == 'author') {
-			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName );
-			$('#title').val(object.author.hexCode + '.' + object.author.firstName);
-			getPosts(action, object.author);
-		} else if (object.event != undefined && action == 'tag') {
-			history.pushState( {}, null, '/@' + object.event);
-			$('#title').val('@' + object.event);
-			getPosts(action, object.event);
-		} else if (object.author != undefined && object.event != undefined && action == 'channel') {
-			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.event);
-			$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.event);
-			var id = {}
-			id.hexCode = object.author.hexCode;
-			id.firstName = object.author.firstName;
-			id.tag = object.event;
-			getPosts(action, id);
-		}
-	}
 
 	/*
 	 * Geo
@@ -584,46 +556,27 @@ function Application($scope, $http) {
 
 } // Fin Controlador - function Application($scope, $http)
 
-function LoginController($scope, $http, $window) {
-  $scope.saveTokenLocalStorage = function () {
-    console.log('ENTRANDO A LA FUNCION SUBMIT');
-    $http.get('/login', $scope.user).success(function (data, status, headers, config) {
-        console.log('DATA!! SUBMIT BUTTON : ' + JSON.stringify(data.token));
-        $window.localStorage.token = data.token;
-        console.log('WAAAAAAAAAAAAAAAAAA1111');
-        $window.close();
-      })
-      .error(function (data, status, headers, config) {
-        // Erase the token if the user fails to log in
-        //delete $window.localStorage.token;
-        console.log('ERROR!  SUBMIT BUTTON');
-        // Handle login errors here
-        $scope.message = 'Error: Invalid user or password';
-      });
-  };
-}
-
 // Directivas
 angular.module('Juaku', [])
 .factory('authInterceptor', function ($rootScope, $q, $window) {
-  return {
-    request: function (config) {
-      config.headers = config.headers || {};
-      if ($window.localStorage.token) {
-        config.headers.Authorization = 'Bearer ' + $window.localStorage.token;
-      }
-      return config;
-    },
-    response: function (response) {
-      if (response.status === 401) {
-        // handle the case where the user is not authenticated
-      }
-      return response || $q.when(response);
-    }
-  };
+	return {
+		request: function (config) {
+			config.headers = config.headers || {};
+			if (token) {
+				console.log('Token: ' + token);
+				config.headers.Authorization = 'Bearer ' + token;
+			}
+			return config;
+		},
+		response: function (response) {
+			if (response.status === 401) {
+				// handle the case where the user is not authenticated
+			}
+			return response || $q.when(response);
+		}
+	};
 })
 .config(function ($httpProvider) {
-  console.log('ÑAAAAAAAAAAAA CONFIG');
   $httpProvider.interceptors.push('authInterceptor');
 })
 .directive('lastPostLoaded', function($timeout) { // Detectar la última carga de Posts
@@ -700,10 +653,8 @@ function postsLoaded() {
 		//assistedScroll(1, $(this).parents('article'));
 	});
 
-	console.log('123');
-
 	$('.author-hex-code').each(function(index) {
-		console.log($(this).css('background-color') + ' ' + $(this).attr('hex-code'));
+		//console.log($(this).css('background-color') + ' ' + $(this).attr('hex-code'));
 		$(this).css('background-color', '#' + $(this).attr('hex-code'));
 	});
 }

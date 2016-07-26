@@ -3,6 +3,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 var ensureAuthenticated = require('./ensureAuth');
+var service = require('../services');
 
 // Clase jPack
 var jPack = require('../jPack');
@@ -13,7 +14,7 @@ var FB = require('fb');
  * Autentica al usuario y crea un jUser y lo loguea/registra en Parse.com
  */
 router.get('/', ensureAuthenticated, function(req, res) {
-
+	console.log('--------------------------8===D------');
 	/*var User = mongoose.model('User');
 	User.findOne({provider_id: profile.id}, function(err, user) {
 		if(err) throw(err);
@@ -72,7 +73,11 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	}, function(error) {
 		res.redirect('/login');
 	});*/
-	// Loguear al usuario en Parse
+
+	// Crear token
+	req.session.token = service.createToken(req.user);
+
+	// Loguear al usuario
 	var User = mongoose.model('User');
 	User.signUp(req, function() {
 		User.getProfilePicture(req, function() {

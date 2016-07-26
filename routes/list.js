@@ -46,6 +46,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		}*/ else if(req.params.action=='tag') {
+			console.log('list.js');
 			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
 				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					res.json(posts);

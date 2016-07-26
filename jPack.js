@@ -281,7 +281,7 @@ jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, 
 			getProviderId(actions[i].authorId, i);
 		}
 		posts[i].authorId = actions[i].authorId;
-		posts[i].event = actions[i].name;
+		posts[i].tag = actions[i].name;
 		posts[i].time = actions[i].createdAt;
 		posts[i].media = './uploads/' + actions[i].media;
 		posts[i].location = {};

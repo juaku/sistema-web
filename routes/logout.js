@@ -6,6 +6,7 @@ var router = express.Router();
  */
 router.get('/', function(req, res){
   res.clearCookie('locale');
+  req.session.token = undefined;
   req.logout();
   res.redirect('/');
 });

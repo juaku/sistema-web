@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-var service = require('../services');
 
 /* GET router para '/login'
  * Si el usuario NO está autenticado, renderiza la vista 'login.jade'; de lo
@@ -8,9 +7,9 @@ var service = require('../services');
  */
 router.get('/', function(req, res){
   if (req.isAuthenticated()) {
-  	res.status(200).json({token: service.createToken(req.user)});
+    res.render('index');
   } else {
-		res.render('login');
+    res.render('login');
   }
 });
 
