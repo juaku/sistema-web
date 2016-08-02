@@ -41,7 +41,9 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 		req.session.queryTimeLimit = queryTimeLimitStep;
 	}
 
-	this.find({})
+	this.find({
+		active: true
+	})
 	.sort({createdAt: -1})
 	.skip(resultsLimit * queryNumber)
 	.limit(resultsLimit)
@@ -72,6 +74,17 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 				}
 			}
 	);
+}
+
+ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
+	if(action.authorId == userId) {
+		this.update({ _id: action.id }, { $set: { active: false }}, function (err, doc) {
+			if (err) return handleError(err);
+			console.log('accion borrada con éxito');
+			console.log(doc);
+		});
+	}
+	callback();
 }
 
 ActionSchema.statics.saveAction = function (action, userId, callback, error) {

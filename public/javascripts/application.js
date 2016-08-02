@@ -155,7 +155,6 @@ function Application($scope, $http, $window) {
 		initialize();
 		loadedImgs = 0;
 		//createEmptyPosts(5);
-		console.log('getmediabyfilter 	 	');
 		if(action == 'author') {
 			history.pushState( {}, null, '/' + object.hexCode + '.' + object.firstName );
 			$('#title').val(object.hexCode + '.' + object.firstName);
@@ -265,10 +264,6 @@ function Application($scope, $http, $window) {
 
 	function postsQuery(action, id, next, error) {
 		//si el id está conformado por hexCod + firstName
-		console.log('typeof id!!!!!!!!!!!!!!!!');
-		console.log(typeof id);
-		console.log(action + '  ...   ');
-		console.log(id);
 		if(typeof id == 'object') {
 			if(id.tag == undefined) {
 				id = id.hexCode + '.' + id.firstName;
@@ -327,6 +322,12 @@ function Application($scope, $http, $window) {
 		for (var i = 0; i < numTmpPost; i++) {
 			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif},"class":"blank"};
 		};
+	}
+
+	$scope.deleteAction = function(post) {
+		$scope.post = post;
+		$http.post('/post/deleteAction', $scope.post).success(function(data) {
+		}).error();
 	}
 
 	//Guarda la foto que el usuario desee
@@ -659,7 +660,7 @@ function postsLoaded() {
 	});
 }
 
-function assistedScroll(modifier, refPost) {
+/*function assistedScroll(modifier, refPost) {
 	modifier = modifier == undefined ? 1 : modifier;
 	var refPostTop = parseInt($(refPost).next().position().top) + 2; // TODO: Arreglar correctamente
 	$('main').stop().animate({
@@ -668,7 +669,7 @@ function assistedScroll(modifier, refPost) {
 			//window.location.hash = refPost; TODO: Actualizar hash
 	});
 }
-
+TODO: Borrar
 function reduceString(str) {
 	var newString = str;
 	var lastIndex = str.lastIndexOf(' ');
@@ -676,7 +677,7 @@ function reduceString(str) {
 		newString = str.substring(0, lastIndex);
 	}
 	return newString;
-}
+}*/
 
 /*if(window.innerHeight > window.innerWidth){
     document.getElementsByTagName("body").style.transform = "rotate(90deg)";

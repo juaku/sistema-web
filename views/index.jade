@@ -150,6 +150,7 @@ block content
             span.action-time(ng-if="post.timeElapsed.type  == 'm' ") {{ post.timeElapsed.val }} #{__('min')}
             span.action-time(ng-if="post.timeElapsed.type  == 'h' ") {{ post.timeElapsed.val }} #{__('h')}
             span.action-time(ng-if="post.timeElapsed.type  == 'd' ") {{ post.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
+            span(href='' ng-if="post.edittable" ng-click="deleteAction(post)").delete #{__('Borrar')}
           .save-button
             a(ng-click="saveClick(post)" ng-class="{ selected: post.saved }").save-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save

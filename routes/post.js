@@ -48,6 +48,13 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
+		} else if (req.params.action=='deleteAction') {
+			Action.deleteAction(req.body, req.session.idMongoDb, function() {
+				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
 		} else if (req.params.action=='save') {
 			Action.saveAction(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();

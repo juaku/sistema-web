@@ -266,42 +266,42 @@ jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, 
 	}
 	User.findById(userId, 'savedActions', function (err, user) {
 		savedActions = user.savedActions;
-	});
-	for(var i in actions) {
-		posts[i] = {};
-		posts[i].id = actions[i]._id;
-		if(providerId != undefined && hexCode	!= undefined) {
-			if(actions[i].authorId != userId ) {
-				getProviderId(actions[i].authorId, i);
-			} else {
+		for(var i in actions) {
+			posts[i] = {};
+			posts[i].id = actions[i]._id;
+			if(providerId != undefined && hexCode	!= undefined) {
 				posts[i].fbId = providerId;
 				getFBInfo(i, posts[i].fbId, hexCode);
+			} else {
+				//getProviderId es llamada por defecto o si el usuario quiere ver Actions filtrados por algún Tag
+				getProviderId(actions[i].authorId, i);
 			}
-		} else {
-			getProviderId(actions[i].authorId, i);
-		}
-		posts[i].authorId = actions[i].authorId;
-		posts[i].tag = actions[i].name;
-		posts[i].time = actions[i].createdAt;
-		posts[i].media = './uploads/' + actions[i].media;
-		posts[i].location = {};
-		posts[i].location.latitude = actions[i].geo[0];
-		posts[i].location.longitude = actions[i].geo[1];
-	}
-	function getProviderId(id, i) {
-		User.findById(id, 'providerId hexCode', function (err, user) {
-			posts[i].fbId = user.providerId;
+			if(actions[i].authorId == userId) {
+				posts[i].edittable = true;
+			}
+			posts[i].tag = actions[i].name;
+			posts[i].time = actions[i].createdAt;
+			posts[i].media = './uploads/' + actions[i].media;
+			posts[i].location = {};
+			posts[i].location.latitude = actions[i].geo[0];
+			posts[i].location.longitude = actions[i].geo[1];
 			if(savedActions.indexOf(posts[i].id) > -1) {
 				posts[i].saved = true;
 			} else {
 				posts[i].saved = false;
 			}
-			getFBInfo(i, posts[i].fbId, user.hexCode, user.savedActions);
+		}
+	});
+	function getProviderId(id, i) {
+		User.findById(id, 'providerId hexCode', function (err, user) {
+			posts[i].fbId = user.providerId;
+			getFBInfo(i, posts[i].fbId, user.hexCode);
 		});
 	}
 	function getFBInfo(i, fbUserId, hexCode) {
 		FB.api('/'+fbUserId+'/', {access_token: accessToken}, function(profile) {
 			posts[i].author = {};
+			posts[i].author.id = actions[i].authorId;
 			posts[i].author.firstName = profile.first_name;
 			posts[i].author.lastName = profile.last_name;
 			posts[i].author.hexCode = hexCode;
