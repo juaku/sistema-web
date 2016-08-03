@@ -58,6 +58,7 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	this.findOne({name: tagName})
 	.populate({
 		path: 'actions',
+		match: {active: true},
 		options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
 	})
 	.exec(function (err, tag) {

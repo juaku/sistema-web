@@ -269,13 +269,7 @@ jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, 
 		for(var i in actions) {
 			posts[i] = {};
 			posts[i].id = actions[i]._id;
-			if(providerId != undefined && hexCode	!= undefined) {
-				posts[i].fbId = providerId;
-				getFBInfo(i, posts[i].fbId, hexCode);
-			} else {
-				//getProviderId es llamada por defecto o si el usuario quiere ver Actions filtrados por algún Tag
-				getProviderId(actions[i].authorId, i);
-			}
+			getProviderId(actions[i].authorId, i);
 			if(actions[i].authorId == userId) {
 				posts[i].edittable = true;
 			}

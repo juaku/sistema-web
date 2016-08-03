@@ -126,6 +126,7 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
   this.findOne({hexCode: hexCode, name: nameAuthor})
   .populate({
     path: 'actions savedActions',
+    match: {active: true},
     options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
   })
   .exec(function (err, author) {
@@ -187,8 +188,9 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
     if(tag!= null) {
       User.findOne({hexCode: hexCode, name: nameAuthor})
       .populate({
-        match: {tagId: tag.id},
         path: 'actions',
+        match: {tagId: tag.id,
+                active: true},
         options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
       })
       .exec(function (err, author) {

@@ -77,7 +77,7 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 }
 
 ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
-	if(action.authorId == userId) {
+	if(action.author.id == userId) {
 		this.update({ _id: action.id }, { $set: { active: false }}, function (err, doc) {
 			if (err) return handleError(err);
 			console.log('accion borrada con éxito');
@@ -88,23 +88,27 @@ ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
 }
 
 ActionSchema.statics.saveAction = function (action, userId, callback, error) {
-	var User = mongoose.model('User');
-	User.update({ _id: userId }, { $push: { savedActions: action.id }}, function (err, doc) {
-		if (err) return handleError(err);
-		console.log('accion guardada con éxito en savedActions');
-		console.log(doc);
-		callback();
-	});
+	if(action.author.id != userId) {
+		var User = mongoose.model('User');
+		User.update({ _id: userId }, { $push: { savedActions: action.id }}, function (err, doc) {
+			if (err) return handleError(err);
+			console.log('accion guardada con éxito en savedActions');
+			console.log(doc);
+		});
+	}
+	callback();
 }
 
 ActionSchema.statics.unsaveAction = function (action, userId, callback, error) {
-	var User = mongoose.model('User');
-	User.update({ _id: userId }, { $pull: { savedActions: action.id }}, function (err, doc) {
-		if (err) return handleError(err);
-		console.log('accion removida de savedActions');
-		console.log(doc);
-		callback();
-	});
+	if(action.author.id != userId) {
+		var User = mongoose.model('User');
+		User.update({ _id: userId }, { $pull: { savedActions: action.id }}, function (err, doc) {
+			if (err) return handleError(err);
+			console.log('accion removida de savedActions');
+			console.log(doc);
+		});
+	}
+	callback();
 }
 
 module.exports = mongoose.model('Action', ActionSchema);
