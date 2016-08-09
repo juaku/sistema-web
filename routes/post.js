@@ -23,8 +23,8 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media ');
 	if(req.body!=undefined && req.body!=''  && req.params.action!=undefined) {
 		if (req.params.action=='new') {
-			jPack.validateTagName(req.body, function(simpleEventName, mediaName, mediaExt) {
-				Tag.newAction(req, simpleEventName, mediaName, mediaExt, req.session.idMongoDb, function () {
+			jPack.validateTag(req.body, function(simpleTag, mediaName, mediaExt) {
+				Tag.newAction(req, simpleTag, mediaName, mediaExt, req.session.idMongoDb, function () {
 					res.status(201).end();
 				}, function(error) {
 					console.log(error);
@@ -44,6 +44,18 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 		} else if (req.params.action=='reportAction') {
 			Action.reportAction(req, function() {
 				res.status(201).end();
+			}, function(error) {
+				console.log(error);
+				res.status(400).end();
+			});
+		} else if (req.params.action=='editTag') {
+			jPack.validateTag(req.body, function(oldSimpleTag, newSimpleTag) {
+				Tag.editTag(req, oldSimpleTag, newSimpleTag, req.session.idMongoDb, function () {
+					res.status(201).end();
+				}, function(error) {
+					console.log(error);
+					res.status(400).end();
+				});
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();

@@ -72,7 +72,7 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	})
 }
 
-TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error
+TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error
 	var Action = mongoose.model('Action');
 	var User = mongoose.model('User');
 	var newAction = req.body;
@@ -80,13 +80,13 @@ TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userI
 	var coords = [];
 	coords[0] = newAction.coords.latitude;
 	coords[1] = newAction.coords.longitude;
-	this.findOne({name: tagName}, function(err, tag) {
+	this.findOne({name: simpleTag}, function(err, tag) {
 		var objectTag = tag;
 		saveMedia(newAction.media, mediaName, mediaExt);
 		if(err) throw(err);
 		console.log(coords);
 		var action = new Action({
-			name: newAction.eventName,
+			name: newAction.tag,
 			geo: coords,
 			media: mediaName + '.' + mediaExt,
 			active: true,
@@ -110,8 +110,8 @@ TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userI
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
-				tag.name = tagName;
-				tag.originalName = newAction.eventName;
+				tag.name = simpleTag;
+				tag.originalName = newAction.tag;
 				tag.actions = action._id;
 				tag.save(function (err) {
 					if (err) return handleError(err);
@@ -155,6 +155,54 @@ TagSchema.statics.newAction = function (req, tagName, mediaName, mediaExt, userI
 		console.log('IMAGEN GUARDADA EN SERVIDOR!!!!!!!!');
 		//next(data); || return data;
 	}
+}
+
+TagSchema.statics.editTag = function (req, oldTagName, newTagName, userId, callback) { //revisar si estoy enviando función error
+	var Action = mongoose.model('Action');
+	var User = mongoose.model('User');
+	var action = req.body;
+	var FB = require('fb');
+	if(action.author.id == userId && oldTagName != newTagName && newTagName != '' && newTagName != undefined) {
+		//Remueve ACTION referenciada a TAG antiguo
+		this.update({ name: oldTagName }, { $pull: { actions: action.id }}, function (err, doc) {
+			if (err) return handleError(err);
+			console.log('accion removida de tag: ' + oldTagName);
+			console.log(doc);
+		});
+		//Cambia nombre de TAG dentro de ACTION
+		Action.update({ _id: action.id }, { $set: { name: action.tag }}, function (err, doc) {//declarar newName
+			if (err) return handleError(err);
+			console.log('Actualización de tag en action: ' + newTagName);
+			console.log(doc);
+		});
+		//Referencia ACTION a nuevo TAG
+		this.findOne({name: newTagName}, function(err, objectTag) {
+			if(err) throw err;
+			if(objectTag!= null) {
+				Action.update({ _id: action.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
+					if (err) return handleError(err);
+				});
+				objectTag.actions.push(action.id);
+				objectTag.save();
+				console.log('Acción referenciada a tag');
+				callback();
+			} else {
+				var Tag = mongoose.model('Tag', TagSchema);
+				var tag = new Tag();
+				tag.name = newTagName;
+				tag.originalName = action.tag;
+				tag.actions = action.id;
+				tag.save(function (err) {
+					if (err) return handleError(err);
+					Action.update({ _id: action.id }, { $set: { tagId: tag._id }}, function (err, doc) {
+						if (err) return handleError(err);
+					});
+					console.log('Tag guardado y acción referenciada');
+				});
+			}
+		});
+	}
+	callback();
 }
 
 module.exports = mongoose.model('Tag', TagSchema);

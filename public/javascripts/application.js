@@ -83,16 +83,6 @@ $(document).ready(function() {
 		$('.events-list').addClass('show-more');
 	});
 
-	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
-	$("#new-event-name").bind('keypress', function(event) {
-		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
-		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-		console.log(regex.test(key));
-		if (!regex.test(key)) {
-			event.preventDefault();
-		}
-	});
-
 	$('input.event-name').on('focus', function() {
 		$('body').addClass('view-menu-hidden');
 	});
@@ -149,6 +139,7 @@ function Application($scope, $http, $window) {
 	$scope.user = {};
 
 	$scope.user.data = {};
+	$scope.isActive = {};
 	//$scope.user.peopleToFollow = [];
 //TODO: Pasar esto a servidor
 	$scope.getMediaByFilter = function(action, object) {
@@ -217,7 +208,7 @@ function Application($scope, $http, $window) {
 		tmpPosts = [];
 		getPostTries = 0;
 		getPostTriesLimit = 20;
-		$scope.posts = [];
+		$scope.actions = [];
 		$scope.trends = [];
 		$scope.events = [];
 	}
@@ -242,7 +233,7 @@ function Application($scope, $http, $window) {
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
-			if($scope.posts.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
+			if($scope.actions.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
 				postsQuery(action, id, function(data) {
 					if(data!=undefined) {
 						for (var i = 0; i < data.length; i++) {
@@ -289,22 +280,21 @@ function Application($scope, $http, $window) {
 	}
 
 	function showPosts() {
-		var numberPostsNow = $scope.posts.length - tmpLoadingPostsNumber;
+		var numberPostsNow = $scope.actions.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
 		//TODO EVALUAR: No se mostrá los n>5 últimos posts.
 		console.log('#1 numberPostsNow = ' + numberPostsNow + ' postShown = ' + postShown);
 		for(var i = numberPostsNow; i < postShown; i++) {
 			if(tmpPosts[i] != undefined) {
-				$scope.posts[i] = $scope.posts[i] == undefined? {} : $scope.posts[i];
+				$scope.actions[i] = $scope.actions[i] == undefined? {} : $scope.actions[i];
 				for(var prop in tmpPosts[i]) {
-					$scope.posts[i][prop] = tmpPosts[i][prop];
+					$scope.actions[i][prop] = tmpPosts[i][prop];
 				}
-				//$scope.posts[i] = tmpPosts[i];
-				//$scope.posts[i].media = 'uploads/' + $scope.posts[i].media;
-				$scope.posts[i].timeElapsed = getTimeElapsed($scope.posts[i].time);
-				$scope.posts[i].class = 'real';
-				//console.log($scope.posts[i].author);
-				console.log($scope.posts[i].author.hexCode);
+				//$scope.actions[i] = tmpPosts[i];
+				//$scope.actions[i].media = 'uploads/' + $scope.actions[i].media;
+				$scope.actions[i].timeElapsed = getTimeElapsed($scope.actions[i].time);
+				$scope.actions[i].class = 'real';
+				$scope.isActive[$scope.actions[i].id] = false;
 			}
 		}
 		createEmptyPosts(1);
@@ -318,10 +308,24 @@ function Application($scope, $http, $window) {
 		tmpLoadingPostsNumber = numTmpPost;
 		loadedImgs -= numTmpPost;
 		var alphaGif = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
-		var lastPostPosition = $scope.posts.length;
+		var lastPostPosition = $scope.actions.length;
 		for (var i = 0; i < numTmpPost; i++) {
-			$scope.posts[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif},"class":"blank"};
+			$scope.actions[i+lastPostPosition] = {"media":alphaGif,"event":"","time":"","author":{"firstName":"","lastName":"","picture":alphaGif},"class":"blank"};
 		};
+	}
+
+	$scope.modifyTag = function(action) {
+		$scope.isActive[action.id] = !$scope.isActive[action.id];
+		console.log($scope.isActive[action.id]);
+
+		$scope.oldTag = action.tag;
+	}
+
+	$scope.updateTag = function(action) {
+		$scope.isActive[action.id] = !$scope.isActive[action.id];
+		action.oldTag = $scope.oldTag;
+		$http.post('/post/editTag', action).success(function() {
+		}).error();
 	}
 
 	$scope.deleteAction = function(post) {
@@ -367,12 +371,12 @@ function Application($scope, $http, $window) {
 	/*
 	 * Post
 	 */
-	$scope.newPost = {};
-	$scope.newPost.shareOnFb = false;
+	$scope.newAction = {};
+	$scope.newAction.shareOnFb = false;
 
 	$scope.shareOnFb = function() {
-		$scope.newPost.shareOnFb = !$scope.newPost.shareOnFb;
-		console.log('scope.newPost.shareOnFb: ' + $scope.newPost.shareOnFb);
+		$scope.newAction.shareOnFb = !$scope.newAction.shareOnFb;
+		console.log('scope.newPost.shareOnFb: ' + $scope.newAction.shareOnFb);
 	}
 
 	$scope.shareActionOnFb = function(post) {
@@ -387,11 +391,11 @@ function Application($scope, $http, $window) {
 		}).error();
 	}
 
-	$scope.sendNewPost = function() {/* TODO: Evaluar riesgo de ataque, Crear post para form Multi - Riesgo de ataque
+	$scope.sendNewAction = function() {/* TODO: Evaluar riesgo de ataque, Crear post para form Multi - Riesgo de ataque
 		var createForm = new FormData();
 
-		for (key in $scope.newPost) {
-			createForm.append(key, $scope.newPost[key]);
+		for (key in $scope.newAction) {
+			createForm.append(key, $scope.newAction[key]);
 		}
 		$http.post('/post', createForm, {
 			withCredentials: true,
@@ -400,7 +404,7 @@ function Application($scope, $http, $window) {
 		}).success(function(data) {
 		}).error();
 	*/
-		$http.post('/post/new', $scope.newPost).success(function(data) {
+		$http.post('/post/new', $scope.newAction).success(function(data) {
 		}).error();
 	}
 
@@ -480,15 +484,15 @@ function Application($scope, $http, $window) {
 					var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
 
 					getGeo( function() {
-						//$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newPost.coords.latitude + ',' + $scope.newPost.coords.longitude);
+						//$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newAction.coords.latitude + ',' + $scope.newAction.coords.longitude);
 					}, function(errorMsg) {
 						console.log(errorMsg);
 					});
 
-					$scope.newPost.media = newImg;
+					$scope.newAction.media = newImg;
 
 					console.log('\x1b[1m\x1b[35m@@@ newImage @@@\x1b[0m');
-					console.log($scope.newPost.media);
+					console.log($scope.newAction.media);
 				}
 				img.src = event.target.result;
 			}
@@ -526,7 +530,7 @@ function Application($scope, $http, $window) {
 				coords.longitude = position.coords.longitude;
 				coords.speed = position.coords.speed;
 				$scope.user.data.coords = coords;
-				$scope.newPost.coords = coords;
+				$scope.newAction.coords = coords;
 				console.log('coords: ' + coords.latitude);
 				next(); 
 			}, function(errorObj) {
@@ -657,6 +661,15 @@ function postsLoaded() {
 	$('.author-hex-code').each(function(index) {
 		//console.log($(this).css('background-color') + ' ' + $(this).attr('hex-code'));
 		$(this).css('background-color', '#' + $(this).attr('hex-code'));
+	});
+
+	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
+	$(".event-name").bind('keypress', function(event) {
+		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
+		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+		if (!regex.test(key)) {
+			event.preventDefault();
+		}
 	});
 }
 

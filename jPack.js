@@ -314,23 +314,29 @@ jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, 
 	}
 }
 
-jPack.validateTagName = function(newAction, next, error) {
+jPack.validateTag = function(action, next, error) {
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
-	var flag = validate({post: newAction.eventName}, {post: {format: pattern}});
+	var flag = validate({post: action.tag}, {post: {format: pattern}});
 
 	if(flag!=undefined) {
 		console.log("ERROR!! AL INSERTAR NOMBRE DE EVENTO");
 		error();
 	} else {
-		var simpleEventName = simplifyName(newAction.eventName);
-		var mediaName = parseInt(Math.random(255,2)*10000);
-		var mediaExt = 'jpg';
-		if( newAction.coords == undefined ) {
-			newAction.coords = {};
-			newAction.coords.latitude = -16.3989;
-			newAction.coords.longitude = -71.535;
+		if(action.oldTag != undefined) {
+			var newSimpleTag = simplifyName(action.tag);
+			var oldSimpleTag = simplifyName(action.oldTag);
+			next(oldSimpleTag, newSimpleTag);
+		} else {
+			var simpleTag = simplifyName(action.tag);
+			var mediaName = parseInt(Math.random(255,2)*10000);
+			var mediaExt = 'jpg';
+			if( action.coords == undefined ) {
+				action.coords = {};
+				action.coords.latitude = -16.3989;
+				action.coords.longitude = -71.535;
+			}
+			next(simpleTag, mediaName, mediaExt);
 		}
-		next(simpleEventName, mediaName, mediaExt);
 	}
 }
 
