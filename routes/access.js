@@ -3,7 +3,9 @@ var router = express.Router();
 var mongoose = require('mongoose');
 
 var ensureAuthenticated = require('./ensureAuth');
-var service = require('../services');
+
+var jwt = require('jsonwebtoken');
+var config = require('../config');
 
 // Clase jPack
 var jPack = require('../jPack');
@@ -75,7 +77,12 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	});*/
 
 	// Crear token
-	req.session.token = service.createToken(req.user);
+	console.log('Hola');
+	req.session.token = jwt.sign(
+		{ id: req.user.id },
+		config.tokenSecret,
+		{ expiresIn : 60*60*24*2 /* 2 Días */}
+  	);
 
 	// Loguear al usuario
 	var User = mongoose.model('User');

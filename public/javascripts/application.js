@@ -13,7 +13,9 @@
  * ---------------------
  */
 
-$(document).ready(function() {
+//$(document).ready(function() {
+
+
 
 	$('main').scrollLeft($('#first').width());
 
@@ -21,7 +23,7 @@ $(document).ready(function() {
 	 * Evitar que se ejecute clicks fuera del area del logotipo
 	 *
 	 */
-	 var clickInsideIcon = false;
+	var clickInsideIcon = false;
 	$('#title a').on('click tapone', function(event){
 		if(!clickInsideIcon) {
 			event.preventDefault();
@@ -39,7 +41,6 @@ $(document).ready(function() {
 	 *
 	 */
 	$('#title img').on('tapone', function(event) {
-		console.log(event.target);
 		$('body').toggleClass('dark');
 	});
 
@@ -102,6 +103,14 @@ $(document).ready(function() {
 		$('aside').toggleClass('show');
 	});
 
+	$('#back').on('tapone', function() {
+		history.back();
+	});
+
+	window.onpopstate = function(event) {
+		angular.element(document.getElementById('controller')).scope().actions = event.state;
+	};
+
 	/*$('main').scroll( function () {
 		var currentTop = $('main').scrollTop();
 		if (currentTop < this.previousTop) {
@@ -111,7 +120,7 @@ $(document).ready(function() {
 		}
 		this.previousTop = currentTop;
 	});*/
-});
+//});
 
 /*
  * Framework Angular
@@ -142,29 +151,37 @@ function Application($scope, $http, $window) {
 	$scope.isActive = {};
 	//$scope.user.peopleToFollow = [];
 //TODO: Pasar esto a servidor
-	$scope.getMediaByFilter = function(action, object) {
+	$scope.refresh = function(pathname) {
 		initialize();
 		loadedImgs = 0;
 		//createEmptyPosts(5);
-		if(action == 'author') {
-			history.pushState( {}, null, '/' + object.hexCode + '.' + object.firstName );
-			$('#title').val(object.hexCode + '.' + object.firstName);
-			getPosts(action, object);
-		} else if (action == 'tag') {
-			history.pushState( {}, null, '/@' + object.tag);
-			$('#title').val('@' + object.tag);
-			getPosts(action, object.tag);
-		} else if (action == 'channel') {
-			history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
-			$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
-			var id = {}
-			id.hexCode = object.author.hexCode;
-			id.firstName = object.author.firstName;
-			id.tag = object.tag;
-			getPosts(action, id);
-		}
+		//if(action == 'author') {
+			//history.pushState( {}, null, '/' + object.hexCode + '.' + object.firstName );
+			//$('#title').val(object.hexCode + '.' + object.firstName);
+			//getPosts(action, object);
+		//} else if (action == 'tag') {
+			//history.pushState( {}, null, '/@' + object.tag);
+			//$('#title').val('@' + object.tag);
+			//getPosts(action, object.tag);
+		//} else if (action == 'channel') {
+			//history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
+			//$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
+			//var id = {}
+			//id.hexCode = object.author.hexCode;
+			//id.firstName = object.author.firstName;
+			//id.tag = object.tag;
+			getPosts(pathname);
+		//}
 	}
-	if(url != '') {
+
+	var pathRegExp = new RegExp(/^\/((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^\/([0-9A-Za-z%]{3,})$/g);
+	var path = pathRegExp.exec(window.location.pathname);
+
+	if(path[0]) {
+		angular.element(document.getElementById('controller')).scope().refresh(path[0].substring(1));
+	}
+
+	/*if(url != '') {
 		initialize();
 		var id = {};
 		if(reqType == 'tag'){
@@ -175,7 +192,7 @@ function Application($scope, $http, $window) {
 			var hexCode = filter[0].toLowerCase();
 			var firstName = filter[1].toLowerCase();
 			id.hexCode = hexCode;
-			id.firstName = filter[1]; //firstname
+			id.firstName = filter[1];
 		} else if(reqType == 'channel') {
 			var separators = ['\\\.', '@'];
 			var filter = url.split(new RegExp(separators.join('|')));
@@ -184,7 +201,7 @@ function Application($scope, $http, $window) {
 			id.author.firstName = filter[1];
 			id.tag = filter[2];
 		}
-		angular.element(document.getElementById('controller')).scope().getMediaByFilter(reqType, id);
+		angular.element(document.getElementById('controller')).scope().refresh(reqType, id);
 	} else {
 		initialize();
 		getGeo(function() {
@@ -194,9 +211,9 @@ function Application($scope, $http, $window) {
 		}, function(errorMsg) {
 			console.log(errorMsg);
 		});
-	}
+	}*/
 
-	var idAux, filterAux, actionAux, gettingPosts = false, firstPostsLoad = true, postQueryCount = 0, postLoadStep = 10, postShown = 0, tmpLoadingPostsNumber, tmpPosts = [], getPostTries = 0, getPostTriesLimit = 20;
+	var filterAux, pathnameAux, gettingPosts = false, firstPostsLoad = true, postQueryCount = 0, postLoadStep = 10, postShown = 0, tmpLoadingPostsNumber, tmpPosts = [], getPostTries = 0, getPostTriesLimit = 20;
 
 	function initialize() {
 		gettingPosts = false;
@@ -218,23 +235,22 @@ function Application($scope, $http, $window) {
 
 	$(document).scroll(function() {
 		if(window.innerWidth + $('body').scrollTop()*1.2 >= $(document).height()) {
-			askForPost(actionAux, idAux);
+			askForPost(pathnameAux);
 		}
 	});
 	
-	function askForPost(action, id) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
-		getPosts(action, id);
+	function askForPost(pathname) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+		getPosts(pathname);
 	}
 
 	// Cargar los post originales
-	function getPosts(action, id) {
-		actionAux = action;
-		idAux = id;
+	function getPosts(pathname) {
+		pathnameAux = pathname;
 		if(!gettingPosts) {
 			gettingPosts = true;
 			var tmpPostsNumber = tmpPosts.length;
 			if($scope.actions.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
-				postsQuery(action, id, function(data) {
+				postsQuery(pathname, function(data) {
 					if(data!=undefined) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
@@ -253,16 +269,16 @@ function Application($scope, $http, $window) {
 		}
 	}
 
-	function postsQuery(action, id, next, error) {
+	function postsQuery(pathname, next, error) {
 		//si el id está conformado por hexCod + firstName
-		if(typeof id == 'object') {
-			if(id.tag == undefined) {
-				id = id.hexCode + '.' + id.firstName;
-			} else {
-				id = id.hexCode + '.' + id.firstName + '.' + id.tag;
-			}
-		}
-		$http.get('/list/' + action + '/' + id + '/' + (postQueryCount==0?'':postQueryCount) ).success(function(data, status) {
+		//if(typeof id == 'object') {
+		//	if(id.tag == undefined) {
+		//		id = id.hexCode + '.' + id.firstName;
+		//	} else {
+		//		id = id.hexCode + '.' + id.firstName + '.' + id.tag;
+		//	}
+		//}
+		$http.get('/list' + (pathname==''?pathname:'/'+pathname) + (postQueryCount>0?'/'+postQueryCount:'') ).success(function(data, status) {
 			if(status == 204) {
 				clearInterval(getPostsInterval);
 			} else {
@@ -274,7 +290,6 @@ function Application($scope, $http, $window) {
 				}
 			}
 		}).error(function(e) {
-			console.log('error!!');
 			//error(e);
 		});
 	}
@@ -283,7 +298,6 @@ function Application($scope, $http, $window) {
 		var numberPostsNow = $scope.actions.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
 		//TODO EVALUAR: No se mostrá los n>5 últimos posts.
-		console.log('#1 numberPostsNow = ' + numberPostsNow + ' postShown = ' + postShown);
 		for(var i = numberPostsNow; i < postShown; i++) {
 			if(tmpPosts[i] != undefined) {
 				$scope.actions[i] = $scope.actions[i] == undefined? {} : $scope.actions[i];
@@ -292,11 +306,16 @@ function Application($scope, $http, $window) {
 				}
 				//$scope.actions[i] = tmpPosts[i];
 				//$scope.actions[i].media = 'uploads/' + $scope.actions[i].media;
+				$scope.actions[i].author.url = $scope.actions[i].author.hexCode + '.' + $scope.actions[i].author.firstName;
 				$scope.actions[i].timeElapsed = getTimeElapsed($scope.actions[i].time);
 				$scope.actions[i].class = 'real';
 				$scope.isActive[$scope.actions[i].id] = false;
 			}
 		}
+
+		history.pushState( $scope.actions, null, '/' +  pathnameAux);
+		$('#title').val(pathnameAux);
+
 		createEmptyPosts(1);
 		gettingPosts = false;
 
@@ -316,8 +335,6 @@ function Application($scope, $http, $window) {
 
 	$scope.modifyTag = function(action) {
 		$scope.isActive[action.id] = !$scope.isActive[action.id];
-		console.log($scope.isActive[action.id]);
-
 		$scope.oldTag = action.tag;
 	}
 
@@ -376,7 +393,6 @@ function Application($scope, $http, $window) {
 
 	$scope.shareOnFb = function() {
 		$scope.newAction.shareOnFb = !$scope.newAction.shareOnFb;
-		console.log('scope.newPost.shareOnFb: ' + $scope.newAction.shareOnFb);
 	}
 
 	$scope.shareActionOnFb = function(post) {
@@ -432,7 +448,6 @@ function Application($scope, $http, $window) {
 		var ctx = canvas.getContext('2d');
 
 		EXIF.getData(evt.target.files[0], function() {
-			//console.log(EXIF.pretty(this));
 			var orientation = this.exifdata.Orientation;
 			var reader = new FileReader();
 			reader.onload = function(event) {
@@ -491,8 +506,6 @@ function Application($scope, $http, $window) {
 
 					$scope.newAction.media = newImg;
 
-					console.log('\x1b[1m\x1b[35m@@@ newImage @@@\x1b[0m');
-					console.log($scope.newAction.media);
 				}
 				img.src = event.target.result;
 			}
@@ -568,7 +581,6 @@ angular.module('Juaku', [])
 		request: function (config) {
 			config.headers = config.headers || {};
 			if (token) {
-				console.log('Token: ' + token);
 				config.headers.Authorization = 'Bearer ' + token;
 			}
 			return config;
@@ -617,7 +629,6 @@ angular.module('Juaku', [])
 			function search(text) {
 				var transformedSearch = text.replace(/[^A-Z0-9a-z@.'/]/g, '');
 				
-				//console.log('FZ: ' + parseInt($(element).css('font-size')));
 				//var titleFontSize = 72;
 				//$(element).css('font-size', titleFontSize - ((text.length - 16)* 2));
 				
@@ -646,7 +657,6 @@ function postsLoaded() {
 
 	$('.post .bottom').off('tapone');
 	$('.post .bottom').on('tapone', function(event) {
-		console.log(event.target);
 		$('body').toggleClass('dark');
 	});
 
@@ -659,7 +669,6 @@ function postsLoaded() {
 	});
 
 	$('.author-hex-code').each(function(index) {
-		//console.log($(this).css('background-color') + ' ' + $(this).attr('hex-code'));
 		$(this).css('background-color', '#' + $(this).attr('hex-code'));
 	});
 

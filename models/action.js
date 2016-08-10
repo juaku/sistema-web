@@ -21,14 +21,14 @@ var ActionSchema = new Schema({
 }*/
 
 ActionSchema.statics.getActions = function (req, callback, error) {
-	var point = {};
+	/*var point = {};
 	if(req.session.coords != undefined) {
 		point.latitude = req.session.coords.latitude;
 		point.longitude = req.session.coords.longitude;
 	} else { // Arequipa
 		point.latitude = -16.3989; 
 		point.longitude = -71.535;
-	}
+	}*/
 
 	var resultsLimit = 10;
 	var queryNumber = 0;

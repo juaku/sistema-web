@@ -16,12 +16,67 @@ var jPack = require('../jPack');
 /* GET router para '/account'
  * Autentica al usuario y carga la vista 'account.jade'
  */
+router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
+	Action.getActions(req, function (actions) {
+		jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+			if(posts.length == 0) {
+				res.status(204).end();
+			} else {
+				res.json(posts);
+			}
+		});
+	}, function(error) {
+		console.log(error);
+		res.status(400).end();
+	});
+});
 
-router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
-	if(req.params.action!=undefined) {
+router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
+	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^([0-9A-Za-z%]{3,})$/g);
+	var path = pathRegExp.exec(req.params.pathname);
+
+	if(path[0]) {
+		req.session.path = path;
+		if(path[1]) {
+			if(path[2]) {
+				User.getActionsByChannel(req, function(actions) {
+					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+						res.json(posts);
+					});
+				}, function(error) {
+					console.log(error);
+					res.status(404).end();
+				});
+			} else {
+				User.getActionsByUser(req, function(actions) {
+					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+						res.json(posts);
+					});
+				}, function(error) {
+					console.log(error);
+					res.status(404).end();
+				});
+			}
+		} else {
+			if(path[2]) {
+				Tag.getActionsByTag(req, function(actions) {
+					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+						res.json(posts);
+					});
+				}, function(error) {
+					console.log(error);
+					res.status(404).end();
+				});
+			} else if(path[3]) {
+				console.log('Tag');
+			}
+		}
+	}
+
+	/*if(req.params.action!=undefined) {
 		if(req.params.action=='actions') {
-			/*jPack.getAllPosts(req, function(result) {
-				if(result.length == 0) {*/
+			jPack.getAllPosts(req, function(result) {
+				if(result.length == 0) {
 			Action.getActions(req, function (actions, providerId, hexCode) {
 				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
 					if(posts.length == 0) {
@@ -34,7 +89,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
-		} /*else if(req.params.action=='trend') {
+		} else if(req.params.action=='trend') {
 			jPack.getTrends(req, function(result) {
 				if(result.length == 0) {
 					res.status(204).end();
@@ -45,7 +100,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
-		}*/ else if(req.params.action=='tag') {
+		} else if(req.params.action=='tag') {
 			console.log('list.js');
 			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
 				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
@@ -55,7 +110,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(404).end();
 			});
-			/*jPack.getAllEvents(req, function(result) {
+			jPack.getAllEvents(req, function(result) {
 				if(result.length == 0) {
 					res.status(204).end();
 				} else {
@@ -64,7 +119,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
-			});*/
+			});
 		} else if(req.params.action=='author') {
 			User.getActionsByAuthor(req, function(actions, providerId, hexCode) {
 				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
@@ -84,7 +139,7 @@ router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
 				res.status(404).end();
 			});
 		}
-	}
+	}*/
 });
 
 /*router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {

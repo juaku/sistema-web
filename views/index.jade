@@ -21,64 +21,6 @@ block content
         span.user-lastname #{user.name.familyName}
         #account-controls
           a(href="" onclick="window.location = '/logout' ") logout
-              
-            //- section#user-relation.side-block.viewing-followers
-            //-   #relation-tabs
-            //-     #followers-tab.relation-tab(viewing='followers')
-            //-       .people-number {{ user.followers.length }}
-            //-       .follow-type Seguidores
-            //-     #following-tab.relation-tab(viewing='following')
-            //-       .people-number {{ user.following.length }}
-            //-       .follow-type Siguiendo
-            //-   #relation-views
-            //-     ul#followers.relation-view
-            //-       li(ng-repeat="follower in user.followers")
-            //-         .user-picture
-            //-           img.picture(ng-src="{{ follower.picture }}")
-            //-         .user-info
-            //-           .user-firstName {{ follower.firstName}}
-            //-           .user-lastName {{ follower.lastName }}
-            //-           .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
-            //-         .user-relation.like(ng-click="likeClick(post)")
-            //-           object(ng-class="{selected: action.like}")
-            //-             svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-            //-               // fill="#DDD" 
-            //-               path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
-            //-     ul#following.relation-view
-            //-       li(ng-repeat="followed in user.following")
-            //-         .user-picture
-            //-           img.picture(ng-src="{{ followed.picture }}")
-            //-         .user-info
-            //-           .user-firstName {{ followed.firstName }}
-            //-           .user-lastName {{ followed.lastName }}
-            //-           .user-followerNumber {{ follower.followersNumber }} 64 #{__('Followers')}
-            //-         .user-relation.like(ng-click="likeClick(post)")
-            //-           object(ng-class="{selected: action.like}")
-            //-             svg(version="1.1" class="like-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve")
-            //-               // fill="#DDD" 
-            //-               path(d="M29.3,15.8l-3.6,2.1l-4.4-2.5c-2.1-1.2-4.7-1.2-6.9,0L13.6,16c-2.2,1.2-3.6,3.6-3.6,6.2v0.5 c0,2.5,1.4,4.9,3.5,6.1L25,35.4l11.5-6.7c2.1-1.3,3.5-3.6,3.5-6.1v-0.8c0-2.4-1.3-4.7-3.3-6l0,0C34.4,14.5,31.6,14.4,29.3,15.8z")#inner
-            
-
-            //(ng-repeat="usuario in usuarios")
-            //{{ usuario.firstName }} {{ usuario.following }}
-            //(type='submit', value='Seguir' ng-click="followRelation(usuario)")
-            //(type='submit', value='Followers' ng-click="getFollowers(1)")
-            //(type='submit', value='Following' ng-click="getFollowers(2)")
-            //(href='' ng-click="getMediaByFilter('post', 'following')")
-            
-            // {__('Blocked accounts')}
-
-            // (ng-click='changeLanguage(data.singleSelect)')
-            // #{__('Language')}
-
-            //label(for='singleSelect')
-            // select#singleSelect(name='singleSelect', ng-model='data.singleSelect')s
-            //  option(value='') ---Please select---
-            //  option(value='en') ingles
-            //  option(value='es') español
-
-            //(href="/logout") #{__('Logout')}
-
         section#events-side
           section#events-controls
             .promoted
@@ -90,7 +32,7 @@ block content
             .events-list
               //.events-title.title #{__('Trends')}
               .event(ng-repeat="trend in trends | limitTo: limit")
-                a.event-link(href='' ng-click="getMediaByFilter('trend', trend)")
+                a.event-link(href='' ng-click="refresh('trend', trend)")
                   span.at-simbol @
                   span.event-name {{ trend.name }}
                 //.event-people {{ trend.count }} #{__('people')}
@@ -130,22 +72,20 @@ block content
 
       //
       // Post
-      //-
-      //-
+      //
       article(ng-repeat="action in actions" last-post-loaded).action
         .media
           .preloader
           img(ng-src='{{ action.media }}' class='{{ action.class }}' image-on-load)
         .info
           .author-picture
-            //a(rel="author").author-link
-            img(ng-src="{{ action.author.picture }}" ng-click="getMediaByFilter('author', action)")
+            img(ng-src="{{ action.author.picture }}" ng-click="refresh(action.author.url)")
           .action-info
             h3.action-title
-              span(hex-code="{{ action.author.hexCode }}" ng-click="getMediaByFilter('channel', action)").author-hex-code
-              span(href='' ng-click="getMediaByFilter('author', action.author)").author-name {{ action.author.firstName }}
+              span(hex-code="{{ action.author.hexCode }}" ng-click="refresh(action.author.url+'@'+action.tag)").author-hex-code
+              span(href='' ng-click="refresh(action.author.hexCode+'.'+action.author.firstName)").author-name {{ action.author.firstName }}
               span.at @
-              span(ng-hide="isActive[action.id]" href='' ng-model="newTag" ng-click="getMediaByFilter('tag', action)") {{action.tag}}
+              span(ng-hide="isActive[action.id]" href='' ng-model="newTag" ng-click="refresh('@'+action.tag)") {{action.tag}}
               span(ng-show="isActive[action.id]")
                 input.event-name(type="text", ng-model="action.tag")
               button(ng-if="action.edittable" ng-hide="isActive[action.id]" ng-click="modifyTag(action)") #{__('Modificar TAG')}
@@ -158,41 +98,6 @@ block content
           .save-button
             a(ng-click="saveClick(action)" ng-class="{ selected: action.saved }").save-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save
-
-      //- article(ng-repeat="action in actions" last-post-loaded)
-      //-   img(ng-src='{{ action.media }}' class='{{ action.class }}' image-on-load)
-      //-   img(ng-src='{{ action.author.picture }}')
-      //-   a(href='' ng-click="getMediaByFilter('author', action)") {{ action.author.firstName }}
-      //-   a {{ action.author.lastName }}
-      //-   a(href='' ng-if="action.event" ng-click="getMediaByFilter('tag', action)")
-      //-   a {{ action.event }}
-      //-   //a ng-click="reportAction(action)"
-      //-   //a ng-click="shareActionOnFb(action)"
-      //-   //a .enviarUbicacion
-      //-   a.time(ng-if="action.timeElapsed.type  == 's' ") #{__('Just now')}
-      //-   a.time(ng-if="action.timeElapsed.type  == 'm' ") {{ action.timeElapsed.val }} #{__('min')}
-      //-   a.time(ng-if="action.timeElapsed.type  == 'h' ") {{ action.timeElapsed.val }} #{__('h')}
-      //-   a.time(ng-if="action.timeElapsed.type  == 'd' ") {{ action.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
-      //-   a(ng-click="likeClick(action)" ng-class="{ selected: action.like }")
-
-
-    //
-    //  Flotante
-    //
-    //nav#view-menu
-      .view-button.first
-        #button-config.button
-      .view-button
-        #button-posts.button.selected
-      .view-button.middle
-        #button-camera.button(ng-click="askForSuggestedEvents()")
-      .view-button
-        #button-events.button
-      .view-button.last
-        #button-search.button
-    
-
-  //#test(style='position: fixed; background: #000; color: #FFF; bottom: 50px;') Test
 
   //
   //  Librería SVG
@@ -209,3 +114,4 @@ block content
     var url = '#{url}'
     var reqType = '#{reqType}'
     var token = '#{token}'
+  script(src="/javascripts/application.js")

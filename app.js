@@ -116,13 +116,13 @@ function issueToken(user, done) {
 }*/
 // END TODO
 
-var routes = require('./routes/index');
 var access = require('./routes/access');
 var login = require('./routes/login');
 var logout = require('./routes/logout');
 var post = require('./routes/post');
 var user = require('./routes/user');
 var list = require('./routes/list');
+var routes = require('./routes/index');
 
 var app = express();
 
@@ -146,7 +146,7 @@ app.use(cookieParser());
 app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 	host: 'localhost',
 	port: '6379'
-}), cookie: { path: '/', maxAge: 1000*60*60*24*15 } // 15 Días
+}), cookie: { path: '/', maxAge: 1000*60*60*24*2 } // 2 Días
 }));
 
 //NO CACHE
@@ -185,13 +185,13 @@ if (app.get('env') === 'development') {
 }
 
 //Usar rutas
-app.use('/', routes);
 app.use('/access', access);
 app.use('/login', login);
 app.use('/logout', logout);
 app.use('/post', post);
 app.use('/user', user);
 app.use('/list', list);
+app.use('/', routes);
 
 // GET /auth/facebook
 //   Use passport.authenticate() como una ruta middleware para autenticar la

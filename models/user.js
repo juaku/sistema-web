@@ -93,21 +93,21 @@ UserSchema.statics.getProfilePicture = function (req, callback) {
   });
 }
 
-/*UserSchema.statics.getActionsByAuthor = function (nameAuthor, callback) {
-  return this.findOne({name: nameAuthor})
+/*UserSchema.statics.getActionsByuser = function (nameuser, callback) {
+  return this.findOne({name: nameuser})
           .populate('actions')
           .exec(callback)
 }*/
 
-UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
-  var point = {};
+UserSchema.statics.getActionsByUser = function (req, callback, error) {
+  /*var point = {};
   if(req.session.coords != undefined) {
     point.latitude = req.session.coords.latitude;
     point.longitude = req.session.coords.longitude;
   } else { // Arequipa
     point.latitude = -16.3989;
     point.longitude = -71.535;
-  }
+  }*/
 
   var resultsLimit = 10;
   var queryNumber = 0;
@@ -120,22 +120,24 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
     req.session.queryTimeLimit = queryTimeLimitStep;
   }
 
-  var res = req.params.id.split('.');
-  var hexCode = res[0];
-  var nameAuthor = res[1];
-  this.findOne({hexCode: hexCode, name: nameAuthor})
+  var userId = req.session.path[1].split('.')
+  var hexCode = userId[0];
+  var nameuser = userId[1];
+  this.findOne({hexCode: hexCode, name: nameuser})
   .populate({
     path: 'actions savedActions',
     match: {active: true},
     options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
   })
-  .exec(function (err, author) {
+  .exec(function (err, user) {
     if (err) return handleError(err);
-    if(author != null) {
-      var mergedActions = author.savedActions.concat(author.actions);
-      callback(mergedActions, author.providerId, author.hexCode);
+    if(user != null) {
+      // TODO: Posible error
+      //var mergedActions = user.savedActions.concat(user.actions);
+      //callback(mergedActions);
+      callback(user.actions);
     } else {
-      console.log('NO EXISTE tal autor');
+      console.log('NO EXISTE tal autor'); // jaja
       error();
     }
   })
@@ -144,14 +146,14 @@ UserSchema.statics.getActionsByAuthor = function (req, callback, error) {
 UserSchema.statics.getActionsByChannel = function (req, callback, error) {
   var User = mongoose.model('User');
   var Tag = mongoose.model('Tag');
-  var point = {};
+  /*var point = {};
   if(req.session.coords != undefined) {
     point.latitude = req.session.coords.latitude;
     point.longitude = req.session.coords.longitude;
   } else { // Arequipa
     point.latitude = -16.3989;
     point.longitude = -71.535;
-  }
+  }*/
 
   var resultsLimit = 10;
   var queryNumber = 0;
@@ -164,10 +166,10 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
     req.session.queryTimeLimit = queryTimeLimitStep;
   }
 
-  var res = req.params.id.split('.');
-  var hexCode = res[0];
-  var nameAuthor = res[1];
-  var tagName = res[2];
+  var userId = req.session.path[1].split('.')
+  var hexCode = userId[0];
+  var nameuser = userId[1];
+  var tagName = req.session.path[2];
 
   var simpleEventName = tagName;
   var diacritics =[
@@ -186,17 +188,17 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
   tagName = simpleEventName.toLowerCase();
   Tag.findOne({ 'name': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
-      User.findOne({hexCode: hexCode, name: nameAuthor})
+      User.findOne({hexCode: hexCode, name: nameuser})
       .populate({
         path: 'actions',
         match: {tagId: tag.id,
                 active: true},
         options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
       })
-      .exec(function (err, author) {
+      .exec(function (err, user) {
         if (err) return handleError(err);
-        if(author != null) {
-          callback(author.actions, author.providerId, author.hexCode);
+        if(user != null) {
+          callback(user.actions);
         } else {
           console.log('NO EXISTE tal autor');
           error();

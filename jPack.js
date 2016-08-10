@@ -257,7 +257,7 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 	});
 }
 
-jPack.showActions = function(userId, accessToken, actions, providerId, hexCode, next) {
+jPack.showActions = function(userId, accessToken, actions, next) {
 	var posts = [];
 	var savedActions;
 	countActions = actions.length;
