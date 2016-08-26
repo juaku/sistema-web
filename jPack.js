@@ -1,13 +1,7 @@
-// Conceccion con Parse
-var Parse = require('./parseConnect').Parse;
-
 // Encriptador
 var crip = require('./crip');
 
 var FB = require('fb');
-
-// Genera hash de userId
-var crypto = require('crypto');
 
 // Guardar imagen en el servidor
 var fs = require('fs');
@@ -19,7 +13,7 @@ var url = require('url');
 var CronJob = require('cron').CronJob;
 
 //Para restingir el uso del @, signos de admiración, interrogación y caracteres especiales
-var validate = require("validate.js")
+//var validate = require("validate.js")
 
 // Herramientas Geo - (Evaluar si es necesaria)
 //var geolib = require('geolib');
@@ -266,7 +260,7 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 	}
 	User.findById(userId, 'savedActions', function (err, user) {
 		savedActions = user.savedActions;
-		for(var i in actions) {
+		for(var i=0; i<actions.length; i++) {
 			posts[i] = {};
 			posts[i].id = actions[i]._id;
 			getProviderId(actions[i].authorId, i);
@@ -314,7 +308,7 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 	}
 }
 
-jPack.validateTag = function(action, next, error) {
+/*jPack.validateTag = function(action, next, error) {
 	var pattern = /[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/; // var pattern = /@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]*\w[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+/;
 	var flag = validate({post: action.tag}, {post: {format: pattern}});
 
@@ -338,7 +332,7 @@ jPack.validateTag = function(action, next, error) {
 			next(simpleTag, mediaName, mediaExt);
 		}
 	}
-}
+}*/
 
 /*
  * @descrip Inicia la secuencia de guradado de nuevo post
@@ -395,7 +389,7 @@ jPack.newPost = function(req, next, error) {
 		//});
 }
 
-function simplifyName(eventName) {
+/*function simplifyName(eventName) {
 	var simpleEventName = eventName;
 	var diacritics =[
 		/[\300-\306]/g, /[\340-\346]/g,  // A, a
@@ -411,7 +405,7 @@ function simplifyName(eventName) {
 		simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
 	}
 	return simpleEventName.toLowerCase();
-}
+}*/
 
 /*D
  * @descrip Asigna relación de like con el post clickeado

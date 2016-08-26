@@ -34,7 +34,6 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 	var queryNumber = 0;
 	var queryTimeLimitStep = 24*20;
 	var countActions;
-
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
 	} else {

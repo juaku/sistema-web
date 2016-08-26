@@ -141,12 +141,14 @@ app.set('view engine', 'jade');
 app.use(favicon());
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '1mb'}));
-app.use(bodyParser.urlencoded());
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 	host: 'localhost',
 	port: '6379'
-}), cookie: { path: '/', maxAge: 1000*60*60*24*2 } // 2 Días
+}), cookie: { path: '/', maxAge: 1000*60*60*24*2 }, // 2 Días
+	resave: false,
+	saveUninitialized: false
 }));
 
 //NO CACHE
@@ -175,7 +177,7 @@ app.locals.title = 'Juaku';
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
 		//if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128' || req.ip.substring(0, 11) == '190.113.211' || req.ip.substring(0, 11) == '190.113.210') {
-		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || (parseInt(req.ip.split('.')[0]) == 179 && parseInt(req.ip.split('.')[1]) == 7)) {
+		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '::ffff:200.48.179.114' || (parseInt(req.ip.split('.')[0]) == 179 && parseInt(req.ip.split('.')[1]) == 7)) {
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )

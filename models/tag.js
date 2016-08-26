@@ -72,11 +72,19 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	})
 }
 
-TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, userId, callback) { //revisar si estoy enviando función error
+TagSchema.statics.newAction = function (req, userId, callback) { //revisar si estoy enviando función error
 	var Action = mongoose.model('Action');
 	var User = mongoose.model('User');
 	var newAction = req.body;
+	var simpleTag = simplifyName(newAction.tag);
+	var mediaName = parseInt(Math.random(255,2)*10000);
+	var mediaExt = 'jpg';
 	var FB = require('fb');
+	if( newAction.coords == undefined ) {
+		newAction.coords = {};
+		newAction.coords.latitude = -16.3989;
+		newAction.coords.longitude = -71.535;
+	}
 	var coords = [];
 	coords[0] = newAction.coords.latitude;
 	coords[1] = newAction.coords.longitude;
@@ -106,7 +114,6 @@ TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, use
 				objectTag.actions.push(action._id);
 				objectTag.save();
 				console.log('Acción referenciada a tag');
-				callback();
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
@@ -119,8 +126,8 @@ TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, use
 						if (err) return handleError(err);
 					});
 					console.log('Tag guardado y acción referenciada');
-					callback();
 				});
+				callback();
 			}
 		});
 		if(newAction.shareOnFb) {
@@ -145,7 +152,8 @@ TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, use
 			);
 		}
 	});
-	function saveMedia(data, name, ext, next) {
+	function saveMedia(data, name, ext) {
+		console.log('saveMedia');
 		var img = data;
 		// Strip off the data: url prefix to get just the base64-encoded bytes
 		var data = img.replace(/^data:image\/\w+;base64,/, "");
@@ -157,26 +165,28 @@ TagSchema.statics.newAction = function (req, simpleTag, mediaName, mediaExt, use
 	}
 }
 
-TagSchema.statics.editTag = function (req, oldTagName, newTagName, userId, callback) { //revisar si estoy enviando función error
+TagSchema.statics.editTag = function (req, userId, callback) { //revisar si estoy enviando función error
 	var Action = mongoose.model('Action');
 	var User = mongoose.model('User');
 	var action = req.body;
+	var newSimpleTag = simplifyName(action.tag);
+	var oldSimpleTag = simplifyName(action.oldTag);
 	var FB = require('fb');
-	if(action.author.id == userId && oldTagName != newTagName && newTagName != '' && newTagName != undefined) {
+	if(action.author.id == userId && oldSimpleTag != newSimpleTag && newSimpleTag != '' && newSimpleTag != undefined) {
 		//Remueve ACTION referenciada a TAG antiguo
-		this.update({ name: oldTagName }, { $pull: { actions: action.id }}, function (err, doc) {
+		this.update({ name: oldSimpleTag }, { $pull: { actions: action.id }}, function (err, doc) {
 			if (err) return handleError(err);
-			console.log('accion removida de tag: ' + oldTagName);
+			console.log('accion removida de tag: ' + oldSimpleTag);
 			console.log(doc);
 		});
 		//Cambia nombre de TAG dentro de ACTION
 		Action.update({ _id: action.id }, { $set: { name: action.tag }}, function (err, doc) {//declarar newName
 			if (err) return handleError(err);
-			console.log('Actualización de tag en action: ' + newTagName);
+			console.log('Actualización de tag en action: ' + newSimpleTag);
 			console.log(doc);
 		});
 		//Referencia ACTION a nuevo TAG
-		this.findOne({name: newTagName}, function(err, objectTag) {
+		this.findOne({name: newSimpleTag}, function(err, objectTag) {
 			if(err) throw err;
 			if(objectTag!= null) {
 				Action.update({ _id: action.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
@@ -185,11 +195,10 @@ TagSchema.statics.editTag = function (req, oldTagName, newTagName, userId, callb
 				objectTag.actions.push(action.id);
 				objectTag.save();
 				console.log('Acción referenciada a tag');
-				callback();
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
-				tag.name = newTagName;
+				tag.name = newSimpleTag;
 				tag.originalName = action.tag;
 				tag.actions = action.id;
 				tag.save(function (err) {
@@ -201,8 +210,26 @@ TagSchema.statics.editTag = function (req, oldTagName, newTagName, userId, callb
 				});
 			}
 		});
+		callback();
 	}
-	callback();
+}
+
+function simplifyName(tag) {
+	console.log('simplifyName ' + tag);
+	var diacritics =[
+		/[\300-\306]/g, /[\340-\346]/g,  // A, a
+		/[\310-\313]/g, /[\350-\353]/g,  // E, e
+		/[\314-\317]/g, /[\354-\357]/g,  // I, i
+		/[\322-\330]/g, /[\362-\370]/g,  // O, o
+		/[\331-\334]/g, /[\371-\374]/g,  // U, u
+		/[\321]/g, /[\361]/g, // N, n
+		/[\307]/g, /[\347]/g, // C, c
+	];
+	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+	for (var i = 0; i < diacritics.length; i++) {
+		tag = tag.replace(diacritics[i],chars[i]);
+	}
+	return tag.toLowerCase();
 }
 
 module.exports = mongoose.model('Tag', TagSchema);
