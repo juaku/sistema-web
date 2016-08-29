@@ -176,8 +176,8 @@ app.locals.title = 'Juaku';
 //DEV: Restringir el uso a usuarios que no sean clientes del servidor
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
-		//if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '191.238.45.128' || req.ip.substring(0, 11) == '190.113.211' || req.ip.substring(0, 11) == '190.113.210') {
-		if(req.ip == process.env.SSH_CLIENT.split(' ')[0] || req.ip == '::ffff:200.48.179.114' || (parseInt(req.ip.split('.')[0]) == 179 && parseInt(req.ip.split('.')[1]) == 7)) {
+		var IPv4 = req.ip.split(':')[3];
+		if(IPv4 == process.env.SSH_CLIENT.split(' ')[0] || IPv4.includes('179.7.')) { // IP cliente SSH e ip's de Claro
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )

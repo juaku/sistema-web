@@ -8,126 +8,109 @@
 // 	*/
 // }
 
-/*
- * Código de maquetación
- * ---------------------
- */
+//
+//	Código de maquetación
+//
 
-//$(document).ready(function() {
+// Evitar que se ejecute clicks fuera del area coloreada del logotipo
+//
+$('#logo-link').on('click tapone', function(event){
+	event.preventDefault();
+});
 
+$('#logo-link #logo #logo-icon').on('click tapone', function(event){
+	window.document.location = '/';
+});
 
+// Cambiar de tema
+//
+$('#title img').on('tapone', function(event) {
+	$('body').toggleClass('dark');
+});
 
-	$('main').scrollLeft($('#first').width());
+$('#take').on('click', function() {
+	$('body').addClass('new-post-view');
+	$('input#media-loader').click();
+});
 
-	/*
-	 * Evitar que se ejecute clicks fuera del area del logotipo
-	 *
-	 */
-	var clickInsideIcon = false;
-	$('#title a').on('click tapone', function(event){
-		if(!clickInsideIcon) {
-			event.preventDefault();
-			clickInsideIcon = false;
-		}
-	});
+$('#share-new-post .share').on('tapone', function() {
+	$(this).toggleClass('selected');
+});
 
-	$('#title a #logo-icon').on('click tapone', function(event){
-		clickInsideIcon = true;
-		$('#title a').click();
-	});
+$('input.event-name').on('focus', function() {
+	$('body').addClass('view-menu-hidden');
+});
+$('input.event-name').on('focusout', function() {
+	$('body').removeClass('view-menu-hidden');
+});
 
-	/*
-	 * Cambiar de tema
-	 *
-	 */
-	$('#title img').on('tapone', function(event) {
+// Vista de seguidores y seguidos
+//
+$('#relation-tabs .relation-tab').on('tapone', function() {
+	$('#user-relation').removeClass('viewing-followers viewing-following');
+	$(this).parents('#user-relation').addClass('viewing-' + $(this).attr('viewing'));
+});
+
+$('main').previousTop = 0;
+
+$('#account a.user-link').on('tapone', function() {
+	$('aside').toggleClass('show');
+});
+
+$('#back').on('tapone', function() {
+	history.back();
+});
+
+window.onpopstate = function(event) {
+	angular.element(document.getElementById('controller')).scope().actions = event.state;
+};
+
+function actionsLoaded() {
+	$('.save').off('tapone');
+	$('.save').on('tapone', function(event) {
 		$('body').toggleClass('dark');
 	});
 
+	// Parpadeo cuando se hace scroll hacia abajo
 	//
+	$('article .media img').off('tapone');
+	$('article .media img').on('tapone', function() { 
+		//assistedScroll(1, $(this).parents('article'));
+	});
 
-	$('#view-menu .button').on('tapone', function() {
-		$('#view-menu .button').removeClass('selected');
-		$(this).addClass('selected');
-		$('body').removeClass('config-view posts-view new-post-view events-view search-view');
-		switch($('#view-menu .button').index(this)) {
-			case 0:
-				$('body').addClass('config-view');
-				break;
-			/*case 1:
-				$('body').addClass('posts-view');
-				break;*/
-			case 2:
-				$('body').addClass('new-post-view');
-				$('input#media-loader').click(); // Petición de archivo
-				break;
-			case 3:
-				$('body').addClass('events-view');
-				break;
-			case 4:
-				$('body').addClass('search-view');
-				break;
+	// Avanza a la siguiente foto haciendo click
+	//
+	/*function assistedScroll(modifier, refPost) {
+		modifier = modifier == undefined ? 1 : modifier;
+		var refPostTop = parseInt($(refPost).next().position().top) + 2; // TODO: Arreglar correctamente
+		$('main').stop().animate({
+				'scrollTop': refPostTop
+			}, 200, 'swing', function () {
+				//window.location.hash = refPost; TODO: Actualizar hash
+		});
+	}*/
+
+	$('.author-hex-code').each(function(index) {
+		$(this).css('background-color', '#' + $(this).attr('hex-code'));
+	});
+
+	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
+	//
+	$(".event-name").bind('keypress', function(event) {
+		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
+		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+		if (!regex.test(key)) {
+			event.preventDefault();
 		}
 	});
+}
 
-	$('#take').on('click', function() {
-		$('body').addClass('new-post-view');
-		$('input#media-loader').click();
-	});
-
-	$('#share-new-post .share').on('tapone', function() {
-		$(this).toggleClass('selected');
-	});
-
-	$('.show-more').on('tapone', function() {
-		// TODO: Evaluar
-		$('.events-list').addClass('show-more');
-	});
-
-	$('input.event-name').on('focus', function() {
-		$('body').addClass('view-menu-hidden');
-	});
-	$('input.event-name').on('focusout', function() {
-		$('body').removeClass('view-menu-hidden');
-	});
-
-	// Vista de seguidores y seguidos
-	$('#relation-tabs .relation-tab').on('tapone', function() {
-		$('#user-relation').removeClass('viewing-followers viewing-following');
-		$(this).parents('#user-relation').addClass('viewing-' + $(this).attr('viewing'));
-	});
-	
-	$('main').previousTop = 0;
-
-	$('#account a.user-link').on('tapone', function() {
-		$('aside').toggleClass('show');
-	});
-
-	$('#back').on('tapone', function() {
-		history.back();
-	});
-
-	window.onpopstate = function(event) {
-		angular.element(document.getElementById('controller')).scope().actions = event.state;
-	};
-
-	/*$('main').scroll( function () {
-		var currentTop = $('main').scrollTop();
-		if (currentTop < this.previousTop) {
-			$('#box').addClass('scrollBack')
-		} else {
-			$('#box').removeClass('scrollBack')
-		}
-		this.previousTop = currentTop;
-	});*/
-//});
-
-/*
- * Framework Angular
- * -----------------
- */
+//
+// Framework Angular
+//
 
 // ES Locale
+//
 if($('html').attr('lang') == 'es') {
 	angular.module("ngLocale", [], ["$provide", function($provide) {
 	var PLURAL_CATEGORY = {ZERO: "zero", ONE: "one", TWO: "two", FEW: "few", MANY: "many", OTHER: "other"};
@@ -136,42 +119,38 @@ if($('html').attr('lang') == 'es') {
 }
 
 // Controlador
-
+//
 var loadedImgs = 0;
 var getPostsBool = true;
 var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
+
+// 
+// 
 function Application($scope, $http, $window) {
-	/*
-	 * User
-	 */
 
+	// Modelo User
+	//
 	$scope.user = {};
-
 	$scope.user.data = {};
 	$scope.isActive = {};
-	//$scope.user.peopleToFollow = [];
-//TODO: Pasar esto a servidor																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	zzzz
+
+	var filterAux,
+		pathnameAux,
+		gettingPosts = false,
+		firstPostsLoad = true,
+		postQueryCount = 0,
+		postLoadStep = 10,
+		postShown = 0,
+		tmpLoadingPostsNumber,
+		tmpPosts = [],
+		getPostTries = 0,
+		getPostTriesLimit = 20;
+
 	$scope.refresh = function(pathname) {
 		initialize();
 		loadedImgs = 0;
+		getPosts(pathname);
 		//createEmptyPosts(5);
-		//if(action == 'author') {
-			//history.pushState( {}, null, '/' + object.hexCode + '.' + object.firstName );
-			//$('#title').val(object.hexCode + '.' + object.firstName);
-			//getPosts(action, object);
-		//} else if (action == 'tag') {
-			//history.pushState( {}, null, '/@' + object.tag);
-			//$('#title').val('@' + object.tag);
-			//getPosts(action, object.tag);
-		//} else if (action == 'channel') {
-			//history.pushState( {}, null, '/' + object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
-			//$('#title').val(object.author.hexCode + '.' + object.author.firstName + '@' + object.tag);
-			//var id = {}
-			//id.hexCode = object.author.hexCode;
-			//id.firstName = object.author.firstName;
-			//id.tag = object.tag;
-			getPosts(pathname);
-		//}
 	}
 
 	var pathRegExp = new RegExp(/^\/((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^\/([0-9A-Za-z%]{3,})$/g);
@@ -180,40 +159,6 @@ function Application($scope, $http, $window) {
 	if(path[0]) {
 		angular.element(document.getElementById('controller')).scope().refresh(path[0].substring(1));
 	}
-
-	/*if(url != '') {
-		initialize();
-		var id = {};
-		if(reqType == 'tag'){
-			var filter = url.split('@');
-			id.tag = filter[1].toLowerCase();
-		} else if(reqType == 'author') {
-			var filter = url.split('.');
-			var hexCode = filter[0].toLowerCase();
-			var firstName = filter[1].toLowerCase();
-			id.hexCode = hexCode;
-			id.firstName = filter[1];
-		} else if(reqType == 'channel') {
-			var separators = ['\\\.', '@'];
-			var filter = url.split(new RegExp(separators.join('|')));
-			id.author = {};
-			id.author.hexCode = filter[0];
-			id.author.firstName = filter[1];
-			id.tag = filter[2];
-		}
-		angular.element(document.getElementById('controller')).scope().refresh(reqType, id);
-	} else {
-		initialize();
-		getGeo(function() {
-			$http.post('/user/setGeo', $scope.user).success(function(data) {
-				getPosts('actions');
-			}).error();
-		}, function(errorMsg) {
-			console.log(errorMsg);
-		});
-	}*/
-
-	var filterAux, pathnameAux, gettingPosts = false, firstPostsLoad = true, postQueryCount = 0, postLoadStep = 10, postShown = 0, tmpLoadingPostsNumber, tmpPosts = [], getPostTries = 0, getPostTriesLimit = 20;
 
 	function initialize() {
 		gettingPosts = false;
@@ -239,11 +184,10 @@ function Application($scope, $http, $window) {
 		}
 	});
 	
-	function askForPost(pathname) { // TODO: EVALUAR: Parece que carga con getPost(). O: En main con pos abs no carga a menos que haya scroll sólo en android
+	function askForPost(pathname) {
 		getPosts(pathname);
 	}
 
-	// Cargar los post originales
 	function getPosts(pathname) {
 		pathnameAux = pathname;
 		if(!gettingPosts) {
@@ -270,14 +214,6 @@ function Application($scope, $http, $window) {
 	}
 
 	function postsQuery(pathname, next, error) {
-		//si el id está conformado por hexCod + firstName
-		//if(typeof id == 'object') {
-		//	if(id.tag == undefined) {
-		//		id = id.hexCode + '.' + id.firstName;
-		//	} else {
-		//		id = id.hexCode + '.' + id.firstName + '.' + id.tag;
-		//	}
-		//}
 		$http.get('/list' + (pathname==''?pathname:'/'+pathname) + (postQueryCount>0?'/'+postQueryCount:'') ).success(function(data, status) {
 			if(status == 204) {
 				clearInterval(getPostsInterval);
@@ -290,7 +226,7 @@ function Application($scope, $http, $window) {
 				}
 			}
 		}).error(function(e) {
-			//error(e);
+			error(e);
 		});
 	}
 
@@ -318,11 +254,9 @@ function Application($scope, $http, $window) {
 
 		createEmptyPosts(1);
 		gettingPosts = false;
-
-		// hexCode
 	}
 
-	// Crear n post vacios mientras carga los post originales
+	// Crear 'numTmpPost' espacios vacios mientras carga los post originales
 	function createEmptyPosts(numTmpPost) {
 		tmpLoadingPostsNumber = numTmpPost;
 		loadedImgs -= numTmpPost;
@@ -339,16 +273,10 @@ function Application($scope, $http, $window) {
 	}
 
 	$scope.updateTag = function(action) {
-		var pathRegExp = new RegExp(/([0-9A-Za-z%]{3,})/g);
-		var newTag = pathRegExp.exec(action.tag);
-		if (newTag) {
-			$scope.isActive[action.id] = !$scope.isActive[action.id];
-			action.oldTag = $scope.oldTag;
-			$http.post('/post/editTag', action).success(function() {
-			}).error();
-		} else {
-			console.log('TAG INCORRECTO ');
-		}
+		$scope.isActive[action.id] = !$scope.isActive[action.id];
+		action.oldTag = $scope.oldTag;
+		$http.post('/post/editTag', action).success(function() {
+		}).error();
 	}
 
 	$scope.deleteAction = function(post) {
@@ -357,7 +285,7 @@ function Application($scope, $http, $window) {
 		}).error();
 	}
 
-	//Guarda la foto que el usuario desee
+	// Guarda la foto
 	$scope.saveClick = function(post) {
 		$scope.post = post;
 		if (!$scope.post.saved) {
@@ -377,7 +305,8 @@ function Application($scope, $http, $window) {
 		}).error();
 	}
 
-	// Envía un objeto con los datos de la persona que deseas bloquear o desbloquear mediante un post 
+	// Envía un objeto con los datos del usuario que se desea bloquear o desbloquear mediante un post
+	//
 	$scope.blockUser = function(userToBlock) {
 		$scope.user.userToBlock = userToBlock;
 		if (!$scope.user.userToBlock.block) {
@@ -391,9 +320,8 @@ function Application($scope, $http, $window) {
 		}
 	}
 
-	/*
-	 * Post
-	 */
+	// Post
+	// 
 	$scope.newAction = {};
 	$scope.newAction.shareOnFb = false;
 
@@ -519,18 +447,8 @@ function Application($scope, $http, $window) {
 		});
 	}
 
-	/*$scope.showMoreEvents = function(oldLimit) {
-		$scope.limit = oldLimit;
-		if($scope.limit <= $scope.trends.length)
-			$scope.limit = $scope.limit+3;
-		else
-			console.log("No hay más eventos en tu ciudad");
-	}*/
-
-
-	/*
-	 * Geo
-	 */
+	// Geo
+	//
 	function getGeo(next, error) {
 		if (navigator.geolocation) {
 			var position = 0;
@@ -577,10 +495,11 @@ function Application($scope, $http, $window) {
 			error("Geolocation is not supported by this browser.");
 		}
 	}
+}
 
-} // Fin Controlador - function Application($scope, $http)
-
+//
 // Directivas
+//
 angular.module('Juaku', [])
 .factory('authInterceptor', function ($rootScope, $q, $window) {
 	return {
@@ -608,12 +527,13 @@ angular.module('Juaku', [])
 		link: function(scope, element, attrs) {
 			if(scope.$last) {
 				$timeout(function() {
-					postsLoaded();
+					actionsLoaded();
 				});
 			}
 		}
 	};
 })
+
 .directive('imageOnLoad', function() { // Aparecer las imagenes cuando carguen
 	return {
 		restrict: 'A',
@@ -653,59 +573,6 @@ angular.module('Juaku', [])
 		return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
 	}
 })
-//.module('app', ['ngTouch']);
-
-function postsLoaded() {
-	$('.like-svg').off('tapone');
-	$('.like-svg').on('tapone', function() {
-		$(this).parents().toggleClass('selected');
-	});
-
-	$('.post .bottom').off('tapone');
-	$('.post .bottom').on('tapone', function(event) {
-		$('body').toggleClass('dark');
-	});
-
-	// Avanza a la siguiente foto haciendo click
-
-	// Parpadeo cuando se hace scroll hacia abajo
-	$('article .media img').off('tapone');
-	$('article .media img').on('tapone', function() { 
-		//assistedScroll(1, $(this).parents('article'));
-	});
-
-	$('.author-hex-code').each(function(index) {
-		$(this).css('background-color', '#' + $(this).attr('hex-code'));
-	});
-
-	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
-	$(".event-name").bind('keypress', function(event) {
-		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
-		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
-		if (!regex.test(key)) {
-			event.preventDefault();
-		}
-	});
-}
-
-/*function assistedScroll(modifier, refPost) {
-	modifier = modifier == undefined ? 1 : modifier;
-	var refPostTop = parseInt($(refPost).next().position().top) + 2; // TODO: Arreglar correctamente
-	$('main').stop().animate({
-			'scrollTop': refPostTop
-		}, 200, 'swing', function () {
-			//window.location.hash = refPost; TODO: Actualizar hash
-	});
-}
-TODO: Borrar
-function reduceString(str) {
-	var newString = str;
-	var lastIndex = str.lastIndexOf(' ');
-	if(str.substring(0, lastIndex) != '') {
-		newString = str.substring(0, lastIndex);
-	}
-	return newString;
-}*/
 
 /*if(window.innerHeight > window.innerWidth){
     document.getElementsByTagName("body").style.transform = "rotate(90deg)";
