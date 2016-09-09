@@ -8,23 +8,27 @@
 // 	*/
 // }
 
+$(function() {
+    FastClick.attach(document.body);
+});
+
 //
 //	Código de maquetación
 //
 
 // Evitar que se ejecute clicks fuera del area coloreada del logotipo
 //
-$('#logo-link').on('click tapone', function(event){
+$('#logo-link').on('click', function(event){
 	event.preventDefault();
 });
 
-$('#logo-link #logo #logo-icon').on('click tapone', function(event){
+$('#logo-link #logo #logo-icon').on('click', function(event){
 	window.document.location = '/';
 });
 
 // Cambiar de tema
 //
-$('#title img').on('tapone', function(event) {
+$('#title img').on('click', function(event) {
 	$('body').toggleClass('dark');
 });
 
@@ -33,7 +37,7 @@ $('#take').on('click', function() {
 	$('input#media-loader').click();
 });
 
-$('#share-new-post .share').on('tapone', function() {
+$('#share-new-post .share').on('click', function() {
 	$(this).toggleClass('selected');
 });
 
@@ -46,19 +50,20 @@ $('input.event-name').on('focusout', function() {
 
 // Vista de seguidores y seguidos
 //
-$('#relation-tabs .relation-tab').on('tapone', function() {
+$('#relation-tabs .relation-tab').on('click', function() {
 	$('#user-relation').removeClass('viewing-followers viewing-following');
 	$(this).parents('#user-relation').addClass('viewing-' + $(this).attr('viewing'));
 });
 
 $('main').previousTop = 0;
 
-$('#account a.user-link').on('tapone', function() {
+$('#account a.user-link').on('click', function() {
 	$('aside').toggleClass('show');
 });
 
-$('#back').on('tapone', function() {
+$('#back').on('click', function() {
 	history.back();
+
 });
 
 window.onpopstate = function(event) {
@@ -66,29 +71,30 @@ window.onpopstate = function(event) {
 };
 
 function actionsLoaded() {
-	$('.save').off('tapone');
-	$('.save').on('tapone', function(event) {
+	$('.save').off('click');
+	$('.save').on('click', function(event) {
 		$('body').toggleClass('dark');
 	});
 
 	// Parpadeo cuando se hace scroll hacia abajo
 	//
-	$('article .media img').off('tapone');
-	$('article .media img').on('tapone', function() { 
-		//assistedScroll(1, $(this).parents('article'));
+	$('article .media img').off('click');
+	$('article .media img').on('click', function() { 
+		assistedScroll(1, $(this).parents('article'));
 	});
 
 	// Avanza a la siguiente foto haciendo click
 	//
-	/*function assistedScroll(modifier, refPost) {
+	function assistedScroll(modifier, refPost) {
 		modifier = modifier == undefined ? 1 : modifier;
-		var refPostTop = parseInt($(refPost).next().position().top) + 2; // TODO: Arreglar correctamente
+		var refPostTop = parseInt($(refPost).next().offset().top) + $('main').scrollTop() + 2; // TODO: Arreglar correctamente
+		console.log(refPostTop);
 		$('main').stop().animate({
 				'scrollTop': refPostTop
 			}, 200, 'swing', function () {
 				//window.location.hash = refPost; TODO: Actualizar hash
 		});
-	}*/
+	}
 
 	$('.author-hex-code').each(function(index) {
 		$(this).css('background-color', '#' + $(this).attr('hex-code'));
@@ -132,7 +138,6 @@ function Application($scope, $http, $window) {
 	//
 	$scope.user = {};
 	$scope.user.data = {};
-	$scope.isActive = {};
 
 	var filterAux,
 		pathnameAux,
@@ -149,7 +154,20 @@ function Application($scope, $http, $window) {
 	$scope.refresh = function(pathname) {
 		initialize();
 		loadedImgs = 0;
-		getPosts(pathname);
+		getPosts(pathname, function(data) {
+			var state = {};
+			state.data = data;
+			state.path = pathnameAux;
+			history.pushState( state, null, '/' +  pathnameAux);
+			$('#title').val(pathnameAux);
+			console.log('pathnameAux');
+			console.log(pathnameAux);
+			if(pathnameAux == '') {
+				$('.user-link').show();
+			} else {
+				$('.user-link').hide();
+			}
+		});
 		//createEmptyPosts(5);
 	}
 
@@ -188,7 +206,7 @@ function Application($scope, $http, $window) {
 		getPosts(pathname);
 	}
 
-	function getPosts(pathname) {
+	function getPosts(pathname, next) {
 		pathnameAux = pathname;
 		if(!gettingPosts) {
 			gettingPosts = true;
@@ -199,7 +217,9 @@ function Application($scope, $http, $window) {
 						for (var i = 0; i < data.length; i++) {
 							tmpPosts[i + tmpPostsNumber] = data[i];
 						};
-						showPosts();
+						showPosts(function (data) {
+							next(data);
+						});
 					} else {
 						gettingPosts = false;
 					}
@@ -207,7 +227,9 @@ function Application($scope, $http, $window) {
 				});
 			} else {
 				$scope.$apply(function() {
-					showPosts();
+					showPosts(function (data) {
+						next(data);
+					});
 				});
 			}
 		}
@@ -230,7 +252,7 @@ function Application($scope, $http, $window) {
 		});
 	}
 
-	function showPosts() {
+	function showPosts(next, error) {
 		var numberPostsNow = $scope.actions.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
 		//TODO EVALUAR: No se mostrá los n>5 últimos posts.
@@ -245,15 +267,14 @@ function Application($scope, $http, $window) {
 				$scope.actions[i].author.url = $scope.actions[i].author.hexCode + '.' + $scope.actions[i].author.firstName;
 				$scope.actions[i].timeElapsed = getTimeElapsed($scope.actions[i].time);
 				$scope.actions[i].class = 'real';
-				$scope.isActive[$scope.actions[i].id] = false;
+				$scope.actions[i].editing = $scope.actions[i].showTools = false;
 			}
 		}
 
-		history.pushState( $scope.actions, null, '/' +  pathnameAux);
-		$('#title').val(pathnameAux);
-
 		createEmptyPosts(1);
 		gettingPosts = false;
+
+		next($scope.actions);
 	}
 
 	// Crear 'numTmpPost' espacios vacios mientras carga los post originales
@@ -268,13 +289,13 @@ function Application($scope, $http, $window) {
 	}
 
 	$scope.modifyTag = function(action) {
-		$scope.isActive[action.id] = !$scope.isActive[action.id];
+		action.editing = true;
 		$scope.oldTag = action.tag;
 	}
 
 	$scope.updateTag = function(action) {
-		$scope.isActive[action.id] = !$scope.isActive[action.id];
 		action.oldTag = $scope.oldTag;
+		action.editing = true;
 		$http.post('/post/editTag', action).success(function() {
 		}).error();
 	}
@@ -358,6 +379,20 @@ function Application($scope, $http, $window) {
 		}).error();
 	}
 
+	$scope.updateContent = function(state) {
+		if (state == null)
+			return;
+		$scope.actions = state.data;
+		$('#title').val(state.path);
+		$scope.$apply();
+		$('media').scrollTop(0);
+		if(state.path == '') {
+			$('.user-link').show();
+		} else {
+			$('.user-link').hide();
+		}
+	}
+
 	function getTimeElapsed(time) {
 		var timeElapsedMill = new Date().getTime() - Date.parse(time);
 		var timeElapsed = {};
@@ -378,6 +413,7 @@ function Application($scope, $http, $window) {
 	}
 
 	$scope.picChange = function(evt) {
+		console.log('PIC');
 		var canvas = document.getElementById('new-media-preview');
 		var ctx = canvas.getContext('2d');
 
@@ -577,3 +613,7 @@ angular.module('Juaku', [])
 /*if(window.innerHeight > window.innerWidth){
     document.getElementsByTagName("body").style.transform = "rotate(90deg)";
 }*/
+
+window.addEventListener('popstate', function(event) {
+	angular.element(document.getElementById('controller')).scope().updateContent(event.state);
+});

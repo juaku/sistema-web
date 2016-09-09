@@ -30,7 +30,7 @@ body
 
 body
 	margin: 0
-	background-color: #F7F7F7 /* EEE */
+	background-color: #EEE /*#F7F7F7*/ /* EEE */
 	font-family: "Arial"
 	color: #111 /* 111 */
 
@@ -71,7 +71,7 @@ input#title
 	outline: 0
 	border: 0
 	border-radius: 0
-	background-color: #F7F7F7
+	background-color: #EEE
 	color: #000
 	display: block
 	text-align: right
@@ -149,8 +149,8 @@ section#view-controls.show #more:after
 h3
 	font-weight: normal
 	font-size: 2.5vmin
-	letter-spacing: -0.05em
-	margin: 0 0 0.2em 0
+	letter-spacing: -0.03em
+	margin: 0.3em 0 0.3em 0
 
 /* Estilos estructurales */
 
@@ -228,7 +228,7 @@ main
 	position: relative
 
 .action .media
-	background-color: #EEE /* CCC */
+	background-color: #F7F7F7 /* CCC */
 	width: 100%
 	height: 82vh
 	max-width: 54vw
@@ -276,7 +276,7 @@ main
 	vertical-align: middle
 
 .info .author-picture
-	width: 19%
+	width: 18%
 	padding: 2.5%
 
 .info a.save-link 
@@ -313,7 +313,7 @@ main
 .info .action-time
 	font-size: 1.75vmin
 	color: #888
-	letter-spacing: -0.5px
+	letter-spacing: -0.02em
 
 .info .save-button
 	width: 18%
@@ -327,7 +327,6 @@ main
 
 svg#svg-library
 	display: none
-
 
 
 /*
@@ -632,9 +631,10 @@ svg#svg-library
 	h3
 		font-size: 16px
 		transition: font-size 100ms
+		margin: 0.3em 0 0 0
 
 	.info .action-time
-		font-size: 13px
+		font-size: 12px
 
 @media screen and (min-width: 481px)
 	@keyframes preloader
@@ -689,11 +689,14 @@ svg#svg-library
 	#account img.user-picture
 		margin: 0.375em
 		position: static
-		display: none
 
 	h3
-		font-size: 5vw
+		font-size: 4.5vw
 		transition: font-size 100ms
+	
+	.info .author-picture
+		width: 20%
+		padding: 2.5%
 
 	#box
 		display: block /* Mejor control de la barra de scroll */
@@ -733,8 +736,8 @@ svg#svg-library
 		max-width: inherit
 		max-height: inherit
 
-	.info .author-name
-		margin-right: 2px 
+	/*.info .author-name
+		margin-right: 2px*/
 
 	.info h3.action-title .author-name::before
 		width: 3.5vw
@@ -742,103 +745,11 @@ svg#svg-library
 		margin: 0 1vw 0 0
 
 	.info .action-time
-		font-size: 4vw
-	
-	/*nav#view-menu
-		display: table*/
-
-/* Old Responsive
-
-@media (max-width: 669px) 
-	body
-		user-select: none // TODO: Pasar a un detector real de dispositivos
+		font-size: 3.5vw
 		
-	#box
-		min-width: 290px
-		width: 100%
-		max-width: inherit
-	
-	aside
-		padding: 0
-
-	aside#side
-		display: none
-	
-	aside#side
-		width: 100%
-	
-	section#options-side
-		text-align: left
-		
-	aside#side section#profile
-		display: table
-	
-	aside#side section#profile img,
-	aside#side section#profile h2
-		display: table-cell
-		vertical-align: top
-	
-	aside#side section#account-controls section#profile h2.profile-name
-		width: 100%
-		padding: 10px
-		line-height: inherit
-	
-	aside#side section#account-controls section#profile h2.profile-name .profile-firstname
+@media screen and (max-width: 360px)
+	h3
 		font-size: 16px
-		color: blackColor
 	
-	aside#side section#account-controls section#profile h2.profile-name .profile-lastname
-		font-size: 14px
-	
-	section#account-controls .account-control
-		margin-bottom: 1px
-		text-align: center
-		
-	section#account-controls .account-control a.button
-		height: 15px
-		padding: 10px
-		display: block
-	
-	section#account-controls .account-control a.button .bold
-		font-weight: bold
-	
-	aside #options-side,
-	aside #events-side
-		position: inherit
-
-	main
-		width: 100%
-		display: block
-		margin: 0 auto
-		padding: 0
-		
-	main section#post-list .post
-		width: 100%
-		max-width: inherit
-		margin-bottom: 5vh
-
-	nav#view-menu
-		display: table
-		
-	body.view-menu-hidden nav#view-menu
-		display: none
-
-	section#events-controls
-		background: initial
-	
-	section#events-controls .event .event-people
-		margin: 0
-	
-	section#events-controls .promoted
-	section#events-controls .events-list
-		margin: 5px 0
-	
-	section#events-controls .promoted .title
-		margin: 5px 0
-	
-	section#events-controls .event
-		background: #FFF
-		margin-bottom: 1px
-		padding: 10px 0
-
-*/
+	.info .action-time
+		font-size: 12px
