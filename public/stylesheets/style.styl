@@ -58,6 +58,10 @@ section#view-controls
 	border-top: 4px solid #333
 	border-left: 4px solid #333
 	transform: rotate(-45deg)
+	transition: transform 200ms
+
+#back.more:before
+	transform: translate(-20%, 20%) rotate(45deg)
 
 input#title
 	font-size: 5vw
@@ -679,16 +683,16 @@ svg#svg-library
 		font-family: 'Verdana'
 		text-align: left
 	
-	#account a.user-link
+	/*#account a.user-link
 		position: absolute
 		left: 0
 		top: 0
 		width: 44px
-		height: 44px
+		height: 44px*/
 		
-	#account img.user-picture
+	/*#account img.user-picture
 		margin: 0.375em
-		position: static
+		position: static*/
 
 	h3
 		font-size: 4.5vw

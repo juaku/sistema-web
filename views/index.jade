@@ -11,7 +11,7 @@ block content
       // Side controls
       //
       section#view-controls
-        #back
+        #back.more
         input(type="search" size="1" ng-model="search" search)#title
         #take.needsclick
       section#account
@@ -32,7 +32,7 @@ block content
             .events-list
               //.events-title.title #{__('Trends')}
               .event(ng-repeat="trend in trends | limitTo: limit")
-                a.event-link(href='' ng-click="refresh('trend', trend)")
+                a.event-link(href='')
                   span.at-simbol @
                   span.event-name {{ trend.name }}
                 //.event-people {{ trend.count }} #{__('people')}
@@ -80,10 +80,10 @@ block content
             img(ng-src="{{ action.author.picture }}" ng-click="action.showTools = !action.showTools")
           .action-info
             h3.action-title(ng-hide="action.showTools")
-              span(hex-code="{{ action.author.hexCode }}" ng-click="refresh(action.author.url+'@'+action.tag)").author-hex-code
-              span(href='' ng-click="refresh(action.author.hexCode+'.'+action.author.firstName)").author-name {{ action.author.firstName }}
+              span(hex-code="{{ action.author.hexCode }}" ng-click="router(action.author.url + '@' + action.tag)").author-hex-code
+              span(href='' ng-click="router(action.author.hexCode + '.' + action.author.firstName)").author-name {{ action.author.firstName }}
               span.at @
-              span(ng-hide="action.editing" href='' ng-model="newTag" ng-click="refresh('@'+action.tag)") {{action.tag}}
+              span(ng-hide="action.editing" href='' ng-model="newTag" ng-click="router('@' + action.tag)") {{action.tag}}
               span(ng-show="action.editing")
                 input.event-name(type="text", ng-model="action.tag")
             span.action-time(ng-if="action.timeElapsed.type  == 's' " ng-hide="action.showTools") #{__('Just now')}

@@ -57,13 +57,14 @@ $('#relation-tabs .relation-tab').on('click', function() {
 
 $('main').previousTop = 0;
 
-$('#account a.user-link').on('click', function() {
-	$('aside').toggleClass('show');
-});
-
+//$('#back').addClass('more');
 $('#back').on('click', function() {
-	history.back();
-
+	if($(this).hasClass('more')) {
+		$('aside').toggleClass('show');
+	} else {
+		$('aside').removeClass('show');
+		history.back();
+	}
 });
 
 window.onpopstate = function(event) {
@@ -138,9 +139,9 @@ function Application($scope, $http, $window) {
 	//
 	$scope.user = {};
 	$scope.user.data = {};
+	$scope.path;
 
 	var filterAux,
-		pathnameAux,
 		gettingPosts = false,
 		firstPostsLoad = true,
 		postQueryCount = 0,
@@ -149,34 +150,64 @@ function Application($scope, $http, $window) {
 		tmpLoadingPostsNumber,
 		tmpPosts = [],
 		getPostTries = 0,
-		getPostTriesLimit = 20;
+		getPostTriesLimit = 20,
+		historyLength = 0;
 
-	$scope.refresh = function(pathname) {
-		initialize();
+	$scope.refresh = function(path) {
 		loadedImgs = 0;
-		getPosts(pathname, function(data) {
-			var state = {};
-			state.data = data;
-			state.path = pathnameAux;
-			history.pushState( state, null, '/' +  pathnameAux);
-			$('#title').val(pathnameAux);
-			console.log('pathnameAux');
-			console.log(pathnameAux);
-			if(pathnameAux == '') {
-				$('.user-link').show();
+		$scope.path = path;
+		if(!gettingPosts) {
+			gettingPosts = true;
+			var tmpPostsNumber = tmpPosts.length;
+			if($scope.actions.length == 0 || postShown > tmpPostsNumber - postLoadStep) { // TODO: Evaluar
+				postsQuery($scope.path, function(data) {
+					if(data!=undefined) {
+						for (var i = 0; i < data.length; i++) {
+							tmpPosts[i + tmpPostsNumber] = data[i];
+						};
+						showPosts();
+					} else {
+						gettingPosts = false;
+					}
+					$('#title').val($scope.path);
+
+					var state = {};
+					state = $scope.actions;
+					history.pushState( state, null, $scope.path);
+					if(historyLength == 0) {
+						$('#back').addClass('more');
+					} else {
+						$('#back').removeClass('more');
+					}
+				}, function() {
+				});
 			} else {
-				$('.user-link').hide();
+				$scope.$apply(function() {
+					showPosts();
+				});
 			}
-		});
-		//createEmptyPosts(5);
+		}
+		// createEmptyPosts(5);
 	}
 
-	var pathRegExp = new RegExp(/^\/((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^\/([0-9A-Za-z%]{3,})$/g);
-	var path = pathRegExp.exec(window.location.pathname);
-
-	if(path[0]) {
-		angular.element(document.getElementById('controller')).scope().refresh(path[0].substring(1));
+	$scope.router = function(path) {
+		if(path === undefined) {
+			path = $scope.path;
+		} else {
+			console.log('incremento');
+			historyLength++;
+			initialize();
+			if(path != '') {
+				var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^([0-9A-Za-z%]{3,})$/g);
+				var pathArray = pathRegExp.exec(path);
+				if(pathArray[0]) { // Es undefined cuando no coincide la RegExp
+					path = pathArray[0];
+				}
+			}
+		}
+		$scope.refresh(path); // no scope
 	}
+	$scope.router(window.location.pathname.substring(1)); // No funciona en Angular si se llama directamente
 
 	function initialize() {
 		gettingPosts = false;
@@ -194,49 +225,15 @@ function Application($scope, $http, $window) {
 	}
 
 	createEmptyPosts(5);
-	//askForPost();
 
 	$(document).scroll(function() {
 		if(window.innerWidth + $('body').scrollTop()*1.2 >= $(document).height()) {
-			askForPost(pathnameAux);
+			$scope.router();
 		}
 	});
-	
-	function askForPost(pathname) {
-		getPosts(pathname);
-	}
-
-	function getPosts(pathname, next) {
-		pathnameAux = pathname;
-		if(!gettingPosts) {
-			gettingPosts = true;
-			var tmpPostsNumber = tmpPosts.length;
-			if($scope.actions.length == 0 || postShown > tmpPostsNumber - postLoadStep) {
-				postsQuery(pathname, function(data) {
-					if(data!=undefined) {
-						for (var i = 0; i < data.length; i++) {
-							tmpPosts[i + tmpPostsNumber] = data[i];
-						};
-						showPosts(function (data) {
-							next(data);
-						});
-					} else {
-						gettingPosts = false;
-					}
-				}, function() {
-				});
-			} else {
-				$scope.$apply(function() {
-					showPosts(function (data) {
-						next(data);
-					});
-				});
-			}
-		}
-	}
 
 	function postsQuery(pathname, next, error) {
-		$http.get('/list' + (pathname==''?pathname:'/'+pathname) + (postQueryCount>0?'/'+postQueryCount:'') ).success(function(data, status) {
+		$http.get('/list' + (pathname==''? pathname : '/' + pathname) + (postQueryCount>0? '/' + postQueryCount : '') ).success(function(data, status) {
 			if(status == 204) {
 				clearInterval(getPostsInterval);
 			} else {
@@ -252,7 +249,7 @@ function Application($scope, $http, $window) {
 		});
 	}
 
-	function showPosts(next, error) {
+	function showPosts() {
 		var numberPostsNow = $scope.actions.length - tmpLoadingPostsNumber;
 		postShown += postLoadStep;
 		//TODO EVALUAR: No se mostrá los n>5 últimos posts.
@@ -273,8 +270,6 @@ function Application($scope, $http, $window) {
 
 		createEmptyPosts(1);
 		gettingPosts = false;
-
-		next($scope.actions);
 	}
 
 	// Crear 'numTmpPost' espacios vacios mientras carga los post originales
@@ -379,18 +374,19 @@ function Application($scope, $http, $window) {
 		}).error();
 	}
 
-	$scope.updateContent = function(state) {
+	$scope.updateState = function(state) {
 		if (state == null)
 			return;
-		$scope.actions = state.data;
-		$('#title').val(state.path);
+		$scope.actions = state;
+		$('#title').val($scope.path);
 		$scope.$apply();
 		$('media').scrollTop(0);
-		if(state.path == '') {
-			$('.user-link').show();
+		if(historyLength == 0) {
+			$('#back').addClass('more');
 		} else {
-			$('.user-link').hide();
+			$('#back').removeClass('more');
 		}
+		historyLength--;
 	}
 
 	function getTimeElapsed(time) {
@@ -615,5 +611,5 @@ angular.module('Juaku', [])
 }*/
 
 window.addEventListener('popstate', function(event) {
-	angular.element(document.getElementById('controller')).scope().updateContent(event.state);
+	angular.element(document.getElementById('controller')).scope().updateState(event.state);
 });

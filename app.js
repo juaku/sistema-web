@@ -8,12 +8,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-// Ya no se requiere
-//Multer multipart/form-data
-//var multer = require('multer');
-
 //Stylus y Nib
-var stylus = require('stylus')
+var stylus = require('stylus');
 var nib = require('nib');
 
 //Coneccion con Facebook
