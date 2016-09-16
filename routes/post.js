@@ -36,7 +36,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='reportAction') {
-			Action.reportAction(req, function() {
+			Action.reportAction(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
@@ -46,7 +46,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 			var pathRegExp = new RegExp(/([0-9A-Za-z%]{3,})/g);
 			var newTag = pathRegExp.exec(req.body.tag);
 			if(newTag) {
-				Tag.editTag(req, req.session.idMongoDb, function () {
+				Tag.editTag(req.body, req.session.idMongoDb, function () {
 					res.status(201).end();
 				}, function(error) {
 					console.log(error);

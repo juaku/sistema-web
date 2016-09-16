@@ -13,31 +13,12 @@ var TagSchema = new Schema({
 	createdAt: {type: Date, default: Date.now}
 });
 
-/*TagSchema.statics.getActionsByTag = function (tagName, callback) {
-	return this.findOne({name: tagName})
-					.populate('actions')
-					.exec(callback)
-}*/
-
 TagSchema.statics.getActionsByTag = function (req, callback, error) {
-	/*var point = {};
-	if(req.session.coords != undefined) {
-		point.latitude = req.session.coords.latitude;
-		point.longitude = req.session.coords.longitude;
-	} else { // Arequipa
-		point.latitude = -16.3989;
-		point.longitude = -71.535;
-	}*/
-
 	var resultsLimit = 10;
 	var queryNumber = 0;
-	var queryTimeLimitStep = 24*20;
-	var countActions;
 
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
-	} else {
-		req.session.queryTimeLimit = queryTimeLimitStep;
 	}
 
 	var simpleEventName = req.session.path[2];
@@ -58,8 +39,8 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	this.findOne({name: tagName})
 	.populate({
 		path: 'actions',
-		match: {active: true},
-		options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+		match: { active: true, geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
+		options: { skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 } }
 	})
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
@@ -72,7 +53,7 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	})
 }
 
-TagSchema.statics.newAction = function (req, userId, callback) { //revisar si estoy enviando función error
+TagSchema.statics.newAction = function (req, userId, callback, error) {
 	var Action = mongoose.model('Action');
 	var User = mongoose.model('User');
 	var newAction = req.body;
@@ -101,15 +82,15 @@ TagSchema.statics.newAction = function (req, userId, callback) { //revisar si es
 			authorId: userId
 		});
 		action.save(function(err) {
-			if(err) throw err;
+			if(err) error();
 			User.update({ _id: userId }, { $push: { actions: action._id }}, function (err, doc) {
-				if (err) return handleError(err);
+				if (err) error();
 				console.log('accion referenciada a user');
 				console.log(doc);
 			});
 			if(objectTag!= null) {
 				Action.update({ _id: action._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
-					if (err) return handleError(err);
+					if (err) error();
 				});
 				objectTag.actions.push(action._id);
 				objectTag.save();
@@ -121,9 +102,9 @@ TagSchema.statics.newAction = function (req, userId, callback) { //revisar si es
 				tag.originalName = newAction.tag;
 				tag.actions = action._id;
 				tag.save(function (err) {
-					if (err) return handleError(err);
+					if (err) error();
 					Action.update({ _id: action._id }, { $set: { tagId: tag._id }}, function (err, doc) {
-						if (err) return handleError(err);
+						if (err) error();
 					});
 					console.log('Tag guardado y acción referenciada');
 				});
@@ -165,23 +146,22 @@ TagSchema.statics.newAction = function (req, userId, callback) { //revisar si es
 	}
 }
 
-TagSchema.statics.editTag = function (req, userId, callback) { //revisar si estoy enviando función error
+TagSchema.statics.editTag = function (action, userId, callback, error) {
 	var Action = mongoose.model('Action');
 	var User = mongoose.model('User');
-	var action = req.body;
 	var newSimpleTag = simplifyName(action.tag);
 	var oldSimpleTag = simplifyName(action.oldTag);
 	var FB = require('fb');
 	if(action.author.id == userId && oldSimpleTag != newSimpleTag && newSimpleTag != '' && newSimpleTag != undefined) {
 		//Remueve ACTION referenciada a TAG antiguo
 		this.update({ name: oldSimpleTag }, { $pull: { actions: action.id }}, function (err, doc) {
-			if (err) return handleError(err);
+			if (err) error();
 			console.log('accion removida de tag: ' + oldSimpleTag);
 			console.log(doc);
 		});
 		//Cambia nombre de TAG dentro de ACTION
-		Action.update({ _id: action.id }, { $set: { name: action.tag }}, function (err, doc) {//declarar newName
-			if (err) return handleError(err);
+		Action.update({ _id: action.id }, { $set: { name: action.tag }}, function (err, doc) {
+			if (err) error();
 			console.log('Actualización de tag en action: ' + newSimpleTag);
 			console.log(doc);
 		});
@@ -190,7 +170,7 @@ TagSchema.statics.editTag = function (req, userId, callback) { //revisar si esto
 			if(err) throw err;
 			if(objectTag!= null) {
 				Action.update({ _id: action.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
-					if (err) return handleError(err);
+					if (err) error();
 				});
 				objectTag.actions.push(action.id);
 				objectTag.save();
@@ -202,9 +182,9 @@ TagSchema.statics.editTag = function (req, userId, callback) { //revisar si esto
 				tag.originalName = action.tag;
 				tag.actions = action.id;
 				tag.save(function (err) {
-					if (err) return handleError(err);
+					if (err) error();
 					Action.update({ _id: action.id }, { $set: { tagId: tag._id }}, function (err, doc) {
-						if (err) return handleError(err);
+						if (err) error();
 					});
 					console.log('Tag guardado y acción referenciada');
 				});

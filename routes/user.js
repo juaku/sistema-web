@@ -11,7 +11,8 @@ var jPack = require('../jPack');
 
 router.get('/:action', ensureAuthenticated, function(req, res) {
 	if(req.params.action!=undefined) {
-		req.session.jUser = new jPack.user(req.session.jUser);
+		//TODO: Remover
+		/*req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
 		if(req.params.action=='getAllUsers') {
 			jUser.getAllUsers(req, function(allUsers) {
@@ -22,7 +23,7 @@ router.get('/:action', ensureAuthenticated, function(req, res) {
 		} else if(req.params.action=='session') {
 			var parseSessionToken = {};
 			res.json({parseSessionToken:req.session.jUser.parseSessionToken});
-		}
+		}*/
 	}
 });
 

@@ -17,6 +17,11 @@ var jPack = require('../jPack');
  * Autentica al usuario y carga la vista 'account.jade'
  */
 router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
+	if(req.session.coords == undefined) { // Arequipa
+		req.session.coords = {};
+		req.session.coords.latitude = -16.3989;
+		req.session.coords.longitude = -71.535;
+	}
 	Action.getActions(req, function (actions) {
 		jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
 			if(posts.length == 0) {
@@ -34,6 +39,11 @@ router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
 router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
 	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^([0-9A-Za-z%]{3,})$/g);
 	var path = pathRegExp.exec(req.params.pathname);
+	if(req.session.coords == undefined) { // Arequipa
+		req.session.coords = {};
+		req.session.coords.latitude = -16.3989;
+		req.session.coords.longitude = -71.535;
+	}
 	if(path[0]) {
 		req.session.path = path;
 		if(path[1]) {

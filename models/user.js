@@ -14,6 +14,7 @@ var UserSchema = new Schema({
   hexCode: String,
   actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
   savedActions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
+  reportedActions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
   channels: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   createdAt: {type: Date, default: Date.now}
@@ -93,31 +94,12 @@ UserSchema.statics.getProfilePicture = function (req, callback) {
   });
 }
 
-/*UserSchema.statics.getActionsByuser = function (nameuser, callback) {
-  return this.findOne({name: nameuser})
-          .populate('actions')
-          .exec(callback)
-}*/
-
 UserSchema.statics.getActionsByUser = function (req, callback, error) {
-  /*var point = {};
-  if(req.session.coords != undefined) {
-    point.latitude = req.session.coords.latitude;
-    point.longitude = req.session.coords.longitude;
-  } else { // Arequipa
-    point.latitude = -16.3989;
-    point.longitude = -71.535;
-  }*/
-
   var resultsLimit = 10;
   var queryNumber = 0;
-  var queryTimeLimitStep = 24*20;
-  var countActions;
 
   if(req.params.i!=undefined) {
     queryNumber = parseInt(req.params.i);
-  } else {
-    req.session.queryTimeLimit = queryTimeLimitStep;
   }
 
   var userId = req.session.path[1].split('.')
@@ -126,18 +108,15 @@ UserSchema.statics.getActionsByUser = function (req, callback, error) {
   this.findOne({hexCode: hexCode, name: nameuser})
   .populate({
     path: 'actions savedActions',
-    match: {active: true},
-    options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+    match: { active: true, geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
+    options: { skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 } }
   })
   .exec(function (err, user) {
     if (err) return handleError(err);
     if(user != null) {
-      // TODO: Posible error
-      //var mergedActions = user.savedActions.concat(user.actions);
-      //callback(mergedActions);
       callback(user.actions);
     } else {
-      console.log('NO EXISTE tal autor'); // jaja
+      console.log('NO EXISTE tal autor');
       error();
     }
   })
@@ -146,24 +125,12 @@ UserSchema.statics.getActionsByUser = function (req, callback, error) {
 UserSchema.statics.getActionsByChannel = function (req, callback, error) {
   var User = mongoose.model('User');
   var Tag = mongoose.model('Tag');
-  /*var point = {};
-  if(req.session.coords != undefined) {
-    point.latitude = req.session.coords.latitude;
-    point.longitude = req.session.coords.longitude;
-  } else { // Arequipa
-    point.latitude = -16.3989;
-    point.longitude = -71.535;
-  }*/
 
   var resultsLimit = 10;
   var queryNumber = 0;
-  var queryTimeLimitStep = 24*20;
-  var countActions;
 
   if(req.params.i!=undefined) {
     queryNumber = parseInt(req.params.i);
-  } else {
-    req.session.queryTimeLimit = queryTimeLimitStep;
   }
 
   var userId = req.session.path[1].split('.')
@@ -191,8 +158,9 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
       User.findOne({hexCode: hexCode, name: nameuser})
       .populate({
         path: 'actions',
-        match: {tagId: tag.id,
-                active: true},
+        match: { tagId: tag.id,
+                 active: true,
+                 geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
         options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
       })
       .exec(function (err, user) {

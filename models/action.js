@@ -9,45 +9,25 @@ var ActionSchema = new Schema({
 	active: Boolean,
 	authorId : String,
 	tagId: String,
-	createdAt: {type: Date, default: Date.now}
+	createdAt: {type: Date, default: Date.now},
+	reportedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-/*ActionSchema.statics.getActions = function (resultsLimit, queryNumber, callback) {
-	return this.find({})
-					.sort({createdAt: -1})
-					.skip(resultsLimit * queryNumber)
-					.limit(resultsLimit)
-					.exec(callback)
-}*/
-
 ActionSchema.statics.getActions = function (req, callback, error) {
-	/*var point = {};
-	if(req.session.coords != undefined) {
-		point.latitude = req.session.coords.latitude;
-		point.longitude = req.session.coords.longitude;
-	} else { // Arequipa
-		point.latitude = -16.3989; 
-		point.longitude = -71.535;
-	}*/
-
 	var resultsLimit = 10;
 	var queryNumber = 0;
-	var queryTimeLimitStep = 24*20;
-	var countActions;
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
-	} else {
-		req.session.queryTimeLimit = queryTimeLimitStep;
 	}
-
 	this.find({
-		active: true
+		active: true,
+		geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ] } } //6.371 km es el radio de la tierra pero está expresado en metros
 	})
 	.sort({createdAt: -1})
-	.skip(resultsLimit * queryNumber)
 	.limit(resultsLimit)
+	.skip(resultsLimit * queryNumber)
 	.exec(function (err, action) {
-		if (err) return handleError(err);
+		if (err) error();
 		callback(action);
 	})
 }
@@ -65,7 +45,6 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 		},
 			function (response) {
 				if (response && !response.error) {
-					// handle the result
 					console.log('Foto compartida en facebook exitósamente');
 					callback();
 				} else {
@@ -75,10 +54,27 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 	);
 }
 
+ActionSchema.statics.reportAction = function (action, userId, callback, error) {
+	if(action.author.id != userId) {
+		var User = mongoose.model('User');
+		this.update({ _id: action.id }, { $push: { reportedBy: userId }}, function (err, doc) {
+			if (err) error();
+			console.log('accion reportada con éxito');
+			console.log(doc);
+			User.update({ _id: userId }, { $push: { reportedActions: action.id }}, function (err, doc) {
+				if (err) error();
+				console.log('accion reportada referenciada a user');
+				console.log(doc);
+			});
+		});
+	}
+	callback();
+}
+
 ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
 	if(action.author.id == userId) {
 		this.update({ _id: action.id }, { $set: { active: false }}, function (err, doc) {
-			if (err) return handleError(err);
+			if (err) error();
 			console.log('accion borrada con éxito');
 			console.log(doc);
 		});
@@ -90,7 +86,7 @@ ActionSchema.statics.saveAction = function (action, userId, callback, error) {
 	if(action.author.id != userId) {
 		var User = mongoose.model('User');
 		User.update({ _id: userId }, { $push: { savedActions: action.id }}, function (err, doc) {
-			if (err) return handleError(err);
+			if (err) error();
 			console.log('accion guardada con éxito en savedActions');
 			console.log(doc);
 		});
@@ -102,7 +98,7 @@ ActionSchema.statics.unsaveAction = function (action, userId, callback, error) {
 	if(action.author.id != userId) {
 		var User = mongoose.model('User');
 		User.update({ _id: userId }, { $pull: { savedActions: action.id }}, function (err, doc) {
-			if (err) return handleError(err);
+			if (err) error();
 			console.log('accion removida de savedActions');
 			console.log(doc);
 		});
