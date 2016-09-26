@@ -14,16 +14,19 @@ var ActionSchema = new Schema({
 });
 
 ActionSchema.statics.getActions = function (req, callback, error) {
-	var resultsLimit = 10;
+	var resultsLimit = 20;
 	var queryNumber = 0;
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
 	}
 	this.find({
 		active: true,
-		geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ] } } //6.371 km es el radio de la tierra pero está expresado en metros
+		geo: {
+			$near: {
+				$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}
+			}
+		}
 	})
-	.sort({createdAt: -1})
 	.limit(resultsLimit)
 	.skip(resultsLimit * queryNumber)
 	.exec(function (err, action) {

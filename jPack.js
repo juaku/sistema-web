@@ -302,6 +302,10 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 	function triggerNext() {
 		countActions--;
 		if(countActions===0) {
+			posts.sort(function(a, b) {
+				var dateA = new Date(a.time), dateB = new Date(b.time);
+				return dateB - dateA;
+			});
 			var response = {posts: posts};
 			next(response);
 		}

@@ -95,7 +95,7 @@ UserSchema.statics.getProfilePicture = function (req, callback) {
 }
 
 UserSchema.statics.getActionsByUser = function (req, callback, error) {
-  var resultsLimit = 10;
+  var resultsLimit = 20;
   var queryNumber = 0;
 
   if(req.params.i!=undefined) {
@@ -108,8 +108,8 @@ UserSchema.statics.getActionsByUser = function (req, callback, error) {
   this.findOne({hexCode: hexCode, name: nameuser})
   .populate({
     path: 'actions savedActions',
-    match: { active: true, geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
-    options: { skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 } }
+    match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
+    options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
   })
   .exec(function (err, user) {
     if (err) return handleError(err);
@@ -126,7 +126,7 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
   var User = mongoose.model('User');
   var Tag = mongoose.model('Tag');
 
-  var resultsLimit = 10;
+  var resultsLimit = 20;
   var queryNumber = 0;
 
   if(req.params.i!=undefined) {
@@ -160,8 +160,8 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
         path: 'actions',
         match: { tagId: tag.id,
                  active: true,
-                 geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
-        options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+                 geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
+        options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
       })
       .exec(function (err, user) {
         if (err) return handleError(err);

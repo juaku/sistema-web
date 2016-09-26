@@ -14,7 +14,7 @@ var TagSchema = new Schema({
 });
 
 TagSchema.statics.getActionsByTag = function (req, callback, error) {
-	var resultsLimit = 10;
+	var resultsLimit = 20;
 	var queryNumber = 0;
 
 	if(req.params.i!=undefined) {
@@ -39,8 +39,8 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	this.findOne({name: tagName})
 	.populate({
 		path: 'actions',
-		match: { active: true, geo: { $geoWithin: { $center: [ [req.session.coords.longitude, req.session.coords.latitude], 6371000 ]}} },
-		options: { skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 } }
+		match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
+		options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
 	})
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
