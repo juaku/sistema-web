@@ -1,7 +1,7 @@
 extends layout
 
 block head
-    body(id="controller" ng-controller="Application")
+  body
 
 block content
   header
@@ -11,17 +11,17 @@ block content
       // Side controls
       //
       section#view-controls
-        #back.more
-        input(type="search" size="1" ng-model="search" search)#title
-        #take.needsclick
+        #more.back(ng-class="{back: back}" v-on:click="back")
+        input(type="search" size="1" v-model="route")#title
+        #take.needsclick(v-on:click="take")
       section#account
         a.user-link
           img(src=user.picture).user-picture
-        span.user-firstname #{user.name.givenName}
-        span.user-lastname #{user.name.familyName}
-        #account-controls
-          a(href="" onclick="window.location = '/logout' ") logout
-        section#events-side
+        .user-userName af6.Rodrigo #{ user.userName }
+        .user-displayName #{ user.displayName }
+      section#account-controls
+        a(href="" onclick="window.location = '/logout' ") #{__('Logout')}
+        //section#events-side
           section#events-controls
             .promoted
               .event.promoted-event
@@ -34,29 +34,27 @@ block content
               .event(ng-repeat="trend in trends | limitTo: limit")
                 a.event-link(href='')
                   span.at-simbol @
-                  span.event-name {{ trend.name }}
+                  span.event-name Trend
                 //.event-people {{ trend.count }} #{__('people')}
             //.show-more
               a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
-          footer 
-            nav Términos y condiciones | Prensa
-            #brand Juaku 2016
-    main
+      footer
+        #brand-url juaku.com
+        nav Términos y condiciones | Prensa
+        #brand Juaku 2016
+    main(v-on:scroll="scroll()")
       section#start
-        a#logo-link(target="_self")
+        a#logo-link(href="/" v-on:click.prevent)
           h1 Juaku
           svg#logo
-            use#logo-icon(xlink:href="#logo-icon-svg")
-      input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
-      // Legacy: input(type="file" id="media-loader" accept="image/*" onchange="angular.element($('body')).scope().picChange(event)")
-      // Legacy: input(type="file" accept="image/*" capture="camera" onchange="angular.element(this).scope().newAction.image = this.files[0]")
+            use#logo-icon(xlink:href="#logo-icon-svg" v-on:click="reload")
+      input.needsclick(type="file" id="media-loader" accept="image/*" v-on:change="setNewMedia($event)")
       section#new-post
         canvas(id="new-media-preview")
         #new-post-controls
           #event-name-input.event
             span.at-simbol @
-            input.event-name(type="text" id="new-tag-name" ng-model="newAction.tag" placeholder="#{__('Event')}")
-
+            input.event-name(type="text" id="new-tag-name" v-model="newPost.tag" placeholder="#{__('Tag')}")
           //
           // Share on Facebook
           //
@@ -66,38 +64,37 @@ block content
                 svg(version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve")
                   path(id="change-color" fill="#3B5998"  d="M22.675,24C23.407,24,24,23.407,24,22.675V1.325C24,0.593,23.407,0,22.675,0H1.325C0.593,0,0,0.593,0,1.325v21.351C0,23.407,0.593,24,1.325,24H22.675z")
                   path(id="f" fill="#FFFFFF" d="M16.56,24v-9.294h3.12l0.467-3.622H16.56V8.771c0-1.049,0.291-1.763,1.795-1.763l1.918-0.001v-3.24c-0.332-0.044-1.47-0.1439-2.75-0.143c-2.765,0-4.659,1.688-4.659,4.788v2.671H9.692v3.622h3.128V24H16.56z")
-          a#send-post(href="" ng-click="sendNewAction()") #{__('Send')}
-
+          a#send-post(href="" v-on:click="sendNewPost($event)") #{__('Send')}
       //
       // Post
       //
-      article(ng-repeat="action in actions" last-post-loaded).action
-        .media
-          .preloader
-          img(ng-src='{{ action.media }}' class='{{ action.class }}' image-on-load)
+      article(v-for="post in posts").post
+        .media(v-bind:class="post.class" v-on:click="assistedScroll")
+          .preloader-animation
+          img(:src="post.media" v-on:load="loaded(post)")
         .info
           .author-picture
-            img(ng-src="{{ action.author.picture }}" ng-click="action.showTools = !action.showTools")
-          .action-info
-            h3.action-title(ng-hide="action.showTools")
-              span(hex-code="{{ action.author.hexCode }}" ng-click="router(action.author.url + '@' + action.tag)").author-hex-code
-              span(href='' ng-click="router(action.author.hexCode + '.' + action.author.firstName)").author-name {{ action.author.firstName }}
-              span.at @
-              span(ng-hide="action.editing" href='' ng-model="newTag" ng-click="router('@' + action.tag)") {{action.tag}}
-              span(ng-show="action.editing")
-                input.event-name(type="text", ng-model="action.tag")
-            span.action-time(ng-if="action.timeElapsed.type  == 's' " ng-hide="action.showTools") #{__('Just now')}
-            span.action-time(ng-if="action.timeElapsed.type  == 'm' " ng-hide="action.showTools") {{ action.timeElapsed.val }} #{__('min')}
-            span.action-time(ng-if="action.timeElapsed.type  == 'h' " ng-hide="action.showTools") {{ action.timeElapsed.val }} #{__('h')}
-            span.action-time(ng-if="action.timeElapsed.type  == 'd' " ng-hide="action.showTools") {{ action.timeElapsed.val | date:"EEE d MMM '#{__('at')}' H:mm" | capitalize}}
-            .action-tools(ng-show="action.showTools")
-              span(href='' ng-if="action.edittable" ng-click="deleteAction(action)").delete #{__('Borrar')}
-              button(ng-if="action.edittable" ng-hide="action.editing" ng-click="modifyTag(action)") #{__('Modificar TAG')}
-              button(ng-if="action.edittable" ng-show="action.editing" ng-click="updateTag(action)") #{__('Actualizar TAG')}
+            img(:src="post.author.picture" v-on:click="post.tools = !post.tools")
+          .post-info
+            h3.post-title(v-show="!post.tools")
+              span(v-on:click="router(post.author.hexCode + '.' + post.author.firstName + '@' + post.tag, $event)" v-bind:style="[post.author.hexCode ? { backgroundColor: '#' + post.author.hexCode } : '' ]").author-hex-code
+              a.author-name-link(href="" v-on:click="router(post.author.hexCode + '.' + post.author.firstName, $event)")
+                span.author-name {{ post.author.firstName }}
+              a.post-tag-link(href='' v-on:click="router('@' + post.tag, $event)")
+                span.at @
+                span(v-show="!post.editing" ng-model="newTag") {{post.tag}}
+              span(v-show="post.editing")
+                input.event-name(type="text", ng-model="post.tag")
+            time.post-time(v-bind:datetime="post.time") {{ post.timeFromNow }}
+            .post-tools(v-show="post.tools")
+              span(href='' ng-if="post.edittable" ng-click="deletepost(post)").delete #{__('Delete')}
+              button(ng-if="post.edittable" v-show="post.editing" ng-click="modifyTag(post)") #{__('Modificar TAG')}
+              button(ng-if="post.edittable" v-show="post.editing" ng-click="updateTag(post)") #{__('Actualizar TAG')}
           .save-button
-            a(ng-click="saveClick(action)" ng-class="{ selected: action.saved }").save-link
+            a(v-on:click="toggleSavePost(post)" v-bind:class="{ saved: post.saved }").save-post-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save
-
+      section#end
+        #endMessage #{__('Llegaste al final de ')} {{ route }}
   //
   //  Librería SVG
   //
