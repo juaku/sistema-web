@@ -61,8 +61,8 @@ UserSchema.statics.signUp = function (req, callback, error) {
 UserSchema.statics.getProfilePicture = function (req, callback) {
   var profilePic;
   var idProfile = req.session.passport.user.id;
-  FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
-    profilePic = response.data.url;
+  FB.api('/v2.8/'+idProfile+'?fields=picture.width(200).height(200)',  function(response) {
+    profilePic = response.picture.data.url;
     var getImg = function(o, cb){
       var port = o.port || 80;
       var parsed = url.parse(o.url);

@@ -102,7 +102,7 @@ jPack.signUp = function(req, next, error) {
 jPack.getProfilePicture = function(session, next) {
 	var profilePic;
 	var idProfile = session.passport.user.id;
-	FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
+	/*FB.api('/'+idProfile+'/picture?redirect=0&height=200&type=normal&width=200',  function(response) {
 		profilePic = response.data.url;
 		var getImg = function(o, cb){
 			var port = o.port || 80;
@@ -133,7 +133,7 @@ jPack.getProfilePicture = function(session, next) {
 			console.log(session.jUser.profilePicture);
 			next();
 		})
-	});
+	});*/
 }
 
 /*
@@ -287,14 +287,14 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 		});
 	}
 	function getFBInfo(i, fbUserId, hexCode) {
-		FB.api('/'+fbUserId+'/', {access_token: accessToken}, function(profile) {
+		FB.api('/v2.8/'+fbUserId+'?fields=first_name,last_name', {access_token: accessToken}, function(profile) {
 			posts[i].author = {};
 			posts[i].author.id = actions[i].authorId;
 			posts[i].author.firstName = profile.first_name;
 			posts[i].author.lastName = profile.last_name;
 			posts[i].author.hexCode = hexCode;
-			FB.api('/'+fbUserId+'/picture?redirect=0&height=200&type=normal&width=200',  function(picture) {
-				posts[i].author.picture= picture.data.url;
+			FB.api('/v2.8/'+fbUserId+'?fields=picture.width(200).height(200)',  function(res) {
+				posts[i].author.picture= res.picture.data.url;
 				triggerNext();
 			});
 		});
@@ -967,7 +967,7 @@ function savePost(req, simpleEventName, data, next, error) {
  * @par {string} data, {object} postFile, {function} next, {function} error.
  * @return null
  */ 
-function shareMediaOnFb(req, url, error) {
+/*function shareMediaOnFb(req, url, error) {
 	var albumId = '';
 	FB.api('/' + albumId + '/photos','POST',
 		{
@@ -983,7 +983,7 @@ function shareMediaOnFb(req, url, error) {
 				}
 			}
 	);
-}
+}*/
 
 
 /*
@@ -991,7 +991,7 @@ function shareMediaOnFb(req, url, error) {
  * @par {string} data, {object} postFile, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.share = function(req, postFile, next, error) {
+/*jPack.user.prototype.share = function(req, postFile, next, error) {
 	var parseFileURL = postFile._url;
 	var albumId = '';
 	FB.api('/' + albumId + '/photos','POST',
@@ -1009,7 +1009,7 @@ jPack.user.prototype.share = function(req, postFile, next, error) {
 				}
 			}
 	);
-}
+}*/
 
 /*
  * @descrip Cambia el idioma
@@ -1200,7 +1200,7 @@ jPack.getAllPosts = function(req, next, error) {
 							getFBInfo(i, crip.deco(results[i].get('author').get('username'))); //getFBInfo(i,crip.deco(results[i].get('author').get('username')),results[i].get('author').get('idKey'));*/
 						}
 						function getFBInfo(i, fbUserId) { //function getFBInfo(i, fbUserId, idKey)
-							FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
+							/*FB.api('/'+fbUserId+'/', {access_token: req.session.passport.user.accessToken},  function(profile) {
 								posts[i].author = {};
 								//posts[i].author.idKey = idKey;
 								posts[i].author.firstName = profile.first_name;
@@ -1209,7 +1209,7 @@ jPack.getAllPosts = function(req, next, error) {
 									posts[i].author.picture= picture.data.url;
 									triggerNext();
 								});
-							});
+							});*/
 						}
 						function triggerNext() {
 							c--;
