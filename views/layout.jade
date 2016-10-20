@@ -19,6 +19,21 @@ html(lang="#{locale}" ng-app="Juaku")
     script(src="/javascripts/fastclick.js")
     script(src="//npmcdn.com/vue/dist/vue.js")
     script(src="//npmcdn.com/vue-resource/dist/vue-resource.js")
-    script(src="//momentjs.com/downloads/moment.js")
+    script(src="/javascripts/moment.js")
+    script.
+        window.fbAsyncInit = function() {
+          FB.init({
+            appId      : '278467565655992',
+            xfbml      : true,
+            version    : 'v2.8'
+          });
+        };
+        (function(d, s, id){
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) {return;}
+          js = d.createElement(s); js.id = id;
+          js.src = "//connect.facebook.net/en_US/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
     block head
     block content

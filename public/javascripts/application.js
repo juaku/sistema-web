@@ -165,6 +165,7 @@ var app = new Vue({
 		reload: function() {
 			window.location = '/';
 		},
+
 		scroll: function() {
 			checkScroll('main');
 		},
@@ -334,6 +335,17 @@ function createEmptyPosts(n) {
 }
 
 app.router(window.location.pathname.substring(1));
+
+if ('serviceWorker' in navigator) {
+	console.log('CLIENT: service worker registration in progress.');
+	navigator.serviceWorker.register('/service-worker.js').then(function() {
+		console.log('CLIENT: service worker registration complete.');
+	}, function() {
+		console.log('CLIENT: service worker registration failure.');
+	});
+} else {
+	console.log('CLIENT: service worker is not supported.');
+}
 
 //
 // Framework Angular

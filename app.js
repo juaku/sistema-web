@@ -45,72 +45,21 @@ passport.deserializeUser(function(obj, done) {
 	done(null, obj);
 });
 
-// TODO: Verificar si este bloque es necesario
-/*
-//Token
-var tokens = {}
-
-function saveRememberMeToken(token, uid, fn) {
-	tokens[token] = uid;
-	return fn();
-}
-*/
-// END TODO
-
 //FacebookStrategy
 passport.use(new FacebookStrategy({
 	clientID: FACEBOOK_APP_ID,
 	clientSecret: FACEBOOK_APP_SECRET,
-	callbackURL: 'http://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
-	passReqToCallback: true
+	callbackURL: 'https://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
+	passReqToCallback: true,
+	profileFields: ['id', 'name', 'email', 'photos']
 },
+// facebook will send back the tokens and profile
 function(req, accessToken, refreshToken, profile, done) {
-    // TODO: Ver si sirve nextTick
-    // verificación asíncrona, para el efecto de ... 
-
     process.nextTick(function () {
     	profile.accessToken = accessToken;
-      // Para mantener el ejemplo sencillo, el perfil de Facebook del usuario se devuelve para
-      // representar al usuario logueado. En una aplicación típica que quieras 
-      // asociar la cuenta de Facebook con un registro de usuario en su base de datos,
-      // y devolver ese usuario en su lugar.
-      return done(null, profile);
+      	return done(null, profile);
     });
-	
-	//req.session.accessToken = accessToken;
-	
-	/*var User = mongoose.model('User');
-
-	User.findOne({providerId: profile.id}, function(err, user) {
-		if(err) throw(err);
-		if(!err && user!= null) return done(null, user);
-
-		var user = new User({
-			providerId: profile.id,
-			provider: profile.provider,
-			name: profile.name.givenName,
-			familyName: profile.name.familyName,
-			userName: profile.name.givenName,
-			//photo: profile.photos[0].value
-		});
-		
-		user.save(function(err) {
-			if(err) throw err;
-			done(null, user);
-		});
-	});*/
 }));
-
-// TODO: Verificar si este bloque es necesario
-/*
-function issueToken(user, done) {
-	var token = utils.randomString(64);
-	saveRememberMeToken(token, user.id, function(err) {
-		if (err) { return done(err); }
-		return done(null, token);
-	});
-}*/
-// END TODO
 
 var access = require('./routes/access');
 var login = require('./routes/login');
@@ -197,7 +146,7 @@ app.use('/', routes);
 //   redirigir al usuario a facebook.com.  Después de la autorizacón, Facebook
 //   redirigirá al usuario a esta aplicación at /auth/facebook/callback
 app.get('/auth/facebook',
-	passport.authenticate('facebook', { scope: ['user_birthday', 'user_photos', 'user_events', 'read_friendlists', 'email', 'publish_actions'], failureRedirect: '/login', display: 'popup'  }),
+	passport.authenticate('facebook', { scope: ['email, user_photos'], failureRedirect: '/login', display: 'popup'  }),
 	function(req, res){
     // La petición será redirigida a Facebook para la autenticación, por lo que
     // esta función no se llamará.
