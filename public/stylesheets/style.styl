@@ -24,6 +24,17 @@ fbColor			= #3b5998
  *
  *  
  */
+
+placeholder()
+	&::-webkit-input-placeholder
+		{block}
+	&:-moz-placeholder
+		{block}
+	&::-moz-placeholder
+		{block}
+	&:-ms-input-placeholder
+		{block}
+
 html
 body
 	height: 100%
@@ -35,26 +46,29 @@ body
 	color: #FFF//000
 
 section#view-controls
-	margin-top: 32vh
 	position: fixed
+	height: 82vh
+	max-height: 54vw
+	min-height: 30vw
 
 input#title
 	font-size: 5vw
 	font-weight: normal
-	letter-spacing: -0.03em
+	letter-spacing: -0.033em
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 	width: 36vw
-	padding-right: 0.03em /* Evitar corte letter-spacing negativo */
 	outline: 0
 	border: 0
 	border-radius: 0
-	background-color: inherit
+	background-color: #000
 	color: #FFF//000
 	display: block
 	text-align: right
-	transition: color 200ms
+	position: absolute
+	top: 50%
+	transform: translate(0,-50%)
 
 input[type=text]::-ms-clear
 	display: none
@@ -72,11 +86,29 @@ input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration
 	display: none
 
-input#title::before
-	content: ''
+input#title
+	color: #FFF
+
+input#title:hover
+	background-color: #111
+	// color: rgba(255,255,255,0.5) Se ve mal
 
 input#title:focus
-	color: #CCC//555
+	background-color: #111
+	color: #FFF
+
+input#title
+	+placeholder()
+		color: #FFF
+		
+input#title:hover
+	+placeholder()
+		color: rgba(255,255,255,0.5)
+
+input#title:focus
+input#title:focus:hover
+	+placeholder()
+		color: transparent
 
 /* = to x Animation
 #more:before,
@@ -141,7 +173,7 @@ main
 #account
 	width: 36vw
 	position: fixed	
-	bottom: 20vh
+	bottom: 24vh
 	
 #account a.user-link
 	float: right
@@ -163,14 +195,13 @@ main
 #account-controls
 	position: fixed
 	width: 36vw
-	bottom: 16vh
+	bottom: 20vh
 	
 #take
 #more
 	display: none
 
 #start
-	background-color: #000//FFF
 	width: 82vh
 	position: relative
 	height: 82vh
@@ -195,6 +226,9 @@ main
 #start #logo-icon
 	cursor: pointer
 
+#start #logo-icon:active
+	opacity: 0.75
+
 #start h1
 	display: none
 
@@ -203,12 +237,13 @@ main
 	background-color: inherit// #F05 Truco de maquetación
 	width: 82vh
 	max-width: 54vw
-	margin-bottom: 3vh
+	// margin-bottom: 3vh
+	border-bottom: 3vh solid #111
 	min-width: 30vw
 	position: relative
 
 .post .media
-	background-color: #000//F7F7F7 /* CCC */
+	background-color: #222//F7F7F7 /* CCC */
 	width: 100%
 	height: 82vh
 	max-width: 54vw
@@ -283,7 +318,6 @@ main
 .info h3.post-title .author-hex-code
 	content: ''
 	display: inline-block
-	background-color: #888
 	border-radius: 50%
 	width: 0.8em
 	height: 0.8em
@@ -305,13 +339,12 @@ main
 .info a.save-post-link .save
 	display: block
 	background-color: #555//CCC
-	border: 2px solid #555
 	border-radius: 50%
 	width: 100%
 	transition: background-color 200ms, border-color 200ms
 
 .info a.save-post-link.saved .save
-	background-color: #000//CCC
+	background-color: #111//CCC
 	border-color: #333
 
 #end
@@ -485,10 +518,11 @@ footer
 	bottom: 5vh
 	font-size: 12px
 
-footer #brand-url
+footer a#brand-url
 	font-family: Tahoma
 	font-size: 2em
-	margin: 1em 0
+	margin: 1vh 0
+	display: block
 
 footer #brand
 	margin: 5px 0
@@ -554,16 +588,6 @@ section#new-post #new-post-controls #event-name-input input#new-event-name
 	display: block
 	outline: none
 	border-radius: 0
-
-placeholder()
-	&::-webkit-input-placeholder
-		{block}
-	&:-moz-placeholder
-		{block}
-	&::-moz-placeholder
-		{block}
-	&:-ms-input-placeholder
-		{block}
 
 section#new-post #new-post-controls #event-name-input input#new-event-name
 	+placeholder()
@@ -631,6 +655,12 @@ body.events-view #box #post-list
 /*
  * Responsive
  */
+@media screen and (min-width: 481px) and (max-height: 480px)
+	#account
+	#account-controls
+	footer
+		display: none
+
 @media screen and (max-width: 1000px) , screen and (max-height: 700px)
 	h3
 		font-size: 16px
@@ -648,6 +678,18 @@ body.events-view #box #post-list
 			box-shadow: 0 0 0 1vw rgba(255,255,255,0.1)
 		100%
 			box-shadow: 0 0 0 1vw rgba(255,255,255,0.05)
+	
+	::-webkit-scrollbar 
+		width: 20px
+
+	::-webkit-scrollbar-track
+		background: #000
+
+	::-webkit-scrollbar-thumb 
+		background: #222
+
+	::-webkit-scrollbar-thumb:window-inactive
+		background: #111
 
 @media screen and (max-width: 480px)
 	aside
@@ -683,11 +725,11 @@ body.events-view #box #post-list
 
 	#take:before
 		content: ''
-		width: 60%
-		height: 60%
+		width: 64%
+		height: 64%
 		background-color: #F05
 		position: absolute
-		margin: 20%
+		margin: 18%
 		border-radius: 50%
 		right: 0
 		top: 0
@@ -699,6 +741,8 @@ body.events-view #box #post-list
 		left: 0
 		top: 0
 		display: block
+		z-index: 1
+		cursor: pointer
 
 	#more:before
 		content: ''
@@ -724,7 +768,17 @@ body.events-view #box #post-list
 		-webkit-appearance: none
 		width: 100vw
 		font-family: 'Verdana'
-		text-align: left
+		text-align: center
+	
+	input#title:focus
+	input#title:hover
+		background-color: #000
+		color: #FFF
+
+	input#title:hover
+		+placeholder()
+			background-color: #000
+			color: #FFF
 
 	/*#account img.user-picture
 		margin: 0.375em
@@ -796,15 +850,3 @@ body.events-view #box #post-list
 	
 	.info .post-time
 		font-size: 12px
-
-::-webkit-scrollbar 
-	width: 20px
-
-::-webkit-scrollbar-track
-	background: #000
-
-::-webkit-scrollbar-thumb 
-	background: #222
-
-::-webkit-scrollbar-thumb:window-inactive
-	background: #111

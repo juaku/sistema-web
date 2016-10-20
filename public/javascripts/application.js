@@ -35,12 +35,6 @@ function actionsLoaded() {
 		$('body').toggleClass('dark');
 	});
 
-	// Parpadeo cuando se hace scroll hacia abajo
-	//
-	$('article .media img').off('click');
-	$('article .media img').on('click', function() { 
-		assistedScroll(1, $(this).parents('article'));
-	});
 	$('.author-hex-code').each(function(index) {
 		$(this).css('background-color', '#' + $(this).attr('hex-code'));
 	});
@@ -190,9 +184,24 @@ var app = new Vue({
 			}
 		},
 		assistedScroll: function(event) {
-			var elements = 'body, main';
-			$(document.body).stop().animate({
-				'scrollTop': $(event.target).parents('article').next().offset().top
+			var scrollToNext = false;
+			var scrollCorrection = 0;
+			var thisTop = Math.ceil($(event.target).parents('article').offset().top);
+			var nextTop = Math.ceil($(event.target).parents('article').next().offset().top);
+
+			if(window.innerWidth <= 480) {
+				scrollToNext = (Math.abs(thisTop) < 1);
+				scrollingElement = 'main'
+				scrollCorrection = $(scrollingElement).scrollTop();
+			} else {
+				scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
+				scrollingElement = 'html, body';
+			}
+
+			var scrollTo = (scrollToNext ? nextTop : thisTop) + scrollCorrection;
+
+			$(scrollingElement).stop().animate({
+				'scrollTop':  scrollTo
 			}, 200, 'swing', function () {
 				//window.location.hash = refPost; TODO: Actualizar hash
 			});
