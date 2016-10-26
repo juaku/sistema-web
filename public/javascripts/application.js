@@ -22,14 +22,25 @@ $('#share-new-post .share').on('click', function() {
 	$(this).toggleClass('selected');
 });
 
-$('input.event-name').on('focus', function() {
+$('input.post-tag').on('focus', function() {
 	$('body').addClass('view-menu-hidden');
 });
-$('input.event-name').on('focusout', function() {
+
+$('input.post-tag').on('focusout', function() {
 	$('body').removeClass('view-menu-hidden');
 });
 
-function actionsLoaded() {
+$('body').bind('keydown', function(event) {
+	if(event.keyCode == 13) {
+		if($('input#title').is(':focus')) {
+			$('input#title').blur();
+		} else {
+			$('input#title').focus();
+		}
+	}
+});
+
+function postsLoaded() {
 	$('.save').off('click');
 	$('.save').on('click', function(event) {
 		$('body').toggleClass('dark');
@@ -41,7 +52,7 @@ function actionsLoaded() {
 
 	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
 	//
-	$(".event-name").bind('keypress', function(event) {
+	$(".post-tag").bind('keypress', function(event) {
 		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
 		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
 		if (!regex.test(key)) {
@@ -74,7 +85,9 @@ var app = new Vue({
 	data: {
 		route: null,
 		posts: createEmptyPosts(3),
-		newPost: {}
+		newPost: {
+			shareOnFb: false
+		}
 	},
 	http: {
 		headers: {
@@ -100,12 +113,6 @@ var app = new Vue({
 			} else {
 				queryStart = 0;
 				this.posts = createEmptyPosts(3);
-				var scrollTo = 0;
-				if(route != '') {
-					scrollTo = $("article").first().offset().top;
-				}
-				$(document).scrollTop(scrollTo);
-				$('main').scrollTop(scrollTo);
 				if(this.route == null) {
 					pushToHistory =  false;
 				} else {
@@ -130,9 +137,9 @@ var app = new Vue({
 			}, function(e) {
 			});
 		},
-		loaded: function(action) {
-			if(action.media != EMPTY_IMAGE) {
-				action.class = 'loaded';
+		loaded: function(post) {
+			if(post.media != EMPTY_IMAGE) {
+				post.class = 'loaded';
 			}
 		},
 		refresh: function(route, next, error) {
@@ -156,9 +163,15 @@ var app = new Vue({
 					app.posts.pop();
 					numEmptyPosts--;
 				}
+
+				if(queryStart == 0) {
+					scrollTo($('.post').first().next());
+				}
+
 				next();
 			}, function(e) {
-				window.location = '/logout'; // TODO: ¿Qué hacer con estos errores?
+				app.router('');
+				// window.location = '/logout'; // TODO: ¿Qué hacer con estos errores?
 				error();
 			});
 		},
@@ -170,42 +183,26 @@ var app = new Vue({
 			checkScroll('main');
 		},
 		take: function() {
-			$('body').addClass('new-post-view');
 			$('input#media-loader').click();
 		},
-		sendNewPost: function(event, error) {
-			event.preventDefault();
-			if(!sendingPost) {
-				sendingPost = true;
-				this.$http.post('/post/new', this.newPost).then(function(data) {
-					sendingPost = false;
-				}, function(res)  {
-					error();
-				});
+		sendNewPost: function(event) {
+			if (confirm('¿Desear enviar el post?')) {
+				event.preventDefault();
+				if(!sendingPost) {
+					sendingPost = true;
+					this.$http.post('/post/new', this.newPost).then(function(data) {
+						sendingPost = false;
+						alert('Post enviado')
+						$('body').removeClass('new-post-view');
+					}, function(res)  {
+						$('body').removeClass('new-post-view');
+					});
+				}
 			}
 		},
 		assistedScroll: function(event) {
-			var scrollToNext = false;
-			var scrollCorrection = 0;
-			var thisTop = Math.ceil($(event.target).parents('article').offset().top);
-			var nextTop = Math.ceil($(event.target).parents('article').next().offset().top);
-
-			if(window.innerWidth <= 480) {
-				scrollToNext = (Math.abs(thisTop) < 1);
-				scrollingElement = 'main'
-				scrollCorrection = $(scrollingElement).scrollTop();
-			} else {
-				scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
-				scrollingElement = 'html, body';
-			}
-
-			var scrollTo = (scrollToNext ? nextTop : thisTop) + scrollCorrection;
-
-			$(scrollingElement).stop().animate({
-				'scrollTop':  scrollTo
-			}, 200, 'swing', function () {
-				//window.location.hash = refPost; TODO: Actualizar hash
-			});
+			var postObject = $(event.target).parents('.post');
+			scrollTo(postObject, $(postObject).next());
 		},
 		updateState: function(state) {
 			if(!state)
@@ -237,72 +234,87 @@ var app = new Vue({
 			var canvas = document.getElementById('new-media-preview');
 			var ctx = canvas.getContext('2d');
 
-			EXIF.getData(event.target.files[0], function() {
-				var orientation = this.exifdata.Orientation;
-				var reader = new FileReader();
-				reader.onload = function(event) {
-					var img = new Image();
-					img.onload = function() {
-						var nTam = 880;
-						canvas.width = nTam;
-						canvas.height = nTam;
-						var nWidth = nTam;
-						var nHeight = nTam;
-						var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
-						if(img.width > img.height) {
-							nWidth = img.width * nTam / img.height;
-						} else if(img.width < img.height) {
-							nHeight = img.height * nTam / img.width;
-							variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
-						}
+			$('body').addClass('new-post-view');
+			scrollTo($('#new-post'));
+			if(event.target.files[0]) {
+				EXIF.getData(event.target.files[0], function() {
+					var orientation = this.exifdata.Orientation;
+					var reader = new FileReader();
+					reader.onload = function(event) {
+						var img = new Image();
+						img.onload = function() {
+							var nTam = 880;
+							canvas.width = nTam;
+							canvas.height = nTam;
+							var nWidth = nTam;
+							var nHeight = nTam;
+							var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
+							if(img.width > img.height) {
+								nWidth = img.width * nTam / img.height;
+							} else if(img.width < img.height) {
+								nHeight = img.height * nTam / img.width;
+								variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
+							}
 
-						switch(orientation) {
-							case 3:
-								variation = {a: 180, desX: -1, desY: -1, cntX: 1, cntY: 0, swt:false};
-								break;
-							case 6:
-								variation = {a: 90, desX: 0, desY: -1, cntX: -1, cntY: 0, swt:true};
-								break;
-							case 8:
-								variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
-								break;
-						}
-						
-						variation.width = nWidth;
-						variation.height = nHeight;
-						if(variation.swt) {
-							variation.width = nHeight;
-							variation.height = nWidth;
-						}
-						var cntVar = 0;
-						if (variation.width > nTam) {
-							cntVar = parseInt((variation.width - nTam)/2);
-						} 
-						if (variation.height > nTam) {
-							cntVar = parseInt((variation.height - nTam)/2);
-						}
-						var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
-						var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
-						ctx.rotate(variation.a*Math.PI/180);
-						ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
-						var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
-						var imgQuality = mobile?0.5:0.75;
-						var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
+							switch(orientation) {
+								case 3:
+									variation = {a: 180, desX: -1, desY: -1, cntX: 1, cntY: 0, swt:false};
+									break;
+								case 6:
+									variation = {a: 90, desX: 0, desY: -1, cntX: -1, cntY: 0, swt:true};
+									break;
+								case 8:
+									variation = {a: -90, desX: -1, desY: 0, cntX: 1, cntY: 0, swt:true};
+									break;
+							}
+							
+							variation.width = nWidth;
+							variation.height = nHeight;
+							if(variation.swt) {
+								variation.width = nHeight;
+								variation.height = nWidth;
+							}
+							var cntVar = 0;
+							if (variation.width > nTam) {
+								cntVar = parseInt((variation.width - nTam)/2);
+							} 
+							if (variation.height > nTam) {
+								cntVar = parseInt((variation.height - nTam)/2);
+							}
+							var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
+							var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
+							ctx.rotate(variation.a*Math.PI/180);
+							ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+							var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
+							var imgQuality = mobile?0.5:0.75;
+							var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
 
-						//getGeo( function() {
-						//	$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newAction.coords.latitude + ',' + $scope.newAction.coords.longitude);
-						//}, function(errorMsg) {
-						//	console.log(errorMsg);
-						//});
-						app.newPost.media = newImg;
+							//getGeo( function() {
+							//	$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newAction.coords.latitude + ',' + $scope.newAction.coords.longitude);
+							//}, function(errorMsg) {
+							//	console.log(errorMsg);
+							//});
+							app.newPost.media = newImg;
+						}
+						img.src = event.target.result;
 					}
-					img.src = event.target.result;
-				}
-				reader.readAsDataURL(event.target.files[0]);
-			});
+					reader.readAsDataURL(event.target.files[0]);
+				});
+			}
+		},
+		shareOnFb: function() {
+			this.newPost.shareOnFb = !this.newPost.shareOnFb;
 		},
 		back: function() {
 			history.back();
+		},
+		logout: function() {
+			navigator.serviceWorker.getRegistrations().then(function(registrations) {
+				for(var registration of registrations) {
+					registration.unregister()
+				}
+			})
+			window.location = '/logout';
 		}
 	}
 });
@@ -334,8 +346,38 @@ function createEmptyPosts(n) {
 	return emptyPosts;
 }
 
-app.router(window.location.pathname.substring(1));
+function scrollTo(object, nextObject) {
+	var directScroll = (typeof nextObject === 'undefined') ? true : false;
 
+	var thisTop = Math.floor($(object).offset().top);
+	var scrollCorrection = 0;
+	var scrollToNext = false;
+	if(window.innerWidth <= 480) {
+		scrollToNext = (Math.abs(thisTop) < 1);
+		scrollingElement = 'main'
+		scrollCorrection = $(scrollingElement).scrollTop();
+	} else {
+		scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
+		scrollingElement = 'html, body';
+	}
+
+	var scrollTo = scrollCorrection;
+	if(directScroll) {
+		scrollTo += thisTop;
+	} else {
+		var nextTop = Math.floor($(nextObject).offset().top);
+		scrollTo += (scrollToNext ? nextTop : thisTop);
+	}
+
+	$(scrollingElement).stop().animate({
+		'scrollTop':  scrollTo
+	}, 200, 'swing', function () {
+		//window.location.hash = refPost; TODO: Actualizar hash
+	});
+}
+
+app.router(window.location.pathname.substring(1));
+/*
 if ('serviceWorker' in navigator) {
 	console.log('CLIENT: service worker registration in progress.');
 	navigator.serviceWorker.register('/service-worker.js').then(function() {
@@ -345,7 +387,7 @@ if ('serviceWorker' in navigator) {
 	});
 } else {
 	console.log('CLIENT: service worker is not supported.');
-}
+}*/
 
 //
 // Framework Angular
@@ -396,10 +438,6 @@ if ('serviceWorker' in navigator) {
 // 	// Post
 // 	// 
 // 	$scope.newAction = {};
-// 	$scope.newAction.shareOnFb = false;
-// 	$scope.shareOnFb = function() {
-// 		$scope.newAction.shareOnFb = !$scope.newAction.shareOnFb;
-// 	}
 // 	$scope.shareActionOnFb = function(post) {
 // 		$scope.post = post.media;
 // 		$http.post('/post/shareActionOnFb', $scope.post).success(function(data) {

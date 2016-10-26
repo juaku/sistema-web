@@ -12,7 +12,7 @@ block content
       //
       section#view-controls
         #more.back(ng-class="{back: back}" v-on:click="back")
-        input(type="search" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:change="router(route)")#title
+        input(type="text" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:change="router(route)")#title
         #take.needsclick(v-on:click="take")
       section#account
         a.user-link
@@ -39,7 +39,7 @@ block content
             //.show-more
               a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
       footer
-        a#brand-url(href="/") juaku.com
+        a#brand-url juaku.com
         nav Términos y condiciones | Prensa
         #brand Juaku 2016
     main(v-on:scroll="scroll()")
@@ -48,22 +48,25 @@ block content
           h1 Juaku
           svg#logo
             use#logo-icon(xlink:href="#logo-icon-svg" v-on:click="reload")
+      //
+      // New Post
+      //
       input.needsclick(type="file" id="media-loader" accept="image/*" v-on:change="setNewMedia($event)")
-      section#new-post
-        canvas(id="new-media-preview")
+      section#new-post.post
+        canvas#new-media-preview(v-on:click="assistedScroll")
         #new-post-controls
-          #event-name-input.event
-            span.at-simbol @
-            input.event-name(type="text" id="new-tag-name" v-model="newPost.tag" placeholder="#{__('Tag')}")
-          //
-          // Share on Facebook
-          //
-          #share-new-post
-            a#share-fb.share(href="" ng-click="shareOnFb()")
-              object
-                svg(version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve")
-                  path(id="change-color" fill="#3B5998"  d="M22.675,24C23.407,24,24,23.407,24,22.675V1.325C24,0.593,23.407,0,22.675,0H1.325C0.593,0,0,0.593,0,1.325v21.351C0,23.407,0.593,24,1.325,24H22.675z")
-                  path(id="f" fill="#FFFFFF" d="M16.56,24v-9.294h3.12l0.467-3.622H16.56V8.771c0-1.049,0.291-1.763,1.795-1.763l1.918-0.001v-3.24c-0.332-0.044-1.47-0.1439-2.75-0.143c-2.765,0-4.659,1.688-4.659,4.788v2.671H9.692v3.622h3.128V24H16.56z")
+          #post-name-input
+            label.at-simbol(for="new-tag") @
+            input.post-tag(type="text" id="new-tag" v-model="newPost.tag" placeholder="#{__('Tag')}")
+            //
+            // Share on Facebook
+            //
+            #share
+              a#share-fb.share-icon(v-bind:class="{ share: newPost.shareOnFb }" href="#" v-on:click="shareOnFb" v-on:click.prevent)
+                object
+                  svg(version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve")
+                    path(id="back" fill="#888888"  d="M22.675,24C23.407,24,24,23.407,24,22.675V1.325C24,0.593,23.407,0,22.675,0H1.325C0.593,0,0,0.593,0,1.325v21.351C0,23.407,0.593,24,1.325,24H22.675z")
+                    path(id="f" fill="#000000" d="M16.56,24v-9.294h3.12l0.467-3.622H16.56V8.771c0-1.049,0.291-1.763,1.795-1.763l1.918-0.001v-3.24c-0.332-0.044-1.47-0.1439-2.75-0.143c-2.765,0-4.659,1.688-4.659,4.788v2.671H9.692v3.622h3.128V24H16.56z")
           a#send-post(href="" v-on:click="sendNewPost($event)") #{__('Send')}
       //
       // Post

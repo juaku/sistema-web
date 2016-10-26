@@ -16,14 +16,11 @@ darkColor		= #202020
 mainColor		= #F05
 fbColor			= #3b5998
 */
+
 /* 
- * Estilos generales
- * ------- ---------
- *
- * 
- *
- *  
- */
+	Estilos generales
+
+*/
 
 placeholder()
 	&::-webkit-input-placeholder
@@ -90,11 +87,11 @@ input#title
 	color: #FFF
 
 input#title:hover
-	background-color: #111
+	background-color: #222
 	// color: rgba(255,255,255,0.5) Se ve mal
 
 input#title:focus
-	background-color: #111
+	background-color: #222
 	color: #FFF
 
 input#title
@@ -232,13 +229,17 @@ main
 #start h1
 	display: none
 
-/* Action */
+/*
+	Post 								
+
+*/									
+
 .post
 	background-color: inherit// #F05 Truco de maquetación
 	width: 82vh
 	max-width: 54vw
 	// margin-bottom: 3vh
-	border-bottom: 3vh solid #111
+	border-bottom: 3vh solid #181818
 	min-width: 30vw
 	position: relative
 
@@ -277,7 +278,10 @@ main
 .post .media.loaded .preloader-animation
 	display: none
 
-/* Action -> Info */
+/*
+	Post -> Info
+
+*/
 
 .info
 	background-color: #000//FFF
@@ -344,7 +348,7 @@ main
 	transition: background-color 200ms, border-color 200ms
 
 .info a.save-post-link.saved .save
-	background-color: #111//CCC
+	background-color: #222//CCC
 	border-color: #333
 
 #end
@@ -363,9 +367,7 @@ svg#svg-library
 
 /*
 
-	
 	V 3.0
-
 
 */
 
@@ -438,6 +440,8 @@ section#account-controls section#profile h2
  * Eventos
  */
 
+
+/*
 aside section#events-controls .events-list.show-more
 	overflow: none
 	position: relative
@@ -454,7 +458,7 @@ aside section#events-controls .events-title
 aside section#events-controls .event
 	padding: 8px 0
 
-aside section#events-controls .event .event-name.small
+aside section#events-controls .event .action-tag.small
 	font-size: 14px
 
 aside section#events-controls .event .event-people
@@ -463,6 +467,7 @@ aside section#events-controls .event .event-people
 
 aside section#events-controls .show-more
 	text-align: center
+*/
 
 /*
  * Controles flotantes
@@ -543,79 +548,89 @@ section#new-post
 
 section#new-post canvas#new-media-preview
 	width: 100%
-
-section#new-post canvas#new-media-preview
-	width: 100%
 	height: 100vw
+	background-color: #333
 	display: block
 
 section#new-post #new-post-controls
 	width: 100%
 	height: 44px
 	display: table
-	margin-bottom: 5px
 
-section#new-post #new-post-controls #event-name-input
-section#new-post #new-post-controls #share-new-post
+section#new-post #new-post-controls #post-name-input
+section#new-post #new-post-controls #share
 section#new-post #new-post-controls #send-post
 	display: table-cell
 	vertical-align: middle
 
-section#new-post #new-post-controls #event-name-input
+section#new-post #new-post-controls #post-name-input
 	display: table
 	width: 100%
+	position: relative
 
-section#new-post #new-post-controls #event-name-input *
+section#new-post #new-post-controls #post-name-input label.at-simbol
+section#new-post #new-post-controls #post-name-input input#new-post-tag
 	font-size: 17px
 	letter-spacing: -0.5px
-
-section#new-post #new-post-controls #event-name-input span.at-simbol
-section#new-post #new-post-controls #event-name-input input#new-event-name
 	display: table-cell
 	vertical-align: middle
 	height: 24px
 
-section#new-post #new-post-controls #event-name-input span.at-simbol
-	// text-align: right
+section#new-post #new-post-controls #post-name-input label.at-simbol
 	padding: 10px 0 10px 10px
-	width: 1px
+	position: absolute
+	font-family: 'Verdana', sans-serif
 
-section#new-post #new-post-controls #event-name-input input#new-event-name
-	width: 95%
+section#new-post #new-post-controls #post-name-input input#new-tag
+	background-color: #222
+	color: #FFF
+	width: calc(100% - 36px)
 	border: none
-	padding: 10px 0
+	padding: 0 8px 0 28px
 	margin: 0
 	display: block
 	outline: none
 	border-radius: 0
+	font-size: 16px
+	height: 44px
+	transition: background-color 200ms
+	overflow: hidden
+	white-space: nowrap
+	text-overflow: ellipsis
 
-section#new-post #new-post-controls #event-name-input input#new-event-name
+section#new-post #new-post-controls #post-name-input input#new-tag:focus 
+section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
+	background-color: #333
+
+section#new-post #new-post-controls #post-name-input input#new-tag
 	+placeholder()
-		color: blackColor
-		border-bottom: 1px solid whiteColor
+		color: #888
 
-section#new-post #new-post-controls #share-new-post
+section#new-post #new-post-controls #share
 	width: 44px
 	height: 44px
 
-section#new-post #new-post-controls #share-new-post .share
+section#new-post #new-post-controls #share a.share-icon
+	background-color: #222
 	width: 24px
 	height: 24px
-	margin: 10px
+	padding: 10px
+	margin: 0
 	display: block
+	transition: background-color 200ms
 
-section#new-post #new-post-controls #share-new-post .share #change-color
-	fill: midColor
+section#new-post #new-post-controls #share a#share-fb.share #back
+	fill: #3B5998
 
-section#new-post #new-post-controls #share-new-post .share.selected #change-color 
-	fill: fbColor
-	
+section#new-post #new-post-controls #share a#share-fb.share #f
+	fill: #FFFFFF
+
 section#new-post #new-post-controls #send-post
 	text-align: center
 	text-transform: uppercase
 	font-weight: bold
 	font-size: 11px
-	padding: 2px 15px 0 15px
+	padding: 0 24px
 
 /*
  * Control de vistas
@@ -639,11 +654,13 @@ body.posts-view #box #post-list
 
 // .new-post-view
 
-body.new-post-view #box #side
+// body.new-post-view #box #side
 body.new-post-view #box #post-list
 	display: none
-body.new-post-view #box #new-post
-	display: block
+
+@media screen and (max-width: 480px)
+	body.new-post-view #box #new-post
+		display: block
 
 // .events-view
 
@@ -689,7 +706,7 @@ body.events-view #box #post-list
 		background: #222
 
 	::-webkit-scrollbar-thumb:window-inactive
-		background: #111
+		background: #181818
 
 @media screen and (max-width: 480px)
 	aside
@@ -765,10 +782,12 @@ body.events-view #box #post-list
 		margin: 0
 		height: 44px
 		padding: 0 44px
-		-webkit-appearance: none
-		width: 100vw
+		width: calc(100% - 88px)
 		font-family: 'Verdana'
 		text-align: center
+		-webkit-appearance: none
+		-moz-appearance: none
+		appearance: none
 	
 	input#title:focus
 	input#title:hover
