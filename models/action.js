@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var FB = require('fb');
 
-var ActionSchema = new Schema({
+var PostSchema = new Schema({
 	name: String,
 	geo: { type: [Number], index: '2d'},
 	media: String,
@@ -13,7 +13,7 @@ var ActionSchema = new Schema({
 	reportedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-ActionSchema.statics.getActions = function (req, callback, error) {
+PostSchema.statics.getPosts = function (req, callback, error) {
 	var resultsLimit = 20;
 	var queryNumber = 0;
 	if(req.params.i!=undefined) {
@@ -29,13 +29,13 @@ ActionSchema.statics.getActions = function (req, callback, error) {
 	})
 	.limit(resultsLimit)
 	.skip(resultsLimit * queryNumber)
-	.exec(function (err, action) {
+	.exec(function (err, posts) {
 		if (err) error();
-		callback(action);
+		callback(posts);
 	})
 }
 
-ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
+PostSchema.statics.sharePostOnFb = function (req, callback, error) {
 	var str = req.body; //req.body es 420.jpg
 	var res = str.split(".");
 	
@@ -57,14 +57,14 @@ ActionSchema.statics.shareActionOnFb = function (req, callback, error) {
 	);
 }
 
-ActionSchema.statics.reportAction = function (action, userId, callback, error) {
-	if(action.author.id != userId) {
+PostSchema.statics.reportPost = function (post, userId, callback, error) {
+	if(post.author.id != userId) {
 		var User = mongoose.model('User');
-		this.update({ _id: action.id }, { $push: { reportedBy: userId }}, function (err, doc) {
+		this.update({ _id: post.id }, { $push: { reportedBy: userId }}, function (err, doc) {
 			if (err) error();
 			console.log('accion reportada con éxito');
 			console.log(doc);
-			User.update({ _id: userId }, { $push: { reportedActions: action.id }}, function (err, doc) {
+			User.update({ _id: userId }, { $push: { reportedPosts: post.id }}, function (err, doc) {
 				if (err) error();
 				console.log('accion reportada referenciada a user');
 				console.log(doc);
@@ -74,9 +74,9 @@ ActionSchema.statics.reportAction = function (action, userId, callback, error) {
 	callback();
 }
 
-ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
-	if(action.author.id == userId) {
-		this.update({ _id: action.id }, { $set: { active: false }}, function (err, doc) {
+PostSchema.statics.deletePost = function (post, userId, callback, error) {
+	if(post.author.id == userId) {
+		this.update({ _id: post.id }, { $set: { active: false }}, function (err, doc) {
 			if (err) error();
 			console.log('accion borrada con éxito');
 			console.log(doc);
@@ -85,28 +85,28 @@ ActionSchema.statics.deleteAction = function (action, userId, callback, error) {
 	callback();
 }
 
-ActionSchema.statics.saveAction = function (action, userId, callback, error) {
-	if(action.author.id != userId) {
+PostSchema.statics.savePost = function (post, userId, callback, error) {
+	if(post.author.id != userId) {
 		var User = mongoose.model('User');
-		User.update({ _id: userId }, { $push: { savedActions: action.id }}, function (err, doc) {
+		User.update({ _id: userId }, { $push: { savedPosts: post.id }}, function (err, doc) {
 			if (err) error();
-			console.log('accion guardada con éxito en savedActions');
+			console.log('accion guardada con éxito en savedPosts');
 			console.log(doc);
 		});
 	}
 	callback();
 }
 
-ActionSchema.statics.unsaveAction = function (action, userId, callback, error) {
-	if(action.author.id != userId) {
+PostSchema.statics.unsavePost = function (post, userId, callback, error) {
+	if(post.author.id != userId) {
 		var User = mongoose.model('User');
-		User.update({ _id: userId }, { $pull: { savedActions: action.id }}, function (err, doc) {
+		User.update({ _id: userId }, { $pull: { savedPosts: post.id }}, function (err, doc) {
 			if (err) error();
-			console.log('accion removida de savedActions');
+			console.log('accion removida de savedPosts');
 			console.log(doc);
 		});
 	}
 	callback();
 }
 
-module.exports = mongoose.model('Action', ActionSchema);
+module.exports = mongoose.model('Post', PostSchema);

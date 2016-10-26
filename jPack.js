@@ -251,29 +251,29 @@ jPack.user.prototype.leaveEvent = function(eventId, next, error) {
 	});
 }
 
-jPack.showActions = function(userId, accessToken, actions, next) {
+jPack.showPosts = function(userId, accessToken, post, next) {
 	var posts = [];
-	var savedActions;
-	countActions = actions.length;
-	if(actions.length == 0) {
-		next(actions);
+	var savedPosts;
+	countPosts = post.length;
+	if(post.length == 0) {
+		next(post);
 	}
-	User.findById(userId, 'savedActions', function (err, user) {
-		savedActions = user.savedActions;
-		for(var i=0; i<actions.length; i++) {
+	User.findById(userId, 'savedPosts', function (err, user) {
+		savedPosts = user.savedPosts;
+		for(var i=0; i<post.length; i++) {
 			posts[i] = {};
-			posts[i].id = actions[i]._id;
-			getProviderId(actions[i].authorId, i);
-			if(actions[i].authorId == userId) {
+			posts[i].id = post[i]._id;
+			getProviderId(post[i].authorId, i);
+			if(post[i].authorId == userId) {
 				posts[i].edittable = true;
 			}
-			posts[i].tag = actions[i].name;
-			posts[i].time = actions[i].createdAt;
-			posts[i].media = './uploads/' + actions[i].media;
+			posts[i].tag = post[i].name;
+			posts[i].time = post[i].createdAt;
+			posts[i].media = './uploads/' + post[i].media;
 			posts[i].location = {};
-			posts[i].location.latitude = actions[i].geo[0];
-			posts[i].location.longitude = actions[i].geo[1];
-			if(savedActions.indexOf(posts[i].id) > -1) {
+			posts[i].location.latitude = post[i].geo[0];
+			posts[i].location.longitude = post[i].geo[1];
+			if(savedPosts.indexOf(posts[i].id) > -1) {
 				posts[i].saved = true;
 			} else {
 				posts[i].saved = false;
@@ -289,7 +289,7 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 	function getFBInfo(i, fbUserId, hexCode) {
 		FB.api('/v2.8/'+fbUserId+'?fields=first_name,last_name', {access_token: accessToken}, function(profile) {
 			posts[i].author = {};
-			posts[i].author.id = actions[i].authorId;
+			posts[i].author.id = post[i].authorId;
 			posts[i].author.firstName = profile.first_name;
 			posts[i].author.lastName = profile.last_name;
 			posts[i].author.hexCode = hexCode;
@@ -300,8 +300,8 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 		});
 	}
 	function triggerNext() {
-		countActions--;
-		if(countActions===0) {
+		countPosts--;
+		if(countPosts===0) {
 			posts.sort(function(a, b) {
 				var dateA = new Date(a.time), dateB = new Date(b.time);
 				return dateB - dateA;
@@ -310,6 +310,44 @@ jPack.showActions = function(userId, accessToken, actions, next) {
 			next(response);
 		}
 	}
+}
+
+jPack.checkTag = function(tag, next) {
+	var checkTag = false;
+	var pathRegExp = new RegExp(/[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]{3,}/g);
+	var tagName = pathRegExp.exec(tag);
+	if(tagName) {
+		checkTag = true;
+	}
+	simplifyName(tag, checkTag, next);
+}
+
+function simplifyName(name, checkTag, next) {
+	if(checkTag) {
+		var diacritics = [
+			{re:/[\xC0-\xC6]/g, ch:'A'},
+			{re:/[\xE0-\xE6]/g, ch:'a'},
+			{re:/[\xC8-\xCB]/g, ch:'E'},
+			{re:/[\xE8-\xEB]/g, ch:'e'},
+			{re:/[\xCC-\xCF]/g, ch:'I'},
+			{re:/[\xEC-\xEF]/g, ch:'i'},
+			{re:/[\xD2-\xD6]/g, ch:'O'},
+			{re:/[\xF2-\xF6]/g, ch:'o'},
+			{re:/[\xD9-\xDC]/g, ch:'U'},
+			{re:/[\xF9-\xFC]/g, ch:'u'},
+			{re:/[\xD1]/g, ch:'N'},
+			{re:/[\xF1]/g, ch:'n'},
+			{re:/[\307]/g, ch:'C'},
+			{re:/[\347]/g, ch:'c'}
+		];
+		for (var i = 0; i < diacritics.length; i++) {
+			name = name.replace(diacritics[i].re, diacritics[i].ch);
+		}
+		name = name.toLowerCase();
+	} else {
+		console.log('Tag NO PERMITIDO!');
+	}
+	next(name, checkTag);
 }
 
 /*jPack.validateTag = function(action, next, error) {

@@ -9,34 +9,37 @@ var ensureAuthenticated = expressJwt({secret : config.tokenSecret});
 //Modelos
 var User = require('../models/user');
 var Tag = require('../models/tag');
-var Action = require('../models/action');
+var Post = require('../models/action');
+
+var jPack = require('../jPack');
 
 router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media ');
 	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
 		if (req.params.action=='new') {
-			var pathRegExp = new RegExp(/([0-9A-Za-z%]{3,})/g);
-			var newTag = pathRegExp.exec(req.body.tag);
-			if (newTag) {
-				Tag.newAction(req, req.session.idMongoDb, function () {
-					res.status(201).end();
-				}, function(error) {
-					console.log(error);
+			jPack.checkTag(req.body.tag, function(tagSimple, checkTag) {
+				if(checkTag) {
+					req.body.tagSimple = tagSimple;
+					Tag.newPost(req, req.session.idMongoDb, function () {
+						res.status(201).end();
+					}, function(error) {
+						console.log(error);
+						res.status(400).end();
+					});
+				} else {
+					console.log('TAG no permitido');
 					res.status(400).end();
-				});
-			} else {
-				console.log('TAG no permitido');
-				res.status(400).end();
-			}
+				}
+			});
 		} else if (req.params.action=='shareActionOnFb') {
-			Action.shareActionOnFb(req, function() {
+			Post.sharePostOnFb(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		} else if (req.params.action=='reportAction') {
-			Action.reportAction(req.body, req.session.idMongoDb, function() {
+			Post.reportPost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
@@ -57,21 +60,21 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			}
 		} else if (req.params.action=='deleteAction') {
-			Action.deleteAction(req.body, req.session.idMongoDb, function() {
+			Post.deletePost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		} else if (req.params.action=='save') {
-			Action.saveAction(req.body, req.session.idMongoDb, function() {
+			Post.savePost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		} else if (req.params.action=='unsave') {
-			Action.unsaveAction(req.body, req.session.idMongoDb, function() {
+			Post.unsavePost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);

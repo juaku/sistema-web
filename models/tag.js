@@ -8,12 +8,11 @@ require('./user');
 
 var TagSchema = new Schema({
 	name: String,
-	originalName : String,
-	actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
+	posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
 	createdAt: {type: Date, default: Date.now}
 });
 
-TagSchema.statics.getActionsByTag = function (req, callback, error) {
+TagSchema.statics.getPostsByTag = function (req, callback, error) {
 	var resultsLimit = 20;
 	var queryNumber = 0;
 
@@ -38,14 +37,14 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	var tagName = simpleEventName.toLowerCase();
 	this.findOne({name: tagName})
 	.populate({
-		path: 'actions',
+		path: 'posts',
 		match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
 		options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
 	})
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
 		if(tag != null) {
-			callback(tag.actions);
+			callback(tag.posts);
 		} else {
 			console.log('NO EXISTE tal tag');
 			error();
@@ -53,57 +52,55 @@ TagSchema.statics.getActionsByTag = function (req, callback, error) {
 	})
 }
 
-TagSchema.statics.newAction = function (req, userId, callback, error) {
-	var Action = mongoose.model('Action');
+TagSchema.statics.newPost = function (req, userId, callback, error) {
+	var Post = mongoose.model('Post');
 	var User = mongoose.model('User');
-	var newAction = req.body;
-	var simpleTag = simplifyName(newAction.tag);
+	var newPost = req.body;
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
 	var FB = require('fb');
-	if( newAction.coords == undefined ) {
-		newAction.coords = {};
-		newAction.coords.latitude = -16.3989;
-		newAction.coords.longitude = -71.535;
+	if( newPost.coords == undefined ) {
+		newPost.coords = {};
+		newPost.coords.latitude = -16.3989;
+		newPost.coords.longitude = -71.535;
 	}
 	var coords = [];
-	coords[0] = newAction.coords.latitude;
-	coords[1] = newAction.coords.longitude;
-	this.findOne({name: simpleTag}, function(err, tag) {
+	coords[0] = newPost.coords.latitude;
+	coords[1] = newPost.coords.longitude;
+	this.findOne({name: newPost.tagSimple}, function(err, tag) {
 		var objectTag = tag;
-		saveMedia(newAction.media, mediaName, mediaExt);
+		saveMedia(newPost.media, mediaName, mediaExt);
 		if(err) throw(err);
 		console.log(coords);
-		var action = new Action({
-			name: newAction.tag,
+		var post = new Post({
+			name: newPost.tag,
 			geo: coords,
 			media: mediaName + '.' + mediaExt,
 			active: true,
 			authorId: userId
 		});
-		action.save(function(err) {
+		post.save(function(err) {
 			if(err) error();
-			User.update({ _id: userId }, { $push: { actions: action._id }}, function (err, doc) {
+			User.update({ _id: userId }, { $push: { posts: post._id }}, function (err, doc) {
 				if (err) error();
 				console.log('accion referenciada a user');
 				console.log(doc);
 			});
 			if(objectTag!= null) {
-				Action.update({ _id: action._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
+				Post.update({ _id: post._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
 					if (err) error();
 				});
-				objectTag.actions.push(action._id);
+				objectTag.posts.push(post._id);
 				objectTag.save();
 				console.log('Acción referenciada a tag');
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
-				tag.name = simpleTag;
-				tag.originalName = newAction.tag;
-				tag.actions = action._id;
+				tag.name = newPost.tagSimple;
+				tag.posts = post._id;
 				tag.save(function (err) {
 					if (err) error();
-					Action.update({ _id: action._id }, { $set: { tagId: tag._id }}, function (err, doc) {
+					Post.update({ _id: post._id }, { $set: { tagId: tag._id }}, function (err, doc) {
 						if (err) error();
 					});
 					console.log('Tag guardado y acción referenciada');
@@ -111,7 +108,7 @@ TagSchema.statics.newAction = function (req, userId, callback, error) {
 				callback();
 			}
 		});
-		if(newAction.shareOnFb) {
+		if(newPost.shareOnFb) {
 			var url = 'http://juaku-dev.cloudapp.net:3000/uploads/' + mediaName + '.' + mediaExt;
 			shareMediaOnFb(req, url);
 		}
@@ -146,44 +143,43 @@ TagSchema.statics.newAction = function (req, userId, callback, error) {
 	}
 }
 
-TagSchema.statics.editTag = function (action, userId, callback, error) {
-	var Action = mongoose.model('Action');
+TagSchema.statics.editTag = function (post, userId, callback, error) {
+	var Post = mongoose.model('Post');
 	var User = mongoose.model('User');
-	var newSimpleTag = simplifyName(action.tag);
-	var oldSimpleTag = simplifyName(action.oldTag);
+	var newSimpleTag = simplifyName(post.tag);
+	var oldSimpleTag = simplifyName(post.oldTag);
 	var FB = require('fb');
-	if(action.author.id == userId && oldSimpleTag != newSimpleTag && newSimpleTag != '' && newSimpleTag != undefined) {
-		//Remueve ACTION referenciada a TAG antiguo
-		this.update({ name: oldSimpleTag }, { $pull: { actions: action.id }}, function (err, doc) {
+	if(post.author.id == userId && oldSimpleTag != newSimpleTag && newSimpleTag != '' && newSimpleTag != undefined) {
+		//Remueve POST referenciado a TAG antiguo
+		this.update({ name: oldSimpleTag }, { $pull: { posts: post.id }}, function (err, doc) {
 			if (err) error();
 			console.log('accion removida de tag: ' + oldSimpleTag);
 			console.log(doc);
 		});
-		//Cambia nombre de TAG dentro de ACTION
-		Action.update({ _id: action.id }, { $set: { name: action.tag }}, function (err, doc) {
+		//Cambia nombre de TAG dentro de POST
+		Post.update({ _id: post.id }, { $set: { name: post.tag }}, function (err, doc) {
 			if (err) error();
-			console.log('Actualización de tag en action: ' + newSimpleTag);
+			console.log('Actualización de tag en post: ' + newSimpleTag);
 			console.log(doc);
 		});
-		//Referencia ACTION a nuevo TAG
+		//Referencia POST a nuevo TAG
 		this.findOne({name: newSimpleTag}, function(err, objectTag) {
 			if(err) throw err;
 			if(objectTag!= null) {
-				Action.update({ _id: action.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
+				Post.update({ _id: post.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
 					if (err) error();
 				});
-				objectTag.actions.push(action.id);
+				objectTag.posts.push(post.id);
 				objectTag.save();
 				console.log('Acción referenciada a tag');
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
 				tag.name = newSimpleTag;
-				tag.originalName = action.tag;
-				tag.actions = action.id;
+				tag.posts = post.id;
 				tag.save(function (err) {
 					if (err) error();
-					Action.update({ _id: action.id }, { $set: { tagId: tag._id }}, function (err, doc) {
+					Post.update({ _id: post.id }, { $set: { tagId: tag._id }}, function (err, doc) {
 						if (err) error();
 					});
 					console.log('Tag guardado y acción referenciada');

@@ -3,7 +3,7 @@ var router = express.Router();
 //Modelos
 var User = require('../models/user');
 var Tag = require('../models/tag');
-var Action = require('../models/action');
+var Post = require('../models/action');
 
 //Autenticación basada en JWT
 var config = require('../config');
@@ -22,8 +22,8 @@ router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
 		req.session.coords.latitude = -16.3989;
 		req.session.coords.longitude = -71.535;
 	}
-	Action.getActions(req, function (actions) {
-		jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+	Post.getPosts(req, function (posts) {
+		jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
 			if(posts.length == 0) {
 				res.status(204).end();
 			} else {
@@ -48,8 +48,8 @@ router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
 		req.session.path = path;
 		if(path[1]) {
 			if(path[2]) {
-				User.getActionsByChannel(req, function(actions) {
-					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+				User.getPostsByChannel(req, function(posts) {
+					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
 						res.json(posts);
 					});
 				}, function(error) {
@@ -57,8 +57,8 @@ router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
 					res.status(404).end();
 				});
 			} else {
-				User.getActionsByUser(req, function(actions) {
-					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+				User.getPostsByUser(req, function(posts) {
+					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
 						res.json(posts);
 					});
 				}, function(error) {
@@ -68,8 +68,8 @@ router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
 			}
 		} else {
 			if(path[2]) {
-				Tag.getActionsByTag(req, function(actions) {
-					jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, function(posts) {
+				Tag.getPostsByTag(req, function(posts) {
+					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
 						res.json(posts);
 					});
 				}, function(error) {
@@ -81,129 +81,6 @@ router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
 			}
 		}
 	}
-
-	/*if(req.params.action!=undefined) {
-		if(req.params.action=='actions') {
-			jPack.getAllPosts(req, function(result) {
-				if(result.length == 0) {
-			Action.getActions(req, function (actions, providerId, hexCode) {
-				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
-					if(posts.length == 0) {
-						res.status(204).end();
-					} else {
-						res.json(posts);
-					}
-				});
-			}, function(error) {
-				console.log(error);
-				res.status(400).end();
-			});
-		} else if(req.params.action=='trend') {
-			jPack.getTrends(req, function(result) {
-				if(result.length == 0) {
-					res.status(204).end();
-				} else {
-					res.json(result);
-				}
-			}, function(error) {
-				console.log(error);
-				res.status(400).end();
-			});
-		} else if(req.params.action=='tag') {
-			console.log('list.js');
-			Tag.getActionsByTag(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
-					res.json(posts);
-				});
-			}, function(error) {
-				console.log(error);
-				res.status(404).end();
-			});
-			jPack.getAllEvents(req, function(result) {
-				if(result.length == 0) {
-					res.status(204).end();
-				} else {
-					res.json(result);
-				}
-			}, function(error) {
-				console.log(error);
-				res.status(400).end();
-			});
-		} else if(req.params.action=='author') {
-			User.getActionsByAuthor(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
-					res.json(posts);
-				});
-			}, function(error) {
-				console.log(error);
-				res.status(404).end();
-			});
-		} else if(req.params.action=='channel') {
-			User.getActionsByChannel(req, function(actions, providerId, hexCode) {
-				jPack.showActions(req.session.idMongoDb, req.session.passport.user.accessToken, actions, providerId, hexCode, function(posts) {
-					res.json(posts);
-				});
-			}, function(error) {
-				console.log(error);
-				res.status(404).end();
-			});
-		}
-	}*/
 });
-
-/*router.get('/:action/:id?/:i?', ensureAuthenticated, function(req, res) {
-	console.log('Ingreso a enrutador avanzado')
-	if(req.params.action!=undefined) {
-		req.session.jUser = new jPack.user(req.session.jUser);
-		var jUser = req.session.jUser;
-		//POST
-		//if(req.params.filter=='post') {  //req.params.action puede ser: following, event, user, trend
-			if(req.params.action=='event') {
-				var Tag = mongoose.model('Tag');
-				Tag.getActionsByTag(req, function(actions) {
-					res.json(actions);
-				}, function(error) {
-					console.log(error);
-					res.status(400).end();
-				});
-			} else if(req.params.action=='author') {
-				var User = mongoose.model('User');
-				User.getActionsByAuthor(req, function(actions) {
-					res.json(actions);
-				}, function(error) {
-					console.log(error);
-					res.status(400).end();
-				});
-			}
-		//EVENT
-		} else if (req.params.filter=='event') {
-			if(req.params.action=='suggested') {
-				jUser.getSuggestedEvents('', req, function(result) {
-					res.json(result);
-				}, function(error) {
-					console.log(error);
-					res.status(400).end();
-				});
-			}
-		//USER
-		} else if (req.params.filter=='user') {
-			if(req.params.action=='followers') {
-				jUser.getFollowers(req, function(followers) {
-					res.json(followers);
-				}, function(error) {
-					res.status(400).end();
-					console.log(error);
-				});
-			} else if (req.params.action=='following') {
-				jUser.getFollowing(req, function(following) {
-					res.json(following);
-				}, function(error) {
-					res.status(400).end();
-					console.log(error);
-				});
-			}
-		}
-	}
-});*/
 
 module.exports = router;

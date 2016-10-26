@@ -11,10 +11,12 @@ var UserSchema = new Schema({
   provider: String,
   name: String,
   familyName: String,
+  originalName: String,
+  originalFamilyName: String,
   hexCode: String,
-  actions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
-  savedActions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
-  reportedActions : [{ type: Schema.Types.ObjectId, ref: 'Action' }],
+  posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+  savedPosts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
+  reportedPosts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   channels: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   createdAt: {type: Date, default: Date.now}
@@ -33,12 +35,16 @@ UserSchema.statics.signUp = function (req, callback, error) {
       fillReqSessionVariables(user, callback);
     } else {
       console.log('no esta logueado, se creara uno');
+      var name = simplifyName(req.user.name.givenName);
+      var familyName = simplifyName(req.user.name.familyName);
       var User = mongoose.model('User', UserSchema);
       var user = new User({
         providerId: req.user.id,
         provider: req.user.provider,
-        name: req.user.name.givenName,
-        familyName: req.user.name.familyName,
+        name: name,
+        familyName: familyName,
+        originalName: req.user.name.givenName,
+        originalFamilyName: req.user.name.familyName,
         hexCode: color
         //photo: profile.photos[0].value
       });
@@ -94,7 +100,7 @@ UserSchema.statics.getProfilePicture = function (req, callback) {
   });
 }
 
-UserSchema.statics.getActionsByUser = function (req, callback, error) {
+UserSchema.statics.getPostsByUser = function (req, callback, error) {
   var resultsLimit = 20;
   var queryNumber = 0;
 
@@ -107,14 +113,14 @@ UserSchema.statics.getActionsByUser = function (req, callback, error) {
   var nameuser = userId[1];
   this.findOne({hexCode: hexCode, name: nameuser})
   .populate({
-    path: 'actions savedActions',
+    path: 'posts savedPosts',
     match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
     options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
   })
   .exec(function (err, user) {
     if (err) return handleError(err);
     if(user != null) {
-      callback(user.actions);
+      callback(user.posts);
     } else {
       console.log('NO EXISTE tal autor');
       error();
@@ -122,7 +128,7 @@ UserSchema.statics.getActionsByUser = function (req, callback, error) {
   })
 }
 
-UserSchema.statics.getActionsByChannel = function (req, callback, error) {
+UserSchema.statics.getPostsByChannel = function (req, callback, error) {
   var User = mongoose.model('User');
   var Tag = mongoose.model('Tag');
 
@@ -157,7 +163,7 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
     if(tag!= null) {
       User.findOne({hexCode: hexCode, name: nameuser})
       .populate({
-        path: 'actions',
+        path: 'posts',
         match: { tagId: tag.id,
                  active: true,
                  geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
@@ -166,7 +172,7 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
       .exec(function (err, user) {
         if (err) return handleError(err);
         if(user != null) {
-          callback(user.actions);
+          callback(user.posts);
         } else {
           console.log('NO EXISTE tal autor');
           error();
@@ -177,6 +183,24 @@ UserSchema.statics.getActionsByChannel = function (req, callback, error) {
       error();
     }
   });
+}
+
+function simplifyName(userName) {
+  console.log('simplifyName ' + userName);
+  var diacritics =[
+    /[\300-\306]/g, /[\340-\346]/g,  // A, a
+    /[\310-\313]/g, /[\350-\353]/g,  // E, e
+    /[\314-\317]/g, /[\354-\357]/g,  // I, i
+    /[\322-\330]/g, /[\362-\370]/g,  // O, o
+    /[\331-\334]/g, /[\371-\374]/g,  // U, u
+    /[\321]/g, /[\361]/g, // N, n
+    /[\307]/g, /[\347]/g, // C, c
+  ];
+  var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
+  for (var i = 0; i < diacritics.length; i++) {
+    userName = userName.replace(diacritics[i],chars[i]);
+  }
+  return userName.toLowerCase();
 }
 
 module.exports = mongoose.model('User', UserSchema);
