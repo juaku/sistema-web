@@ -20,7 +20,7 @@ block content
         .user-userName af6.Rodrigo #{ user.userName }
         .user-displayName #{ user.displayName }
       section#account-controls
-        a(href="/logout") #{__('Logout')}
+        a(v-on:click="logout") #{__('Logout')}
         //section#events-side
           section#events-controls
             .promoted
@@ -82,10 +82,10 @@ block content
             h3.post-title(v-show="!post.tools")
               span(v-on:click="router(post.author.hexCode + '.' + post.author.firstName + '@' + post.tag, $event)" v-bind:style="[post.author.hexCode ? { backgroundColor: '#' + post.author.hexCode } : '' ]").author-hex-code
               a.author-name-link(href="" v-on:click="router(post.author.hexCode + '.' + post.author.firstName, $event)")
-                span.author-name {{ post.author.firstName }}
+                span.author-name {{ post.author.originalFirstName }}
               a.post-tag-link(href='' v-on:click="router('@' + post.tag, $event)")
                 span.at(v-show="post.tag") @
-                span(v-show="!post.editing" ng-model="newTag") {{post.tag}}
+                span(v-show="!post.editing" ng-model="newTag") {{post.originalTag}}
               span(v-show="post.editing")
                 input.event-name(type="text", ng-model="post.tag")
             time.post-time(v-bind:datetime="post.time") {{ post.timeFromNow }}

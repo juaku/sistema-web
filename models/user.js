@@ -159,7 +159,7 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
     simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
   }
   tagName = simpleEventName.toLowerCase();
-  Tag.findOne({ 'name': tagName }, '_id', function (err, tag) {
+  Tag.findOne({ 'tag': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
       User.findOne({hexCode: hexCode, name: nameuser})
       .populate({

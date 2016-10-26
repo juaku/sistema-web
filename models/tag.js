@@ -7,7 +7,7 @@ require('./action');
 require('./user');
 
 var TagSchema = new Schema({
-	name: String,
+	tag: String,
 	posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
 	createdAt: {type: Date, default: Date.now}
 });
@@ -15,27 +15,11 @@ var TagSchema = new Schema({
 TagSchema.statics.getPostsByTag = function (req, callback, error) {
 	var resultsLimit = 20;
 	var queryNumber = 0;
-
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
 	}
-
-	var simpleEventName = req.session.path[2];
-	var diacritics =[
-		/[\300-\306]/g, /[\340-\346]/g,  // A, a
-		/[\310-\313]/g, /[\350-\353]/g,  // E, e
-		/[\314-\317]/g, /[\354-\357]/g,  // I, i
-		/[\322-\330]/g, /[\362-\370]/g,  // O, o
-		/[\331-\334]/g, /[\371-\374]/g,  // U, u
-		/[\321]/g, /[\361]/g, // N, n
-		/[\307]/g, /[\347]/g, // C, c
-	];
-	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
-	for (var i = 0; i < diacritics.length; i++) {
-		simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
-	}
-	var tagName = simpleEventName.toLowerCase();
-	this.findOne({name: tagName})
+	var tag = req.session.path[2];
+	this.findOne({tag: tag})
 	.populate({
 		path: 'posts',
 		match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
@@ -67,13 +51,14 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 	var coords = [];
 	coords[0] = newPost.coords.latitude;
 	coords[1] = newPost.coords.longitude;
-	this.findOne({name: newPost.tagSimple}, function(err, tag) {
+	this.findOne({tag: newPost.tagSimple}, function(err, tag) {
 		var objectTag = tag;
 		saveMedia(newPost.media, mediaName, mediaExt);
 		if(err) throw(err);
 		console.log(coords);
 		var post = new Post({
-			name: newPost.tag,
+			tag: newPost.tagSimple,
+			originalTag: newPost.tag,
 			geo: coords,
 			media: mediaName + '.' + mediaExt,
 			active: true,
@@ -96,7 +81,7 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 			} else {
 				var Tag = mongoose.model('Tag', TagSchema);
 				var tag = new Tag();
-				tag.name = newPost.tagSimple;
+				tag.tag = newPost.tagSimple;
 				tag.posts = post._id;
 				tag.save(function (err) {
 					if (err) error();
