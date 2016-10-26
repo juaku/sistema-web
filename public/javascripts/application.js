@@ -303,6 +303,14 @@ var app = new Vue({
 		},
 		back: function() {
 			history.back();
+		},
+		logout: function() {
+			navigator.serviceWorker.getRegistrations().then(function(registrations) {
+				for(var registration of registrations) {
+					registration.unregister()
+				}
+			})
+			window.location = '/logout';
 		}
 	}
 });

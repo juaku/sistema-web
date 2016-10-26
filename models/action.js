@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 var FB = require('fb');
 
 var PostSchema = new Schema({
-	name: String,
+	tag: String,
+	originalTag: String,
 	geo: { type: [Number], index: '2d'},
 	media: String,
 	active: Boolean,

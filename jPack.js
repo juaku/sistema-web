@@ -267,7 +267,8 @@ jPack.showPosts = function(userId, accessToken, post, next) {
 			if(post[i].authorId == userId) {
 				posts[i].edittable = true;
 			}
-			posts[i].tag = post[i].name;
+			posts[i].tag = post[i].tag;
+			posts[i].originalTag = post[i].originalTag;
 			posts[i].time = post[i].createdAt;
 			posts[i].media = './uploads/' + post[i].media;
 			posts[i].location = {};
@@ -281,22 +282,22 @@ jPack.showPosts = function(userId, accessToken, post, next) {
 		}
 	});
 	function getProviderId(id, i) {
-		User.findById(id, 'providerId hexCode', function (err, user) {
+		User.findById(id, 'providerId hexCode name originalName familyName originalFamilyName', function (err, user) {
 			posts[i].fbId = user.providerId;
-			getFBInfo(i, posts[i].fbId, user.hexCode);
+			getFBInfo(i, posts[i].fbId, user.hexCode, user.name, user.originalName, user.familyName, user.originalFamilyName);
 		});
 	}
-	function getFBInfo(i, fbUserId, hexCode) {
-		FB.api('/v2.8/'+fbUserId+'?fields=first_name,last_name', {access_token: accessToken}, function(profile) {
-			posts[i].author = {};
-			posts[i].author.id = post[i].authorId;
-			posts[i].author.firstName = profile.first_name;
-			posts[i].author.lastName = profile.last_name;
-			posts[i].author.hexCode = hexCode;
-			FB.api('/v2.8/'+fbUserId+'?fields=picture.width(200).height(200)',  function(res) {
-				posts[i].author.picture= res.picture.data.url;
-				triggerNext();
-			});
+	function getFBInfo(i, fbUserId, hexCode, name, originalName, familyName, originalFamilyName) {
+		posts[i].author = {};
+		posts[i].author.id = post[i].authorId;
+		posts[i].author.hexCode = hexCode;
+		posts[i].author.originalFirstName = originalName;
+		posts[i].author.originalLastName = originalFamilyName;
+		posts[i].author.firstName = name;
+		posts[i].author.lastName = familyName;
+		FB.api('/v2.8/'+fbUserId+'?fields=picture.width(200).height(200)',  function(res) {
+			posts[i].author.picture= res.picture.data.url;
+			triggerNext();
 		});
 	}
 	function triggerNext() {
