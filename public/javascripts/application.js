@@ -53,7 +53,7 @@ function postsLoaded() {
 	// Restringe el uso de espacios, @ y cualquier otro caracter que no esté en la expresión regular al escribir el nombre del evento
 	//
 	$(".post-tag").bind('keypress', function(event) {
-		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+");
+		var regex = new RegExp("[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß]+");
 		var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
 		if (!regex.test(key)) {
 			event.preventDefault();
@@ -96,6 +96,9 @@ var app = new Vue({
 	},
 	methods: {
 		router: function(route, event) {
+			if(route) {
+				route = decodeURI(route);
+			}
 			if(event) {
 				event.preventDefault();
 			}
@@ -320,6 +323,16 @@ var app = new Vue({
 });
 
 function query(route, next, error) {
+	if(route) {
+		validateName(route, function(routeSimple) {
+			route = routeSimple;
+		}, function(e) {
+			console.log('URL no permitida');
+			window.location = '/logout'; // TODO: ¿Qué hacer con estos errores?
+		});
+	}
+	console.log('route!!');
+	console.log(route);
 	app.$http.get('/list/' + [route, queryStart].join('/')).then(function(res) {
 		next(res.body.posts);
 	}, function(res)  {
@@ -376,8 +389,79 @@ function scrollTo(object, nextObject) {
 	});
 }
 
+function validateName(pathname, next, error) {
+	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?(?:@([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?$|^([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+	var path = pathRegExp.exec(pathname);
+	var userId, hexCode, nameUser, tagName, channelRequest, userRequest, tagRequest;
+	if(path[0]) {
+		if(path[1]) {
+			if(path[2]) {
+				//Channel
+				userId = path[1].split('.')
+				hexCode = userId[1];
+				simplifyName(userId[1], function(nameuser) {
+					nameuser = nameuser;
+					simplifyName(path[2], function(tagName) {
+						tagName = tagName
+						channelRequest = hexCode + '.' + nameuser + '@' + tagName;
+						next(channelRequest);
+					});
+				});
+			} else {
+				//User
+				userId = path[1].split('.')
+				simplifyName(userId[0], function(hexCode) {
+					hexCode = hexCode;
+					simplifyName(userId[1], function(nameuser) {
+						nameuser = nameuser;
+						userRequest = hexCode + '.' + nameuser;
+						next(userRequest);
+					});
+				});
+			}
+		} else {
+			if(path[2]) {
+				//Tag
+				simplifyName(path[2], function(tag){
+					tagRequest = '@' + tag;
+					next(tagRequest);
+				});
+			} else if(path[3]) {
+				console.log('Tag path[3]');
+			}
+		}
+	} else {
+		console.log('No permitido');
+		error();
+	}
+}
+
+function simplifyName(name, next) {
+	console.log('simplifyName');
+	var diacritics = [
+		{re:/[\xC0-\xC6]/g, ch:'A'},
+		{re:/[\xE0-\xE6]/g, ch:'a'},
+		{re:/[\xC8-\xCB]/g, ch:'E'},
+		{re:/[\xE8-\xEB]/g, ch:'e'},
+		{re:/[\xCC-\xCF]/g, ch:'I'},
+		{re:/[\xEC-\xEF]/g, ch:'i'},
+		{re:/[\xD2-\xD6]/g, ch:'O'},
+		{re:/[\xF2-\xF6]/g, ch:'o'},
+		{re:/[\xD9-\xDC]/g, ch:'U'},
+		{re:/[\xF9-\xFC]/g, ch:'u'},
+		{re:/[\xD1]/g, ch:'N'},
+		{re:/[\xF1]/g, ch:'n'},
+		{re:/[\307]/g, ch:'C'},
+		{re:/[\347]/g, ch:'c'}
+	];
+	for (var i = 0; i < diacritics.length; i++) {
+		name = name.replace(diacritics[i].re, diacritics[i].ch);
+	}
+	next(name.toLowerCase());
+}
+
 app.router(window.location.pathname.substring(1));
-/*
+
 if ('serviceWorker' in navigator) {
 	console.log('CLIENT: service worker registration in progress.');
 	navigator.serviceWorker.register('/service-worker.js').then(function() {
@@ -387,7 +471,7 @@ if ('serviceWorker' in navigator) {
 	});
 } else {
 	console.log('CLIENT: service worker is not supported.');
-}*/
+}
 
 //
 // Framework Angular

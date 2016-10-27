@@ -107,10 +107,9 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   if(req.params.i!=undefined) {
     queryNumber = parseInt(req.params.i);
   }
-
-  var userId = req.session.path[1].split('.')
-  var hexCode = userId[0];
-  var nameuser = userId[1];
+  var path = req.session.path.split('.')
+  var hexCode = path[0];
+  var nameuser = path[1];
   this.findOne({hexCode: hexCode, name: nameuser})
   .populate({
     path: 'posts savedPosts',
@@ -139,26 +138,11 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
     queryNumber = parseInt(req.params.i);
   }
 
-  var userId = req.session.path[1].split('.')
-  var hexCode = userId[0];
-  var nameuser = userId[1];
-  var tagName = req.session.path[2];
+  var path = req.session.path.split('.')
+  var hexCode = path[0];
+  var nameuser = path[1];
+  var tagName = path[2];
 
-  var simpleEventName = tagName;
-  var diacritics =[
-    /[\300-\306]/g, /[\340-\346]/g,  // A, a
-    /[\310-\313]/g, /[\350-\353]/g,  // E, e
-    /[\314-\317]/g, /[\354-\357]/g,  // I, i
-    /[\322-\330]/g, /[\362-\370]/g,  // O, o
-    /[\331-\334]/g, /[\371-\374]/g,  // U, u
-    /[\321]/g, /[\361]/g, // N, n
-    /[\307]/g, /[\347]/g, // C, c
-  ];
-  var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
-  for (var i = 0; i < diacritics.length; i++) {
-    simpleEventName = simpleEventName.replace(diacritics[i],chars[i]);
-  }
-  tagName = simpleEventName.toLowerCase();
   Tag.findOne({ 'tag': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
       User.findOne({hexCode: hexCode, name: nameuser})

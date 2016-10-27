@@ -17,19 +17,17 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media ');
 	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
 		if (req.params.action=='new') {
-			jPack.checkTag(req.body.tag, function(tagSimple, checkTag) {
-				if(checkTag) {
-					req.body.tagSimple = tagSimple;
-					Tag.newPost(req, req.session.idMongoDb, function () {
-						res.status(201).end();
-					}, function(error) {
-						console.log(error);
-						res.status(400).end();
-					});
-				} else {
-					console.log('TAG no permitido');
+			jPack.checkTag(req.body.tag, function(tagSimple) {
+				req.body.tagSimple = tagSimple;
+				Tag.newPost(req, req.session.idMongoDb, function () {
+					res.status(201).end();
+				}, function(error) {
+					console.log(error);
 					res.status(400).end();
-				}
+				});
+			}, function(e) {
+				console.log('TAG no permitido');
+				res.status(400).end();
 			});
 		} else if (req.params.action=='shareActionOnFb') {
 			Post.sharePostOnFb(req, function() {

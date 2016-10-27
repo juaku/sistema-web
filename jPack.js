@@ -313,42 +313,90 @@ jPack.showPosts = function(userId, accessToken, post, next) {
 	}
 }
 
-jPack.checkTag = function(tag, next) {
-	var checkTag = false;
-	var pathRegExp = new RegExp(/[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]{3,}/g);
-	var tagName = pathRegExp.exec(tag);
-	if(tagName) {
-		checkTag = true;
+jPack.validateName = function(pathname, next, error) {
+	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?(?:@([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?$|^([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+	var path = pathRegExp.exec(pathname);
+	var userId, hexCode, nameUser, tagName, channelRequest, userRequest, tagRequest, type;
+	if(path[0]) {
+		if(path[1]) {
+			if(path[2]) {
+				//Channel
+				userId = path[1].split('.')
+				hexCode = userId[0];
+				simplifyName(userId[1], function(nameuser) {
+					nameuser = nameuser;
+					simplifyName(path[2], function(tagName) {
+						tagName = tagName
+						channelRequest = hexCode + '.' + nameuser + '.' + tagName;
+						type = 'channel';
+						next(channelRequest, type);
+					});
+				});
+			} else {
+				//User
+				userId = path[1].split('.')
+				simplifyName(userId[0], function(hexCode) {
+					hexCode = hexCode;
+					simplifyName(userId[1], function(nameuser) {
+						nameuser = nameuser;
+						userRequest = hexCode + '.' + nameuser;
+						type = 'user';
+						next(userRequest, type);
+					});
+				});
+			}
+		} else {
+			if(path[2]) {
+				//Tag
+				simplifyName(path[2], function(tag){
+					tagName = tag;
+					type = 'tag';
+					next(tagName, type);
+				});
+			} else if(path[3]) {
+				console.log('Tag path[3]');
+			}
+		}
+	} else {
+		console.log('No permitido');
+		error();
 	}
-	simplifyName(tag, checkTag, next);
 }
 
-function simplifyName(name, checkTag, next) {
-	if(checkTag) {
-		var diacritics = [
-			{re:/[\xC0-\xC6]/g, ch:'A'},
-			{re:/[\xE0-\xE6]/g, ch:'a'},
-			{re:/[\xC8-\xCB]/g, ch:'E'},
-			{re:/[\xE8-\xEB]/g, ch:'e'},
-			{re:/[\xCC-\xCF]/g, ch:'I'},
-			{re:/[\xEC-\xEF]/g, ch:'i'},
-			{re:/[\xD2-\xD6]/g, ch:'O'},
-			{re:/[\xF2-\xF6]/g, ch:'o'},
-			{re:/[\xD9-\xDC]/g, ch:'U'},
-			{re:/[\xF9-\xFC]/g, ch:'u'},
-			{re:/[\xD1]/g, ch:'N'},
-			{re:/[\xF1]/g, ch:'n'},
-			{re:/[\307]/g, ch:'C'},
-			{re:/[\347]/g, ch:'c'}
-		];
-		for (var i = 0; i < diacritics.length; i++) {
-			name = name.replace(diacritics[i].re, diacritics[i].ch);
-		}
-		name = name.toLowerCase();
+jPack.checkTag = function(tag, next, error) {
+	var pathRegExp = new RegExp(/[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß]{3,}/g);
+	var tagName = pathRegExp.exec(tag);
+	if(tagName) {
+		simplifyName(tag, function(tag) {
+			next(tag);
+		});
 	} else {
-		console.log('Tag NO PERMITIDO!');
+		console.log('No permitido');
+		error();
 	}
-	next(name, checkTag);
+}
+
+function simplifyName(name, next) {
+	var diacritics = [
+		{re:/[\xC0-\xC6]/g, ch:'A'},
+		{re:/[\xE0-\xE6]/g, ch:'a'},
+		{re:/[\xC8-\xCB]/g, ch:'E'},
+		{re:/[\xE8-\xEB]/g, ch:'e'},
+		{re:/[\xCC-\xCF]/g, ch:'I'},
+		{re:/[\xEC-\xEF]/g, ch:'i'},
+		{re:/[\xD2-\xD6]/g, ch:'O'},
+		{re:/[\xF2-\xF6]/g, ch:'o'},
+		{re:/[\xD9-\xDC]/g, ch:'U'},
+		{re:/[\xF9-\xFC]/g, ch:'u'},
+		{re:/[\xD1]/g, ch:'N'},
+		{re:/[\xF1]/g, ch:'n'},
+		{re:/[\307]/g, ch:'C'},
+		{re:/[\347]/g, ch:'c'}
+	];
+	for (var i = 0; i < diacritics.length; i++) {
+		name = name.replace(diacritics[i].re, diacritics[i].ch);
+	}
+	next(name.toLowerCase());
 }
 
 /*jPack.validateTag = function(action, next, error) {

@@ -37,50 +37,45 @@ router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
 });
 
 router.get('/:pathname?/:i?', ensureAuthenticated, function(req, res) {
-	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-z%]{3,}))?(?:@([0-9A-Za-z%]{3,}))?$|^([0-9A-Za-z%]{3,})$/g);
-	var path = pathRegExp.exec(req.params.pathname);
 	if(req.session.coords == undefined) { // Arequipa
 		req.session.coords = {};
 		req.session.coords.latitude = -16.3989;
 		req.session.coords.longitude = -71.535;
 	}
-	if(path[0]) {
-		req.session.path = path;
-		if(path[1]) {
-			if(path[2]) {
-				User.getPostsByChannel(req, function(posts) {
-					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
-						res.json(posts);
-					});
-				}, function(error) {
-					console.log(error);
-					res.status(404).end();
+	jPack.validateName(req.params.pathname, function(pathSimple, type) {
+		req.session.path = pathSimple;
+		if(type == 'channel') {
+			User.getPostsByChannel(req, function(posts) {
+				jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
+					res.json(posts);
 				});
-			} else {
-				User.getPostsByUser(req, function(posts) {
-					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
-						res.json(posts);
-					});
-				}, function(error) {
-					console.log(error);
-					res.status(404).end();
+			}, function(error) {
+				console.log(error);
+				res.status(404).end();
+			});
+		} else if(type == 'user') {
+			User.getPostsByUser(req, function(posts) {
+				jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
+					res.json(posts);
 				});
-			}
-		} else {
-			if(path[2]) {
-				Tag.getPostsByTag(req, function(posts) {
-					jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
-						res.json(posts);
-					});
-				}, function(error) {
-					console.log(error);
-					res.status(404).end();
+			}, function(error) {
+				console.log(error);
+				res.status(404).end();
+			});
+		} else if(type == 'tag') {
+			Tag.getPostsByTag(req, function(posts) {
+				jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
+					res.json(posts);
 				});
-			} else if(path[3]) {
-				console.log('Tag');
-			}
+			}, function(error) {
+				console.log(error);
+				res.status(404).end();
+			});
 		}
-	}
+	}, function(e) {
+		console.log('URL no permitida');
+		res.status(400).end();
+	});
 });
 
 module.exports = router;

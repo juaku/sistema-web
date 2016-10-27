@@ -14,7 +14,7 @@ router.get('/', function(req, res) {
 	}
 });
 
-router.get('/:tag(@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+)', function(req, res) {
+router.get('/:tag(@[A-Z0-9a-z%]+)', function(req, res) {
 	if (req.isAuthenticated()) {
 		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.tag, reqType: 'tag', token: req.session.token });
 	} else {
@@ -22,7 +22,7 @@ router.get('/:tag(@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõ�
 	}
 });
 
-router.get('/:author([0-9a-fA-F]{3}(\.+[a-zA-Z]+))', function(req, res) {
+router.get('/:author([0-9a-fA-F]{3}(\.+[a-z0-9A-Z%]+))', function(req, res) {
 	if (req.isAuthenticated()) {
 		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.author, reqType: 'author', token: req.session.token });
 	} else {
@@ -30,7 +30,7 @@ router.get('/:author([0-9a-fA-F]{3}(\.+[a-zA-Z]+))', function(req, res) {
 	}
 });
 
-router.get('/:channel(([0-9a-fA-F]{3}(\.+[a-zA-Z]+)@[A-Z0-9a-záéíóúàèìòùäëïöüÿâêîôûçœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇŒÃÕÑß]+))', function(req, res) {
+router.get('/:channel(([0-9a-fA-F]{3}(\.+[a-z0-9A-Z%]+)@[A-Z0-9a-z%]+))', function(req, res) {
 	if (req.isAuthenticated()) {
 		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.channel, reqType: 'channel', token: req.session.token });
 	} else {

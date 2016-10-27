@@ -18,7 +18,7 @@ TagSchema.statics.getPostsByTag = function (req, callback, error) {
 	if(req.params.i!=undefined) {
 		queryNumber = parseInt(req.params.i);
 	}
-	var tag = req.session.path[2];
+	var tag = req.session.path;
 	this.findOne({tag: tag})
 	.populate({
 		path: 'posts',
