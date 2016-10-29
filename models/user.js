@@ -9,95 +9,99 @@ require('./tag');
 var UserSchema = new Schema({
   providerId: {type: String, unique: true},
   provider: String,
-  name: String,
-  familyName: String,
-  originalName: String,
-  originalFamilyName: String,
+  firstName: String,
+  lastName: String,
+  originalFirstName: String,
+  originalLastName: String,
   hexCode: String,
   posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   savedPosts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   reportedPosts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   channels: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   blockedUsers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-  createdAt: {type: Date, default: Date.now}
+  createdAt: {type: Date, default: Date.now},
+  profilePic: String
 });
 
 UserSchema.statics.signUp = function (req, callback, error) {
   this.findOne({providerId: req.user.id}, function(err, user) {
+    var currentUser = user;
     if(err) throw(err);
     var letters = '0123456789abcdef'.split('');
     var color = '';
     for (var i = 0; i < 3; i++ ) {
       color += letters[Math.floor(Math.random() * 16)];
     }
-    if(!err && user!= null) {
-      console.log('el usuario ya se enuentra logueado');
-      fillReqSessionVariables(user, callback);
-    } else {
-      console.log('no esta logueado, se creara uno');
-      var name = simplifyName(req.user.name.givenName);
-      var familyName = simplifyName(req.user.name.familyName);
-      var User = mongoose.model('User', UserSchema);
-      var user = new User({
-        providerId: req.user.id,
-        provider: req.user.provider,
-        name: name,
-        familyName: familyName,
-        originalName: req.user.name.givenName,
-        originalFamilyName: req.user.name.familyName,
-        hexCode: color
-        //photo: profile.photos[0].value
-      });
-      user.save(function(err) {
-        if(err) throw err;
-        console.log('Se logueo al usuario satisfoctoriamente');
-        fillReqSessionVariables(user, callback);
-      });
-    }
+    FB.api('/v2.8/'+ req.user.id +'?fields=picture.width(200).height(200)',  function(response) {
+      console.log(response);
+      var profilePic = response.picture.data.url;
+      var getImg = function(o, cb){
+        var port = o.port || 80;
+        var parsed = url.parse(o.url);
+        var options = {
+          host: parsed.hostname,
+          port: port,
+          path: parsed.path
+        };
+        http.get(options, function(res) {
+          res.setEncoding('binary');
+          var imagedata = '';
+          res.on('data', function(chunk){
+            imagedata+= chunk;
+          });
+          res.on('end', function(){
+            fs.writeFile(o.dest, imagedata, 'binary', cb);
+          });
+        }).on('error', function(e) {
+            console.log("Got error: " + e.message);
+          });
+      }
+      getImg({
+        url: profilePic,
+        dest: "./public/images/profPic"+req.session.id+".png"
+      },function(err){
+        if(!err && currentUser!= null) {
+          console.log('el usuario ya se enuentra logueado');
+          var User = mongoose.model('User');
+          User.update({ _id: currentUser.id }, { $set: { profilePic: profilePic }}, function (err, doc) {
+            if (err) error();
+            fillReqSessionVariables(currentUser, callback);
+          });
+        } else {
+          console.log('no esta logueado, se creara uno');
+          var firstName = simplifyName(req.user.name.givenName);
+          var lastName = simplifyName(req.user.name.familyName);
+          var User = mongoose.model('User', UserSchema);
+          var user = new User({
+            providerId: req.user.id,
+            provider: req.user.provider,
+            firstName: firstName,
+            lastName: lastName,
+            originalFirstName: req.user.name.givenName,
+            originalLastName: req.user.name.familyName,
+            hexCode: color,
+            profilePic: profilePic
+            //photo: profile.photos[0].value
+          });
+          user.save(function(err) {
+            if(err) throw err;
+            console.log('Se logueo al usuario satisfoctoriamente');
+            fillReqSessionVariables(user, callback);
+          });
+        }
+      })
+    });
   });
   function fillReqSessionVariables(user, callback) {
+    req.user.picture = user.profilePic;
+    req.user.name.hexCode = user.hexCode;
     req.session.idMongoDb = user.id;
-    req.session.name = user.name;
-    req.session.familyName = user.familyName;
+    req.session.firstName = user.firstName;
+    req.session.lastName = user.lastName;
     req.session.hexCode = user.hexCode;
+    req.session.profilePic = user.profilePic;
     callback();
   }
-}
-
-UserSchema.statics.getProfilePicture = function (req, callback) {
-  var profilePic;
-  var idProfile = req.session.passport.user.id;
-  FB.api('/v2.8/'+idProfile+'?fields=picture.width(200).height(200)',  function(response) {
-    profilePic = response.picture.data.url;
-    var getImg = function(o, cb){
-      var port = o.port || 80;
-      var parsed = url.parse(o.url);
-      var options = {
-        host: parsed.hostname,
-        port: port,
-        path: parsed.path
-      };
-      http.get(options, function(res) {
-        res.setEncoding('binary');
-        var imagedata = '';
-        res.on('data', function(chunk){
-          imagedata+= chunk;
-        });
-        res.on('end', function(){
-          fs.writeFile(o.dest, imagedata, 'binary', cb);
-        });
-      }).on('error', function(e) {
-          console.log("Got error: " + e.message);
-        });
-    }
-    getImg({
-      url: profilePic,
-      dest: "./public/images/profPic"+req.session.id+".png"
-    },function(err){
-      req.session.passport.user.picture = profilePic;
-      callback();
-    })
-  });
 }
 
 UserSchema.statics.getPostsByUser = function (req, callback, error) {
@@ -109,8 +113,8 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   }
   var path = req.session.path.split('.')
   var hexCode = path[0];
-  var nameuser = path[1];
-  this.findOne({hexCode: hexCode, name: nameuser})
+  var firstName = path[1];
+  this.findOne({hexCode: hexCode, firstName: firstName})
   .populate({
     path: 'posts savedPosts',
     match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
@@ -140,12 +144,12 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
 
   var path = req.session.path.split('.')
   var hexCode = path[0];
-  var nameuser = path[1];
+  var firstName = path[1];
   var tagName = path[2];
 
   Tag.findOne({ 'tag': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
-      User.findOne({hexCode: hexCode, name: nameuser})
+      User.findOne({hexCode: hexCode, firstName: firstName})
       .populate({
         path: 'posts',
         match: { tagId: tag.id,
