@@ -1,21 +1,19 @@
 @import 'nib'
 
 /*
- * Variables
- * ---------
- *
- *
- *
- * Colores
- *
- 
+	Variables
+*/
+
 whiteColor	= #FFF
 lightColor	= #EEE
-midColor		= #888
-darkColor		= #202020
-mainColor		= #F05
-fbColor			= #3b5998
-*/
+grayColor	= #DDD
+midColor	= #888
+deepColor	= #181818
+darkColor	= #222
+dimColor	= #333
+mainColor	= #F05
+fbColor		= #3b5998
+blackColor	= #000
 
 /* 
 	Estilos generales
@@ -38,9 +36,9 @@ body
 
 body
 	margin: 0
-	background-color: #000//EEE /*#F7F7F7*/ /* EEE */
+	background-color: whiteColor /*#EEE*/ /*#F7F7F7*/
 	font-family: "Arial"
-	color: #FFF//000
+	color: blackColor
 
 section#view-controls
 	position: fixed
@@ -59,8 +57,8 @@ input#title
 	outline: 0
 	border: 0
 	border-radius: 0
-	background-color: #000
-	color: #FFF//000
+	background-color: whiteColor
+	color: blackColor
 	display: block
 	text-align: right
 	position: absolute
@@ -83,24 +81,20 @@ input[type="search"]::-webkit-search-results-button,
 input[type="search"]::-webkit-search-results-decoration
 	display: none
 
-input#title
-	color: #FFF
-
 input#title:hover
-	background-color: #222
-	// color: rgba(255,255,255,0.5) Se ve mal
+	background-color: lightColor
 
 input#title:focus
-	background-color: #222
-	color: #FFF
+	background-color: lightColor
+	color: blackColor
 
 input#title
 	+placeholder()
-		color: #FFF
+		color: blackColor
 		
 input#title:hover
 	+placeholder()
-		color: rgba(255,255,255,0.5)
+		color: rgba(0,0,0,0.5)
 
 input#title:focus
 input#title:focus:hover
@@ -187,7 +181,7 @@ main
 	font-size: 1.5em
 
 #account .user-displayName
-	color: #888
+	color: midColor
 
 #account-controls
 	position: fixed
@@ -206,6 +200,7 @@ main
 	max-height: 54vw
 	min-width: 30vw
 	min-height: 30vw
+	cursor: pointer
 
 #start a#logo-link
 	display: block
@@ -239,12 +234,12 @@ main
 	width: 82vh
 	max-width: 54vw
 	// margin-bottom: 3vh
-	border-bottom: 3vh solid #181818
+	border-bottom: 3vh solid lightColor
 	min-width: 30vw
 	position: relative
 
 .post .media
-	background-color: #222//F7F7F7 /* CCC */
+	background-color: lightColor
 	width: 100%
 	height: 82vh
 	max-width: 54vw
@@ -284,7 +279,8 @@ main
 */
 
 .info
-	background-color: #000//FFF
+	background-color: blackColor
+	color: whiteColor
 	width: 100%
 	height: 15vmin // Evaluar si sirve. Probar 12vmin
 	min-height: 72px // 64px
@@ -329,7 +325,7 @@ main
 
 .info .post-time
 	font-size: 1.75vmin
-	color: #888
+	color: midColor
 	// letter-spacing: -0.02em
 
 .info .save-button
@@ -342,17 +338,14 @@ main
 
 .info a.save-post-link .save
 	display: block
-	background-color: #555//CCC
+	background-color: midColor
 	border-radius: 50%
 	width: 100%
 	transition: background-color 200ms, border-color 200ms
 
 .info a.save-post-link.saved .save
-	background-color: #222//CCC
-	border-color: #333
-
-#end
-	display: none
+	background-color: lightColor
+	border-color: grayColor
 	
 #end.show
 	display: block
@@ -360,7 +353,6 @@ main
 #end #endMessage
 	text-align: center
 	margin: 5vh 0 8vh 0
-	color: #FFF//EEE
 
 svg#svg-library
 	display: none
@@ -549,7 +541,7 @@ section#new-post
 section#new-post canvas#new-media-preview
 	width: 100%
 	height: 100vw
-	background-color: #333
+	background-color: grayColor
 	display: block
 
 section#new-post #new-post-controls
@@ -582,8 +574,8 @@ section#new-post #new-post-controls #post-name-input label.at-simbol
 	font-family: 'Verdana', sans-serif
 
 section#new-post #new-post-controls #post-name-input input#new-tag
-	background-color: #222
-	color: #FFF
+	background-color: lightColor
+	color: blackColor
 	width: calc(100% - 36px)
 	border: none
 	padding: 0 8px 0 28px
@@ -600,18 +592,18 @@ section#new-post #new-post-controls #post-name-input input#new-tag
 
 section#new-post #new-post-controls #post-name-input input#new-tag:focus 
 section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
-	background-color: #333
+	background-color: grayColor
 
 section#new-post #new-post-controls #post-name-input input#new-tag
 	+placeholder()
-		color: #888
+		color: midColor
 
 section#new-post #new-post-controls #share
 	width: 44px
 	height: 44px
 
 section#new-post #new-post-controls #share a.share-icon
-	background-color: #222
+	background-color: whiteColor
 	width: 24px
 	height: 24px
 	padding: 10px
@@ -620,10 +612,10 @@ section#new-post #new-post-controls #share a.share-icon
 	transition: background-color 200ms
 
 section#new-post #new-post-controls #share a#share-fb.share #back
-	fill: #3B5998
+	fill: fbColor
 
 section#new-post #new-post-controls #share a#share-fb.share #f
-	fill: #FFFFFF
+	fill: darkColor
 
 section#new-post #new-post-controls #send-post
 	text-align: center
@@ -631,6 +623,7 @@ section#new-post #new-post-controls #send-post
 	font-weight: bold
 	font-size: 11px
 	padding: 0 24px
+
 
 /*
  * Control de vistas
@@ -700,13 +693,13 @@ body.events-view #box #post-list
 		width: 20px
 
 	::-webkit-scrollbar-track
-		background: #000
+		background: whiteColor
 
 	::-webkit-scrollbar-thumb 
-		background: #222
+		background: lightColor
 
 	::-webkit-scrollbar-thumb:window-inactive
-		background: #181818
+		background: deepColor
 
 @media screen and (max-width: 480px)
 	aside
@@ -717,7 +710,6 @@ body.events-view #box #post-list
 		box-shadow: 0 -4px 16px rgba(0,0,0,0.1)
 		height: 44px
 		position: absolute
-		background-color: #000//FFF
 		overflow: hidden
 	
 	aside.show
@@ -744,7 +736,7 @@ body.events-view #box #post-list
 		content: ''
 		width: 64%
 		height: 64%
-		background-color: #F05
+		background-color: mainColor
 		position: absolute
 		margin: 18%
 		border-radius: 50%
@@ -768,8 +760,8 @@ body.events-view #box #post-list
 		position: absolute
 		top: 15px
 		right: 10px
-		border-top: 4px solid #333
-		border-left: 4px solid #333
+		border-top: 4px solid midColor
+		border-left: 4px solid midColor
 		transform: translate(-20%, 20%) rotate(45deg)
 		transition: transform 200ms
 
@@ -791,13 +783,13 @@ body.events-view #box #post-list
 	
 	input#title:focus
 	input#title:hover
-		background-color: #000
-		color: #FFF
+		background-color: whiteColor
+		color: blackColor
 
 	input#title:hover
 		+placeholder()
-			background-color: #000
-			color: #FFF
+			background-color: whiteColor
+			color: blackColor
 
 	/*#account img.user-picture
 		margin: 0.375em
@@ -869,3 +861,75 @@ body.events-view #box #post-list
 	
 	.info .post-time
 		font-size: 12px
+
+/*
+	Temas
+
+*/
+
+body.dark
+body.dark input#title
+input#title:focus
+input#title:hover
+	background-color: blackColor
+	color: whiteColor
+
+input#title:hover
+	+placeholder()
+		background-color: blackColor
+		color: whiteColor
+
+body.dark input#title:hover
+	background-color: darkColor
+
+body.dark input#title:focus
+	background-color: darkColor
+	color: whiteColor
+
+body.dark input#title
+	+placeholder()
+		color: whiteColor
+		
+body.dark input#title:hover
+	+placeholder()
+		color: rgba(255,255,255,0.5)
+	
+body.dark .post
+	border-bottom-color: deepColor
+
+body.dark .post .media
+	background-color: darkColor
+
+body.dark .info a.save-post-link.saved .save
+	background-color: darkColor
+	border-color: dimColor
+
+body.dark section#new-post canvas#new-media-preview
+	background-color: dimColor
+
+body.dark section#new-post #new-post-controls #post-name-input input#new-tag
+	background-color: darkColor
+	color: whiteColor
+
+body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus 
+body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
+	background-color: dimColor
+
+body.dark section#new-post #new-post-controls #share a.share-icon
+	background-color: darkColor
+
+body.dark section#new-post #new-post-controls #share a#share-fb.share #f
+	fill: whiteColor
+
+.dark::-webkit-scrollbar 
+	width: 20px
+
+.dark::-webkit-scrollbar-track
+	background: blackColor
+
+.dark::-webkit-scrollbar-thumb 
+	background: darkColor
+
+.dark::-webkit-scrollbar-thumb:window-inactive
+	background: deepColor
+

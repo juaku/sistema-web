@@ -67,6 +67,7 @@ $(document).scroll(function() {
 
 var gettingPosts = false;
 var sendingPost = false;
+var endOfList = false;
 var queryStart = 0;
 var numEmptyPosts = 0;
 
@@ -107,6 +108,8 @@ var app = new Vue({
 			var newRoute = route;
 			var pushToHistory = false;
 			if(route == undefined) {
+				if(endOfList)
+					return;
 				queryStart++;
 				var emptyPosts = createEmptyPosts(1);
 				for(post in emptyPosts) {
@@ -115,6 +118,7 @@ var app = new Vue({
 				newRoute = this.route;
 			} else {
 				queryStart = 0;
+				endOfList = false;
 				this.posts = createEmptyPosts(3);
 				if(this.route == null) {
 					pushToHistory =  false;
@@ -161,6 +165,11 @@ var app = new Vue({
 						}
 					}
 				}
+
+				if(!data || data.length < 10) {
+					endOfList = true;
+					$('#end').addClass('show');
+				}
 				
 				while(numEmptyPosts > 0) {
 					app.posts.pop();
@@ -173,7 +182,7 @@ var app = new Vue({
 
 				next();
 			}, function(e) {
-				app.router('');
+				// app.router(''); Bucle
 				// window.location = '/logout'; // TODO: ¿Qué hacer con estos errores?
 				error();
 			});
@@ -181,7 +190,6 @@ var app = new Vue({
 		reload: function() {
 			window.location = '/';
 		},
-
 		scroll: function() {
 			checkScroll('main');
 		},
@@ -311,12 +319,25 @@ var app = new Vue({
 		back: function() {
 			history.back();
 		},
-		logout: function() {
-			navigator.serviceWorker.getRegistrations().then(function(registrations) {
-				for(var registration of registrations) {
-					registration.unregister()
-				}
+		changeTheme: function(event) {
+			$('body').toggleClass('dark');
+		},
+		setGeo: function() {
+			getGeo(function(coords) {
+				app.$http.post('/user/setgeo', coords).then(function() {
+				}, function(){
+				});
+			}, function() {
 			})
+		},
+		logout: function() {
+			if(navigator.serviceWorker) {
+				navigator.serviceWorker.getRegistrations().then(function(registrations) {
+					for (var i = 0; i < registrations.length; i++) {
+						registrations[i].unregister();
+					}
+				})
+			}
 			window.location = '/logout';
 		}
 	}
@@ -460,6 +481,7 @@ function simplifyName(name, next) {
 	next(name.toLowerCase());
 }
 
+app.setGeo();
 app.router(window.location.pathname.substring(1));
 
 if ('serviceWorker' in navigator) {
@@ -546,51 +568,46 @@ if ('serviceWorker' in navigator) {
 // }
 // 	// Geo
 // 	//
-// 	function getGeo(next, error) {
-// 		if (navigator.geolocation) {
-// 			var position = 0;
-// 			next(); 
-// 			// TODO: HTTPS
-// 			/*			
-// 			navigator.geolocation.getCurrentPosition(function(position) {
-// 				var coords = {};
-// 				coords.accuracy = position.coords.accuracy;
-// 				coords.altitude = position.coords.altitude;
-// 				coords.altitudeAccuracy = position.coords.altitudeAccuracy;
-// 				coords.heading = position.coords.heading;
-// 				coords.latitude = position.coords.latitude;
-// 				coords.longitude = position.coords.longitude;
-// 				coords.speed = position.coords.speed;
-// 				$scope.user.data.coords = coords;
-// 				$scope.newAction.coords = coords;
-// 				console.log('coords: ' + coords.latitude);
-// 				next(); 
-// 			}, function(errorObj) {
-// 				var errorMsg = "";
-// 				switch(errorObj.code) {
-// 					case errorObj.PERMISSION_DENIED:
-// 						errorMsg = "User denied the request for Geolocation."
-// 						break;
-// 					case errorObj.POSITION_UNAVAILABLE:
-// 						errorMsg = "Location information is unavailable."
-// 						break;
-// 					case errorObj.TIMEOUT:
-// 						errorMsg = "The request to get user location timed out."
-// 						break;
-// 					case errorObj.UNKNOWN_ERROR:
-// 						errorMsg = "An unknown error occurred."
-// 						break;
-// 				}
-// 				// TODO: Manejar error 
-// 				alert('Mal! ' + errorMsg);
-// 				error(errorMsg);
-// 			});
-// 			*/
-// 		} else {
-// 			error("Geolocation is not supported by this browser.");
-// 		}
-// 	}
-// }
+function getGeo(next, error) {
+	if (navigator.geolocation) {
+		var position = 0;		
+		navigator.geolocation.getCurrentPosition(function(position) {
+			var coords = {};
+			coords.accuracy = position.coords.accuracy;
+			coords.altitude = position.coords.altitude;
+			coords.altitudeAccuracy = position.coords.altitudeAccuracy;
+			coords.heading = position.coords.heading;
+			coords.latitude = position.coords.latitude;
+			coords.longitude = position.coords.longitude;
+			coords.speed = position.coords.speed;
+			//$scope.user.data.coords = coords;
+			//$scope.newAction.coords = coords;
+			console.log(coords);
+			next(coords); 
+		}, function(errorObj) {
+			var errorMsg = "";
+			switch(errorObj.code) {
+				case errorObj.PERMISSION_DENIED:
+					errorMsg = "User denied the request for Geolocation."
+					break;
+				case errorObj.POSITION_UNAVAILABLE:
+					errorMsg = "Location information is unavailable."
+					break;
+				case errorObj.TIMEOUT:
+					errorMsg = "The request to get user location timed out."
+					break;
+				case errorObj.UNKNOWN_ERROR:
+					errorMsg = "An unknown error occurred."
+					break;
+			}
+			// TODO: Manejar error 
+			alert('Mal! ' + errorMsg);
+			error(errorMsg);
+		});
+	} else {
+		error("Geolocation is not supported by this browser.");
+	}
+}
 
 // .filter('capitalize', function() {
 // 	return function(input) {
