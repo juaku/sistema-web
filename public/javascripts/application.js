@@ -398,11 +398,11 @@ function validateName(pathname, next, error) {
 			if(path[2]) {
 				//Channel
 				userId = path[1].split('.')
-				hexCode = userId[1];
+				hexCode = userId[0];
 				simplifyName(userId[1], function(nameuser) {
 					nameuser = nameuser;
 					simplifyName(path[2], function(tagName) {
-						tagName = tagName
+						tagName = tagName;
 						channelRequest = hexCode + '.' + nameuser + '@' + tagName;
 						next(channelRequest);
 					});
@@ -411,7 +411,7 @@ function validateName(pathname, next, error) {
 				//User
 				userId = path[1].split('.')
 				simplifyName(userId[0], function(hexCode) {
-					hexCode = hexCode;
+					hexCode = userId[0];;
 					simplifyName(userId[1], function(nameuser) {
 						nameuser = nameuser;
 						userRequest = hexCode + '.' + nameuser;

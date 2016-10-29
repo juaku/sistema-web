@@ -17,8 +17,8 @@ block content
       section#account
         a.user-link
           img(src=user.picture).user-picture
-        .user-userName af6.Rodrigo #{ user.userName }
-        .user-displayName #{ user.displayName }
+        .user-userName #{ user.name.hexCode}.#{user.name.givenName }
+        .user-displayName #{ user.name.familyName }
       section#account-controls
         a(v-on:click="logout") #{__('Logout')}
         //section#events-side

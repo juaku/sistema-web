@@ -87,9 +87,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	// Loguear al usuario
 	var User = mongoose.model('User');
 	User.signUp(req, function() {
-		User.getProfilePicture(req, function() {
-			res.render('access', { user: req.user});
-		});
+		res.render('access', { user: req.user});
 	}, function(error) {
 		res.redirect('/login');
 	});
