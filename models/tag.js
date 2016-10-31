@@ -22,8 +22,10 @@ TagSchema.statics.getPostsByTag = function (req, callback, error) {
 	this.findOne({tag: tag})
 	.populate({
 		path: 'posts',
-		match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
-		options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
+		match: {
+			active: true, geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
+			},
+		options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
 	})
 	.exec(function (err, tag) {
 		if (err) return handleError(err);

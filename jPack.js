@@ -937,8 +937,10 @@ jPack.user.prototype.unBlockUser = function(userToBlock, next, error) {
  */ 
 jPack.setGenericData = function(req, next, error) {
 	// TODO: Evaluar
-	this.coords = req.body.data.coords;
-	req.session.coords = this.coords;
+	console.log('asignando ubición actual');
+	req.session.coords = {};
+	req.session.coords.latitude = req.body.latitude;
+	req.session.coords.longitude = req.body.longitude;
 	next();
 }
 

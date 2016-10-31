@@ -32,8 +32,7 @@ UserSchema.statics.signUp = function (req, callback, error) {
     for (var i = 0; i < 3; i++ ) {
       color += letters[Math.floor(Math.random() * 16)];
     }
-    FB.api('/v2.8/'+ req.user.id +'?fields=picture.width(200).height(200)',  function(response) {
-      console.log(response);
+    FB.api('/v2.8/'+ req.user.id +'?fields=picture.width(200).height(200)', {access_token: req.user.accessToken}, function(response) {
       var profilePic = response.picture.data.url;
       var getImg = function(o, cb){
         var port = o.port || 80;
@@ -56,40 +55,40 @@ UserSchema.statics.signUp = function (req, callback, error) {
             console.log("Got error: " + e.message);
           });
       }
-      getImg({
-        url: profilePic,
-        dest: "./public/images/profPic"+req.session.id+".png"
-      },function(err){
-        if(!err && currentUser!= null) {
-          console.log('el usuario ya se enuentra logueado');
-          var User = mongoose.model('User');
-          User.update({ _id: currentUser.id }, { $set: { profilePic: profilePic }}, function (err, doc) {
-            if (err) error();
-            fillReqSessionVariables(currentUser, callback);
-          });
-        } else {
-          console.log('no esta logueado, se creara uno');
-          var firstName = simplifyName(req.user.name.givenName);
-          var lastName = simplifyName(req.user.name.familyName);
-          var User = mongoose.model('User', UserSchema);
-          var user = new User({
-            providerId: req.user.id,
-            provider: req.user.provider,
-            firstName: firstName,
-            lastName: lastName,
-            originalFirstName: req.user.name.givenName,
-            originalLastName: req.user.name.familyName,
-            hexCode: color,
-            profilePic: profilePic
-            //photo: profile.photos[0].value
-          });
-          user.save(function(err) {
-            if(err) throw err;
-            console.log('Se logueo al usuario satisfoctoriamente');
-            fillReqSessionVariables(user, callback);
-          });
-        }
-      })
+      if(!err && currentUser!= null) {
+        console.log('el usuario ya se enuentra logueado');
+        var User = mongoose.model('User');
+        User.update({ _id: currentUser.id }, { $set: { profilePic: profilePic }}, function (err, doc) {
+          if (err) error();
+          fillReqSessionVariables(currentUser, callback);
+        });
+      } else {
+        console.log('no esta logueado, se creara uno');
+        var firstName = simplifyName(req.user.name.givenName);
+        var lastName = simplifyName(req.user.name.familyName);
+        var User = mongoose.model('User', UserSchema);
+        var user = new User({
+          providerId: req.user.id,
+          provider: req.user.provider,
+          firstName: firstName,
+          lastName: lastName,
+          originalFirstName: req.user.name.givenName,
+          originalLastName: req.user.name.familyName,
+          hexCode: color,
+          profilePic: profilePic
+          //photo: profile.photos[0].value
+        });
+        user.save(function(err) {
+          if(err) throw err;
+          getImg({
+            url: profilePic,
+            dest: "./public/images/profPic"+req.session.id+".png"
+          },function(err){
+          })
+          console.log('Se logueo al usuario satisfoctoriamente');
+          fillReqSessionVariables(user, callback);
+        });
+      }
     });
   });
   function fillReqSessionVariables(user, callback) {
@@ -117,8 +116,10 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   this.findOne({hexCode: hexCode, firstName: firstName})
   .populate({
     path: 'posts savedPosts',
-    match: {active: true, geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
-    options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
+    match: {
+      active: true, geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
+    },
+    options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
   })
   .exec(function (err, user) {
     if (err) return handleError(err);
@@ -154,8 +155,9 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
         path: 'posts',
         match: { tagId: tag.id,
                  active: true,
-                 geo: {$near: {$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}}}},
-        options: {skip: resultsLimit*queryNumber, limit: resultsLimit}
+                 geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
+               },
+        options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
       })
       .exec(function (err, user) {
         if (err) return handleError(err);

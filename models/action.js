@@ -22,12 +22,9 @@ PostSchema.statics.getPosts = function (req, callback, error) {
 	}
 	this.find({
 		active: true,
-		geo: {
-			$near: {
-				$geometry: {type: "Point",  coordinates: [req.session.coords.longitude, req.session.coords.latitude]}
-			}
-		}
+		geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
 	})
+	.sort({createdAt: -1})
 	.limit(resultsLimit)
 	.skip(resultsLimit * queryNumber)
 	.exec(function (err, posts) {

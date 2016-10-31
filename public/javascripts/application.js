@@ -299,13 +299,18 @@ var app = new Vue({
 							var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
 							var imgQuality = mobile?0.5:0.75;
 							var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
-
+							getGeo(function(coords) {
+								app.newPost.media = newImg;
+								app.newPost.coords = {};
+								app.newPost.coords.latitude = coords.latitude;
+								app.newPost.coords.longitude = coords.longitude;
+							}, function() {
+							});
 							//getGeo( function() {
 							//	$('#positionMap img').attr('src','http://maps.googleapis.com/maps/api/staticmap?zoom=15&size=500x100&markers=color:red|' + $scope.newAction.coords.latitude + ',' + $scope.newAction.coords.longitude);
 							//}, function(errorMsg) {
 							//	console.log(errorMsg);
 							//});
-							app.newPost.media = newImg;
 						}
 						img.src = event.target.result;
 					}
@@ -324,7 +329,7 @@ var app = new Vue({
 		},
 		setGeo: function() {
 			getGeo(function(coords) {
-				app.$http.post('/user/setgeo', coords).then(function() {
+				app.$http.post('/user/setGeo', coords).then(function() {
 				}, function(){
 				});
 			}, function() {
