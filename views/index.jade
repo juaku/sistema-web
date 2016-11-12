@@ -52,6 +52,7 @@ block content
       // New Post
       //
       input.needsclick(type="file" id="media-loader" accept="image/*" v-on:change="setNewMedia($event)")
+      #newSendPost
       section#new-post.post
         canvas#new-media-preview(v-on:click="assistedScroll")
         #new-post-controls

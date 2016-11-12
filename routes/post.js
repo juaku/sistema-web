@@ -19,8 +19,8 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 		if (req.params.action=='new') {
 			jPack.checkTag(req.body.tag, function(tagSimple) {
 				req.body.tagSimple = tagSimple;
-				Tag.newPost(req, req.session.idMongoDb, function () {
-					res.status(201).end();
+				Tag.newPost(req, req.session.idMongoDb, function (mediaName) {
+					res.json(mediaName);
 				}, function(error) {
 					console.log(error);
 					res.status(400).end();
@@ -65,8 +65,10 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='save') {
-			Post.savePost(req.body, req.session.idMongoDb, function() {
-				res.status(201).end();
+			Post.savePost(req.body, req.session.idMongoDb, function(post) {
+				var channel = req.session.hexCode + '.' + req.session.firstName + '@' + post.tag;
+				post.channelTo = channel;
+				res.json(post);
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();

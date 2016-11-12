@@ -92,7 +92,7 @@ PostSchema.statics.savePost = function (post, userId, callback, error) {
 			console.log(doc);
 		});
 	}
-	callback();
+	callback(post);
 }
 
 PostSchema.statics.unsavePost = function (post, userId, callback, error) {

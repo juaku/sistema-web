@@ -81,7 +81,7 @@ router.get('/', ensureAuthenticated, function(req, res) {
 	req.session.token = jwt.sign(
 		{ id: req.user.id },
 		config.tokenSecret,
-		{ expiresIn : 60*60*24*2 /* 2 Días */}
+		{ expiresIn : 60*60*24*15 /* 15 Días */}
   	);
 
 	// Loguear al usuario

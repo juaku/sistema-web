@@ -72,28 +72,28 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 				if (err) error();
 				console.log('accion referenciada a user');
 				console.log(doc);
-			});
-			if(objectTag!= null) {
-				Post.update({ _id: post._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
-					if (err) error();
-				});
-				objectTag.posts.push(post._id);
-				objectTag.save();
-				console.log('Acción referenciada a tag');
-			} else {
-				var Tag = mongoose.model('Tag', TagSchema);
-				var tag = new Tag();
-				tag.tag = newPost.tagSimple;
-				tag.posts = post._id;
-				tag.save(function (err) {
-					if (err) error();
-					Post.update({ _id: post._id }, { $set: { tagId: tag._id }}, function (err, doc) {
+				if(objectTag!= null) {
+					Post.update({ _id: post._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
 						if (err) error();
 					});
-					console.log('Tag guardado y acción referenciada');
-				});
-				callback();
-			}
+					objectTag.posts.push(post._id);
+					objectTag.save();
+					console.log('Acción referenciada a tag');
+				} else {
+					var Tag = mongoose.model('Tag', TagSchema);
+					var tag = new Tag();
+					tag.tag = newPost.tagSimple;
+					tag.posts = post._id;
+					tag.save(function (err) {
+						if (err) error();
+						Post.update({ _id: post._id }, { $set: { tagId: tag._id }}, function (err, doc) {
+							if (err) error();
+						});
+						console.log('Tag guardado y acción referenciada');
+					});
+				}
+				callback(mediaName);
+			});
 		});
 		if(newPost.shareOnFb) {
 			var url = 'http://juaku-dev.cloudapp.net:3000/uploads/' + mediaName + '.' + mediaExt;
