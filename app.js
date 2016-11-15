@@ -91,7 +91,7 @@ app.use(cookieParser());
 app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 	host: 'localhost',
 	port: '6379'
-}), cookie: { path: '/', maxAge: 1000*60*60*24*2 }, // 2 Días
+}), cookie: { path: '/', maxAge: 1000*60*60*24*15 }, // 15 Días
 	resave: false,
 	saveUninitialized: false
 }));

@@ -1,12 +1,21 @@
 // 	/*
 // 	 * Framework socket.io
 // 	 */
-// 	/*var socket = io();
-// 	socket.on('newEvent', function() {
-// 		$scope.showEvents();
-// 	});
-// 	*/
-// }
+	var socket = io();
+
+	socket.on('newEvent', function() {
+		$scope.showEvents();
+	});
+
+	socket.on('showPost', function(media) {
+		var html = "<img src='/uploads/" + media  + " ' " + " alt='Nueva Imagen' width='70%' height='70%'>";
+		document.getElementById('newSendPost').innerHTML = html;
+	});
+
+	socket.on('showInChannel', function(media) {
+		var html = "<img src=' " + media  + " ' " + " alt='Nueva Imagen' width='70%' height='70%'>";
+		document.getElementById('newSendPost').innerHTML = html;
+	});
 
 var EMPTY_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
@@ -202,8 +211,8 @@ var app = new Vue({
 				if(!sendingPost) {
 					sendingPost = true;
 					this.$http.post('/post/new', this.newPost).then(function(data) {
+						socket.emit('showPost', data.body);
 						sendingPost = false;
-						alert('Post enviado')
 						$('body').removeClass('new-post-view');
 					}, function(res)  {
 						$('body').removeClass('new-post-view');
@@ -229,8 +238,8 @@ var app = new Vue({
 		toggleSavePost: function(post) {
 			if (!post.saved) {
 	 			post.saved = true;
-	 			console.log(post);
 	 			this.$http.post('/post/save', post).then(function(data) {
+					socket.emit('showPostSaved', data.body);
 	 			},function(e) {
 	 			});
 	 		} else {
@@ -360,6 +369,7 @@ function query(route, next, error) {
 	console.log('route!!');
 	console.log(route);
 	app.$http.get('/list/' + [route, queryStart].join('/')).then(function(res) {
+		socket.emit('joinChannel', route);
 		next(res.body.posts);
 	}, function(res)  {
 		error(res);

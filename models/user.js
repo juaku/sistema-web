@@ -115,7 +115,7 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   var firstName = path[1];
   this.findOne({hexCode: hexCode, firstName: firstName})
   .populate({
-    path: 'posts savedPosts',
+    path: 'posts',
     match: {
       active: true, geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
     },
@@ -152,7 +152,7 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
     if(tag!= null) {
       User.findOne({hexCode: hexCode, firstName: firstName})
       .populate({
-        path: 'posts',
+        path: 'posts savedPosts',
         match: { tagId: tag.id,
                  active: true,
                  geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
@@ -162,7 +162,8 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
       .exec(function (err, user) {
         if (err) return handleError(err);
         if(user != null) {
-          callback(user.posts);
+          var posts = user.posts.concat(user.savedPosts);
+          callback(posts);
         } else {
           console.log('NO EXISTE tal autor');
           error();
