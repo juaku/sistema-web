@@ -97,7 +97,8 @@ block content
             a(v-on:click="toggleSavePost(post)" v-bind:class="{ saved: post.saved }").save-post-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save
       section#end
-        #endMessage #{__('Llegaste al final de ')} {{ route }}
+        #endMessage(v-if="route") #{__('Llegaste al final de ')} {{ route }}
+        #endMessage(v-else) #{__('Llegaste al final')} {{ route }}
   //
   //  Librería SVG
   //

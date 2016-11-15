@@ -346,6 +346,9 @@ main
 .info a.save-post-link.saved .save
 	background-color: lightColor
 	border-color: grayColor
+
+#end
+	display: none
 	
 #end.show
 	display: block
@@ -683,6 +686,14 @@ body.events-view #box #post-list
 @media screen and (min-width: 481px)
 	@keyframes preloader
 		0%
+			box-shadow: 0 0 0 0 rgba(0,0,0,0)
+		50%
+			box-shadow: 0 0 0 1vw rgba(0,0,0,0.1)
+		100%
+			box-shadow: 0 0 0 1vw rgba(0,0,0,0.05)
+	
+	@keyframes preloaderDark
+		0%
 			box-shadow: 0 0 0 0 rgba(255,255,255,0)
 		50%
 			box-shadow: 0 0 0 1vw rgba(255,255,255,0.1)
@@ -780,7 +791,7 @@ body.events-view #box #post-list
 		-webkit-appearance: none
 		-moz-appearance: none
 		appearance: none
-	
+
 	input#title:focus
 	input#title:hover
 		background-color: whiteColor
@@ -799,6 +810,10 @@ body.events-view #box #post-list
 		font-size: 4.5vw
 		transition: font-size 100ms
 	
+	.info
+		background-color: whiteColor
+		color: blackColor
+
 	.info .author-picture
 		width: 20%
 		padding: 2.5%
@@ -826,8 +841,20 @@ body.events-view #box #post-list
 
 	.post
 		max-width: inherit
+
+	.dark .info
+		background-color: blackColor
+		color: whiteColor
 	
 	@keyframes preloader
+		0%
+			box-shadow: 0 0 0 0 rgba(0,0,0,0)
+		50%
+			box-shadow: 0 0 0 3vw rgba(0,0,0,0.1)
+		100%
+			box-shadow: 0 0 0 3vw rgba(0,0,0,0.05)
+	
+	@keyframes preloaderDark
 		0%
 			box-shadow: 0 0 0 0 rgba(255,255,255,0)
 		50%
@@ -869,14 +896,12 @@ body.events-view #box #post-list
 
 body.dark
 body.dark input#title
-input#title:focus
-input#title:hover
 	background-color: blackColor
 	color: whiteColor
 
-input#title:hover
+body.dark input#title:hover
 	+placeholder()
-		background-color: blackColor
+		background-color: darkColor
 		color: whiteColor
 
 body.dark input#title:hover
@@ -899,6 +924,9 @@ body.dark .post
 
 body.dark .post .media
 	background-color: darkColor
+	
+body.dark .post .media .preloader-animation
+	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
 body.dark .info a.save-post-link.saved .save
 	background-color: darkColor
@@ -932,4 +960,3 @@ body.dark section#new-post #new-post-controls #share a#share-fb.share #f
 
 .dark::-webkit-scrollbar-thumb:window-inactive
 	background: deepColor
-
