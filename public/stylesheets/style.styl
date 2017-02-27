@@ -4,16 +4,16 @@
 	Variables
 */
 
-whiteColor	= #FFF
-lightColor	= #EEE
-grayColor	= #DDD
-midColor	= #888
-deepColor	= #181818
-darkColor	= #222
-dimColor	= #333
 mainColor	= #F05
-fbColor		= #3b5998
-blackColor	= #000
+backColor	= #000
+back1Color	= #222
+back2Color	= #333
+midColor	= #888
+front2Color	= #DDD
+front1Color	= #EEE
+frontColor	= #FFF
+aux1color	= #181818
+auxFbColor	= #3b5998
 
 /* 
 	Estilos generales
@@ -36,9 +36,17 @@ body
 
 body
 	margin: 0
-	background-color: whiteColor /*#EEE*/ /*#F7F7F7*/
+	background-color: backColor /*#EEE*/ /*#F7F7F7*/
 	font-family: "Arial"
-	color: blackColor
+	color: frontColor
+
+/* TODO: Decidir si inculir - regular selección de algunos elementos
+::selection
+	background: rgba(255,0,85,.99) // Seleccion sin opacidad: 1=auto-opacidad
+	color: backColor
+	mix-blend-mode: normal
+	opacity: 1
+*/
 
 section#view-controls
 	position: fixed
@@ -57,8 +65,8 @@ input#title
 	outline: 0
 	border: 0
 	border-radius: 0
-	background-color: whiteColor
-	color: blackColor
+	background-color: backColor
+	color: frontColor
 	display: block
 	text-align: right
 	position: absolute
@@ -82,15 +90,15 @@ input[type="search"]::-webkit-search-results-decoration
 	display: none
 
 input#title:hover
-	background-color: lightColor
+	background-color: back1Color
 
 input#title:focus
-	background-color: lightColor
-	color: blackColor
+	background-color: back1Color
+	color: frontColor
 
 input#title
 	+placeholder()
-		color: blackColor
+		color: frontColor
 		
 input#title:hover
 	+placeholder()
@@ -100,35 +108,6 @@ input#title:focus
 input#title:focus:hover
 	+placeholder()
 		color: transparent
-
-/* = to x Animation
-#more:before,
-#more:after
-	content: ''
-	width: 20px
-	height: 2px
-	position: absolute
-	right: 12px
-	background-color: #AAA
-	transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
-				bottom 200ms cubic-bezier(0.4, 0, 0.2, 1)
-
-#more:after
-	bottom: 18px
-
-#more:before
-	bottom: 24px
-
-section#view-controls.show #more:before
-section#view-controls.show #more:after
-	bottom: 21px
-	transform: rotate(-45deg)
-	transition: transform 200ms 200ms cubic-bezier(0.4, 0, 0.2, 1),
-				bottom 200ms cubic-bezier(0.4, 0, 0.2, 1)
-
-section#view-controls.show #more:after
-	transform: rotate(45deg)
-*/
 
 h3
 	font-weight: normal
@@ -151,7 +130,6 @@ h3
 main
 	display: table-cell
 	width: 56vw
-
 
 /* Estilos modulares */
 		
@@ -234,12 +212,12 @@ main
 	width: 82vh
 	max-width: 54vw
 	// margin-bottom: 3vh
-	border-bottom: 3vh solid lightColor
+	border-bottom: 3vh solid back1Color
 	min-width: 30vw
 	position: relative
 
 .post .media
-	background-color: lightColor
+	background-color: backColor
 	width: 100%
 	height: 82vh
 	max-width: 54vw
@@ -253,10 +231,13 @@ main
 	height: 100%
 	display: block
 	opacity: 0
-	transition: opacity 200ms
+	transition: opacity 100ms
 	user-select: none
 	// cursor: pointer
 
+.post .media.loaded
+	background-color: #000
+	
 .post .media.loaded img
 	opacity: 1
 
@@ -279,8 +260,8 @@ main
 */
 
 .info
-	background-color: blackColor
-	color: whiteColor
+	background-color: backColor
+	color: frontColor
 	width: 100%
 	height: 15vmin // Evaluar si sirve. Probar 12vmin
 	min-height: 72px // 64px
@@ -294,7 +275,7 @@ main
 	vertical-align: middle
 
 .info .author-picture
-	width: 18%
+	width: 19%
 	padding: 2.5%
 
 .info .author-picture img
@@ -329,8 +310,8 @@ main
 	// letter-spacing: -0.02em
 
 .info .save-button
-	width: 18%
-	padding: 4%
+	width: 19%
+	padding: 2.5%
 
 .info a.save-post-link
 	display: block
@@ -340,12 +321,21 @@ main
 	display: block
 	background-color: midColor
 	border-radius: 50%
-	width: 100%
-	transition: background-color 200ms, border-color 200ms
+	width: 57%
+	margin: 0 auto
+	transition: background-color 100ms
+	transition-timing-function: ease-out
 
 .info a.save-post-link.saved .save
-	background-color: lightColor
-	border-color: grayColor
+	background-color: back1Color
+	border-color: back2Color
+
+.post.tools .media img
+	opacity: .5
+	
+.post.tools .info a.save-post-link .save
+	background-color: back1Color
+	//width: 50%
 
 #end
 	display: none
@@ -425,7 +415,7 @@ section#account-controls section#profile h2
 
 /*section#account-controls section#profile h2.profile-name .profile-firstname
 	font-size: 24px
-	color: blackColor*/
+	color: frontColor*/
 
 /*
  * Vista
@@ -544,7 +534,7 @@ section#new-post
 section#new-post canvas#new-media-preview
 	width: 100%
 	height: 100vw
-	background-color: grayColor
+	background-color: back2Color
 	display: block
 
 section#new-post #new-post-controls
@@ -577,8 +567,8 @@ section#new-post #new-post-controls #post-name-input label.at-simbol
 	font-family: 'Verdana', sans-serif
 
 section#new-post #new-post-controls #post-name-input input#new-tag
-	background-color: lightColor
-	color: blackColor
+	background-color: back1Color
+	color: frontColor
 	width: calc(100% - 36px)
 	border: none
 	padding: 0 8px 0 28px
@@ -595,7 +585,7 @@ section#new-post #new-post-controls #post-name-input input#new-tag
 
 section#new-post #new-post-controls #post-name-input input#new-tag:focus 
 section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
-	background-color: grayColor
+	background-color: back2Color
 
 section#new-post #new-post-controls #post-name-input input#new-tag
 	+placeholder()
@@ -606,7 +596,7 @@ section#new-post #new-post-controls #share
 	height: 44px
 
 section#new-post #new-post-controls #share a.share-icon
-	background-color: whiteColor
+	background-color: backColor
 	width: 24px
 	height: 24px
 	padding: 10px
@@ -615,10 +605,10 @@ section#new-post #new-post-controls #share a.share-icon
 	transition: background-color 200ms
 
 section#new-post #new-post-controls #share a#share-fb.share #back
-	fill: fbColor
+	fill: auxFbColor
 
 section#new-post #new-post-controls #share a#share-fb.share #f
-	fill: darkColor
+	fill: front1Color
 
 section#new-post #new-post-controls #send-post
 	text-align: center
@@ -656,7 +646,7 @@ body.new-post-view #box #post-list
 
 @media screen and (max-width: 480px)
 	body.new-post-view #box #new-post
-		display: block
+		display: block	
 
 // .events-view
 
@@ -668,11 +658,12 @@ body.events-view #box #post-list
 /*
  * Responsive
  */
-@media screen and (min-width: 481px) and (max-height: 480px)
+
+/*@media screen and (min-width: 481px) and (max-height: 480px)
 	#account
 	#account-controls
 	footer
-		display: none
+		display: none*/
 
 @media screen and (max-width: 1000px) , screen and (max-height: 700px)
 	h3
@@ -704,24 +695,26 @@ body.events-view #box #post-list
 		width: 20px
 
 	::-webkit-scrollbar-track
-		background: whiteColor
+		background: backColor
 
 	::-webkit-scrollbar-thumb 
-		background: lightColor
+		background: back1Color
 
 	::-webkit-scrollbar-thumb:window-inactive
-		background: deepColor
+		background: aux1color
 
 @media screen and (max-width: 480px)
 	aside
 		z-index: 1
-		bottom: 0
+		top: 0
 		margin-top: 0
 		transition: height 200ms cubic-bezier(0.4, 0, 0.2, 1)
-		box-shadow: 0 -4px 16px rgba(0,0,0,0.1)
-		height: 44px
+		/* box-shadow: 0 -4px 16px rgba(0,0,0,0.1) // Reemplazado por border-top */
+		/* border-top: 1px solid rgba(127,127,127,.25); // Descartado */
+		height: 52px
 		position: absolute
 		overflow: hidden
+		background-color: backColor
 	
 	aside.show
 		height: 176px
@@ -735,28 +728,48 @@ body.events-view #box #post-list
 		text-align: left
 		width: 100vw
 	
+	section#view-controls
+		height: 52px
+		min-height: 52px
+	
 	#take
-		width: 44px
-		height: 44px
-		position: absolute
-		right: 0
-		top: 0
+		width: 52px
+		height: 52px
 		display: block
+		position: absolute
+		transform: translateX(50%)
+		right: 50%
+		bottom: 0
+		border-radius: 50%
+		margin-bottom: 10px
+		background-color: backColor
+		box-shadow: 0 2px 1px rgba(0,0,0,.2)
 
 	#take:before
+	//#take:after
 		content: ''
-		width: 64%
-		height: 64%
-		background-color: mainColor
 		position: absolute
-		margin: 18%
-		border-radius: 50%
-		right: 0
-		top: 0
-	
-	#more
+		top: 50%
+		left: 50%
+		transform: translate(-50%, -50%)
+		background-color: front2Color
+
+	#take:before
 		width: 44px
 		height: 44px
+		border-radius: 50%
+
+	/*#take:before // Signo mas
+		width: 5%
+		height: 50%
+	
+	#take:after
+		height: 5%
+		width: 50%*/
+
+	#back
+		width: 52px
+		height: 52px
 		position: absolute
 		left: 0
 		top: 0
@@ -764,43 +777,88 @@ body.events-view #box #post-list
 		z-index: 1
 		cursor: pointer
 
-	#more:before
+	#back:before
 		content: ''
 		width: 12px
 		height: 12px
 		position: absolute
-		top: 15px
-		right: 10px
-		border-top: 4px solid midColor
-		border-left: 4px solid midColor
-		transform: translate(-20%, 20%) rotate(45deg)
+		top: 20px
+		right: 15px
+		border-top: 2px solid frontColor
+		border-left: 2px solid frontColor
+		transform: rotate(-45deg)
 		transition: transform 200ms
 
-	#more.back:before
-		transform: rotate(-45deg)
+	#more
+		display: block
+		width: 52px
+		height: 52px
+		right: 0
+		top: 0
+		cursor: pointer
+		position: absolute
+	
+	i.more-back
+		width: 32px
+		height: 32px
+		border-radius: 50%
+		display: block
+		margin: 10px
+		background-color: backColor
+		transition: background-color 100ms
+
+	aside.show i.more-back
+		background-color: mainColor
+		
+	#more i.more-icon:before
+	#more i.more-icon:after
+		content: ''
+	
+	#more i.more-icon
+	#more i.more-icon:after
+	#more i.more-icon:before
+		background-color: frontColor
+		width: 4px
+		height: 4px
+		position: absolute
+		left: 50%
+		display: block
+		transform: translateX(-50%)
+		border-radius: 50%
+
+	#more i.more-icon
+		top: 18px
+	
+	#more i.more-icon:before
+		top: 6px
+		
+	#more i.more-icon:after
+		top: 12px
 
 	input#title
 		font-size: 1em
 		display: block
 		margin: 0
-		height: 44px
-		padding: 0 44px
-		width: calc(100% - 88px)
+		height: 52px
+		padding: 0 52px
+		width: calc(100% - 104px)
 		font-family: 'Verdana'
-		text-align: center
+		text-align: left
 		-webkit-appearance: none
 		-moz-appearance: none
 		appearance: none
+		top:0
+		transform: none
 
 	input#title:focus
 	input#title:hover
-		background-color: whiteColor
-		color: blackColor
+		background-color: backColor
+		color: frontColor
 
 	input#title:hover
 		+placeholder()
-			background-color: whiteColor
-			color: blackColor
+			background-color: backColor
+			color: frontColor
 
 	/*#account img.user-picture
 		margin: 0.375em
@@ -811,11 +869,11 @@ body.events-view #box #post-list
 		transition: font-size 100ms
 	
 	.info
-		background-color: whiteColor
-		color: blackColor
+		background-color: backColor
+		color: frontColor
 
 	.info .author-picture
-		width: 20%
+		width: 19%
 		padding: 2.5%
 
 	#box
@@ -825,8 +883,10 @@ body.events-view #box #post-list
 		overflow-y: auto
 		overflow-x: hidden
 		-webkit-overflow-scrolling: touch
-		height: calc(100vh - 44px)
+		height: calc(100vh - 52px)
 		display: block
+		position: relative
+		top: 52px
 		//transition: height 200ms
 	
 	main,
@@ -843,8 +903,8 @@ body.events-view #box #post-list
 		max-width: inherit
 
 	.dark .info
-		background-color: blackColor
-		color: whiteColor
+		background-color: frontColor
+		color: backColor
 	
 	@keyframes preloader
 		0%
@@ -896,67 +956,67 @@ body.events-view #box #post-list
 
 body.dark
 body.dark input#title
-	background-color: blackColor
-	color: whiteColor
+	background-color: frontColor
+	color: backColor
 
 body.dark input#title:hover
 	+placeholder()
-		background-color: darkColor
-		color: whiteColor
+		background-color: front1Color
+		color: backColor
 
 body.dark input#title:hover
-	background-color: darkColor
+	background-color: front1Color
 
 body.dark input#title:focus
-	background-color: darkColor
-	color: whiteColor
+	background-color: front1Color
+	color: backColor
 
 body.dark input#title
 	+placeholder()
-		color: whiteColor
+		color: backColor
 		
 body.dark input#title:hover
 	+placeholder()
 		color: rgba(255,255,255,0.5)
 	
 body.dark .post
-	border-bottom-color: deepColor
+	border-bottom-color: aux1color
 
 body.dark .post .media
-	background-color: darkColor
+	background-color: front1Color
 	
 body.dark .post .media .preloader-animation
 	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
 body.dark .info a.save-post-link.saved .save
-	background-color: darkColor
-	border-color: dimColor
+	background-color: front1Color
+	border-color: front2Color
 
 body.dark section#new-post canvas#new-media-preview
-	background-color: dimColor
+	background-color: front2Color
 
 body.dark section#new-post #new-post-controls #post-name-input input#new-tag
-	background-color: darkColor
-	color: whiteColor
+	background-color: front1Color
+	color: backColor
 
 body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus 
 body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
-	background-color: dimColor
+	background-color: front2Color
 
 body.dark section#new-post #new-post-controls #share a.share-icon
-	background-color: darkColor
+	background-color: front1Color
 
 body.dark section#new-post #new-post-controls #share a#share-fb.share #f
-	fill: whiteColor
+	fill: backColor
 
 .dark::-webkit-scrollbar 
 	width: 20px
 
 .dark::-webkit-scrollbar-track
-	background: blackColor
+	background: frontColor
 
 .dark::-webkit-scrollbar-thumb 
-	background: darkColor
+	background: front1Color
 
 .dark::-webkit-scrollbar-thumb:window-inactive
-	background: deepColor
+	background: aux1color

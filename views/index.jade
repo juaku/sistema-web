@@ -11,9 +11,11 @@ block content
       // Side controls
       //
       section#view-controls
-        #more.back(ng-class="{back: back}" v-on:click="back")
+        #back(v-on:click="back")
         input(type="text" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:change="router(route)")#title
-        #take.needsclick(v-on:click="take")
+        #more(v-on:click="more")
+          i.more-back
+            i.more-icon
       section#account
         a.user-link
           img(src=user.picture).user-picture
@@ -72,7 +74,7 @@ block content
       //
       // Post
       //
-      article(v-for="post in posts").post
+      article( v-bind:class="{ tools: post.tools }" v-for="post in posts").post
         .media(v-bind:class="post.class" v-on:click="assistedScroll")
           .preloader-animation
           img(:src="post.media" v-on:load="loaded(post)")
@@ -100,6 +102,7 @@ block content
       section#end
         #endMessage(v-if="route") #{__('Llegaste al final de ')} {{ route }}
         #endMessage(v-else) #{__('Llegaste al final')} {{ route }}
+    #take.needsclick(v-on:click="take")
   //
   //  Librería SVG
   //

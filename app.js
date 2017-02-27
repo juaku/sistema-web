@@ -122,7 +122,7 @@ app.locals.title = 'Juaku';
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
 		var IPv4 = req.ip.split(':')[3];
-		if(IPv4 == process.env.SSH_CLIENT.split(' ')[0] || IPv4.includes('179.7.')) { // IP cliente SSH e ip's de Claro
+		if(IPv4 == process.env.SSH_CLIENT.split(' ')[0] || IPv4.includes('179.7.') || IPv4.includes('190.113.')) { // IP cliente SSH e ip's de Claro
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )

@@ -53,6 +53,7 @@ function postsLoaded() {
 	$('.save').off('click');
 	$('.save').on('click', function(event) {
 		$('body').toggleClass('dark');
+		alert('');
 	});
 
 	$('.author-hex-code').each(function(index) {
@@ -185,7 +186,7 @@ var app = new Vue({
 					numEmptyPosts--;
 				}
 
-				if(queryStart == 0) {
+				if(queryStart == 0 && route!='') {
 					scrollTo($('.post').first().next());
 				}
 
@@ -236,18 +237,21 @@ var app = new Vue({
 			}
 		},
 		toggleSavePost: function(post) {
-			if (!post.saved) {
-	 			post.saved = true;
+			if (!post.tools) {
+			/*if (!post.saved) {*/
+	 			post.tools = true;
+	 			/*post.saved = true;
 	 			this.$http.post('/post/save', post).then(function(data) {
 					socket.emit('showPostSaved', data.body);
 	 			},function(e) {
-	 			});
+	 			});*/
 	 		} else {
-	 			post.saved = false;
+	 			post.tools = false;
+	 			/*post.saved = false;
 	 			console.log(post);
 	 			this.$http.post('/post/unsave', post).then(function(data) {
 	 			},function(e) {
-	 			});
+	 			});*/
 	 		}
 		},
 		setNewMedia: function(event) {
@@ -333,6 +337,9 @@ var app = new Vue({
 		back: function() {
 			history.back();
 		},
+		more: function() {
+			$('aside').toggleClass('show');
+		},
 		changeTheme: function(event) {
 			$('body').toggleClass('dark');
 		},
@@ -398,30 +405,35 @@ function createEmptyPosts(n) {
 function scrollTo(object, nextObject) {
 	var directScroll = (typeof nextObject === 'undefined') ? true : false;
 
-	var thisTop = Math.floor($(object).offset().top);
+	var thisTop = $(object).offset().top;
 	var scrollCorrection = 0;
 	var scrollToNext = false;
+	var headerHeight = 52;
+	var animationDistance = 60;
 	if(window.innerWidth <= 480) {
-		scrollToNext = (Math.abs(thisTop) < 1);
+		scrollToNext = (Math.abs(thisTop) < 1 + headerHeight);
 		scrollingElement = 'main'
-		scrollCorrection = $(scrollingElement).scrollTop();
+		scrollCorrection = $(scrollingElement).scrollTop() - headerHeight;
 	} else {
 		scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
 		scrollingElement = 'html, body';
 	}
 
 	var scrollTo = scrollCorrection;
+	console.log(scrollToNext);
 	if(directScroll) {
 		scrollTo += thisTop;
 	} else {
-		var nextTop = Math.floor($(nextObject).offset().top);
+		var nextTop = $(nextObject).offset().top;
 		scrollTo += (scrollToNext ? nextTop : thisTop);
 	}
 
+	var direction = $(object).offset().top - headerHeight >= 0 ? -1 : 1;
+	$(scrollingElement).scrollTop(Math.ceil(scrollTo) + (animationDistance * direction));
 	$(scrollingElement).stop().animate({
-		'scrollTop':  scrollTo
-	}, 200, 'swing', function () {
-		//window.location.hash = refPost; TODO: Actualizar hash
+		'scrollTop':  Math.ceil(scrollTo)
+	}, 100, function() {
+		//window.location.hash = refPost; // TODO: Actualizar hash
 	});
 }
 
