@@ -236,7 +236,7 @@ var app = new Vue({
 				this.posts.push(state.posts[post]);
 			}
 		},
-		toggleSavePost: function(post) {
+		togglePostTools: function(post) {
 			if (!post.tools) {
 			/*if (!post.saved) {*/
 	 			post.tools = true;
@@ -267,7 +267,7 @@ var app = new Vue({
 					reader.onload = function(event) {
 						var img = new Image();
 						img.onload = function() {
-							var nTam = 880;
+							var nTam = 1080;
 							canvas.width = nTam;
 							canvas.height = nTam;
 							var nWidth = nTam;
@@ -310,7 +310,7 @@ var app = new Vue({
 							ctx.rotate(variation.a*Math.PI/180);
 							ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
 							var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
-							var imgQuality = mobile?0.5:0.75;
+							var imgQuality = mobile?0.75:0.75; // 0.5:0.75
 							var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
 							getGeo(function(coords) {
 								app.newPost.media = newImg;
