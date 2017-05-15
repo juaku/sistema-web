@@ -122,7 +122,7 @@ h3
 	width: 100%
 	height: 100%
 
-#side
+aside
 	display: table-cell
 	vertical-align: top
 	text-align: right
@@ -769,19 +769,26 @@ body.events-view #box #post-list
 		position: absolute
 		overflow: hidden
 		background-color: backColor
+		text-align: center
 	
 	aside.show
-		height: 176px
+		height: 320px
 	
 	aside section#view-controls
 	aside section#account
 	aside section#account-controls
 	aside footer
-		margin: 0
+		margin: 0 0 10px 0
 		position: static
-		text-align: left
 		width: 100vw
-	
+
+	aside section#account a.user-link
+		float: none
+
+	aside section#account a.user-link img
+		display: block
+		margin: 0 auto
+
 	section#view-controls
 		height: 52px
 		min-height: 52px

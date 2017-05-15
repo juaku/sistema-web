@@ -13,13 +13,14 @@ html(lang="#{locale}" ng-app="Juaku")
     title= title
     link(rel="icon" type="image/png" href="/images/favicon.png")
     link(rel="stylesheet", href="/stylesheets/style.css")
-    script(src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
+    script(src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js")
     script(src="/socket.io/socket.io.js")
+    //script(src="/javascripts/socket.io.js")
     script(src="/javascripts/exif.js")
     script(src="/javascripts/fastclick.js")
-    script(src="//npmcdn.com/vue/dist/vue.js")
-    script(src="//npmcdn.com/vue-resource/dist/vue-resource.js")
     script(src="/javascripts/moment.js")
+    script(src="https://npmcdn.com/vue/dist/vue.js")
+    script(src="https://npmcdn.com/vue-resource/dist/vue-resource.js")
     script.
         window.fbAsyncInit = function() {
           FB.init({
@@ -32,7 +33,7 @@ html(lang="#{locale}" ng-app="Juaku")
           var js, fjs = d.getElementsByTagName(s)[0];
           if (d.getElementById(id)) {return;}
           js = d.createElement(s); js.id = id;
-          js.src = "//connect.facebook.net/en_US/sdk.js";
+          js.src = "https://connect.facebook.net/en_US/sdk.js";
           fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'facebook-jssdk'));
     block head

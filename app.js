@@ -8,6 +8,11 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+//json web token
+var jwt = require('jsonwebtoken');
+var config = require('./config');
+var mongoose = require('mongoose');
+
 //Stylus y Nib
 var stylus = require('stylus');
 var nib = require('nib');
@@ -15,6 +20,7 @@ var nib = require('nib');
 //Coneccion con Facebook
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy;
+var FacebookTokenStrategy = require('passport-facebook-token');
 
 // Concección con MongoDB
 var db = require('./mongodbConnect');
@@ -50,14 +56,26 @@ passport.use(new FacebookStrategy({
 	clientID: FACEBOOK_APP_ID,
 	clientSecret: FACEBOOK_APP_SECRET,
 	callbackURL: 'https://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
-	passReqToCallback: true,
+	passReqToCallback: true, // TODO: ¿Cómo funciona?
 	profileFields: ['id', 'name', 'email', 'photos']
 },
 // facebook will send back the tokens and profile
 function(req, accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
-    	profile.accessToken = accessToken;
-      	return done(null, profile);
+		return done(null, profile);
+    });
+}));
+
+//FacebookTokenStrategy
+passport.use(new FacebookTokenStrategy({
+	clientID: FACEBOOK_APP_ID,
+	clientSecret: FACEBOOK_APP_SECRET,
+	passReqToCallback: true // TODO: ¿Cómo funciona?
+},
+// facebook will send back the tokens and profile
+function(req, accessToken, refreshToken, profile, done) {
+    process.nextTick(function () {
+		return done(null, profile);
     });
 }));
 
@@ -128,7 +146,7 @@ if (app.get('env') === 'development') {
 			console.log('Acceso denegado para: ' + req.ip )
 			res.status(403).end();
 		}
-	});
+	})
 }
 
 //Usar rutas
@@ -140,17 +158,15 @@ app.use('/user', user);
 app.use('/list', list);
 app.use('/', routes);
 
+//Urls logueo con facebook en escritorio
+
 // GET /auth/facebook
 //   Use passport.authenticate() como una ruta middleware para autenticar la
 //   petición.  El primero paso en la auntenticación de Facebook implicará
 //   redirigir al usuario a facebook.com.  Después de la autorizacón, Facebook
 //   redirigirá al usuario a esta aplicación at /auth/facebook/callback
 app.get('/auth/facebook',
-	passport.authenticate('facebook', { scope: ['email, user_photos'], failureRedirect: '/login', display: 'popup'  }),
-	function(req, res){
-    // La petición será redirigida a Facebook para la autenticación, por lo que
-    // esta función no se llamará.
-});
+	passport.authenticate('facebook', { scope: ['email, user_photos'], failureRedirect: '/login', display: 'popup'  }));
 
 // GET /auth/facebook/callback
 //   Use passport.authenticate() como una ruta middleware para autenticar la
@@ -159,23 +175,44 @@ app.get('/auth/facebook',
 //   el cual, en este ejemplo, se redirigirá al usuario a la página de inicio.
 app.get('/auth/facebook/callback',
 	passport.authenticate('facebook', {failureRedirect: '/login' }),
-	function(req, res, next) {
-    // Emite un remember me cookie si la opción se aprobó
-    // if (!req.body.remember_me) { return next(); }
+	function(req, res) {
+		// Successful authentication, redirect home.
+		req.session.token = jwt.sign(
+			{ id: req.user.id },
+			config.tokenSecret,
+			{ expiresIn : 60*60*24*15 /* 15 Días */}
+		);
+		// Loguear al usuario
+		var User = mongoose.model('User');
+		User.signUp(req, function() {
+			res.render('access');
+		}, function(error) {
+			console.log('error');
+		});
+	});
 
-    next();  // Si el bloque de abajo no es necesario
-    // TODO: Verificar si este bloque es necesario
-		/*
-    issueToken(req.user, function(err, token) {
-    	if (err) { return next(err); }
-    	res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
-    	return next();
-    });*/
-		// END TODO
-},
-function(req, res, next) {
-	res.redirect('/access');
-}
+///Url logueo con facebook en móvil - cordova
+
+app.get('/auth/facebook/token',
+  passport.authenticate('facebook-token'),
+  function (req, res) {
+	req.session.token = jwt.sign(
+		{ id: req.user.id },
+		config.tokenSecret,
+		{ expiresIn : 60*60*24*15 /* 15 Días */}
+	);
+	// Loguear al usuario
+	var User = mongoose.model('User');
+	var data = {};
+	User.signUp(req, function() {
+		data.user = req.user;
+		data.token = req.session.token;
+		data.locale = req.getLocale();
+		res.json(data);
+	}, function(error) {
+		console.log('error');
+	});
+  }
 );
 
 /// captura un 404 y reenvia un error al manejador

@@ -56,14 +56,14 @@ UserSchema.statics.signUp = function (req, callback, error) {
           });
       }
       if(!err && currentUser!= null) {
-        console.log('el usuario ya se enuentra logueado');
+        console.log('el usuario ya se registró');
         var User = mongoose.model('User');
         User.update({ _id: currentUser.id }, { $set: { profilePic: profilePic }}, function (err, doc) {
           if (err) error();
           fillReqSessionVariables(currentUser, callback);
         });
       } else {
-        console.log('no esta logueado, se creara uno');
+        console.log('no esta registrado, se creará una cuenta nueva');
         var firstName = simplifyName(req.user.name.givenName);
         var lastName = simplifyName(req.user.name.familyName);
         var User = mongoose.model('User', UserSchema);

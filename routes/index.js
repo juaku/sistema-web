@@ -2,40 +2,15 @@ var express = require('express');
 var router = express.Router();
 
 /* GET router para '/'
- * Renderiza la vista 'index.jade' o la 'login.jade' dependiendo si el usuario
+ * Renderiza la vista 'index.jade' y devuelve datos de usuario si es que el jwt está definido
  * está logueado o no
  */
 router.get('/', function(req, res) {
-	if (req.isAuthenticated()) {
-		console.log('req.session.token ' + req.session.token);
-		res.render('index', { user: req.user, locale: req.getLocale(), token: req.session.token });
-	} else {
-		res.render('login');
-	}
+	res.render('index', { user: JSON.stringify(req.user), locale: req.getLocale(), token: req.session.token });
 });
 
-router.get('/:tag(@[A-Z0-9a-z%]+)', function(req, res) {
-	if (req.isAuthenticated()) {
-		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.tag, reqType: 'tag', token: req.session.token });
-	} else {
-		res.render('login');
-	}
-});
-
-router.get('/:author([0-9a-fA-F]{3}(\.+[a-z0-9A-Z%]+))', function(req, res) {
-	if (req.isAuthenticated()) {
-		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.author, reqType: 'author', token: req.session.token });
-	} else {
-		res.render('login');
-	}
-});
-
-router.get('/:channel(([0-9a-fA-F]{3}(\.+[a-z0-9A-Z%]+)@[A-Z0-9a-z%]+))', function(req, res) {
-	if (req.isAuthenticated()) {
-		res.render('index', { user: req.user, locale: req.getLocale(), url: req.params.channel, reqType: 'channel', token: req.session.token });
-	} else {
-		res.render('login');
-	}
+router.get('/:path((([0-9A-Fa-f]{3})(\.+[A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?(?:@([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?$)', function(req, res) {
+	res.render('index', { user: JSON.stringify(req.user), locale: req.getLocale(), url: req.params.path, reqType: 'path', token: req.session.token });
 });
 
 module.exports = router;

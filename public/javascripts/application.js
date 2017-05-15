@@ -49,6 +49,103 @@ $('body').bind('keydown', function(event) {
 	}
 });
 
+//Variables used by cordova for access to the device camera
+var pictureSource;   // picture source
+var destinationType; // sets the format of returned value
+
+// Wait for device API libraries to load
+document.addEventListener("deviceready",onDeviceReady,false);
+
+// device APIs are available
+function onDeviceReady() {
+    pictureSource=navigator.camera.PictureSourceType;
+    destinationType=navigator.camera.DestinationType;
+}
+
+// Called when a photo is successfully retrieved
+function onPhotoDataSuccess(imageData) {
+	var canvas = document.getElementById('new-media-preview');
+	var ctx = canvas.getContext('2d');
+	$('body').addClass('new-post-view');
+	scrollTo($('#new-post'));
+	var img = new Image();
+	img.onload = function() {
+		var nTam = 1080;
+		canvas.width = nTam;
+		canvas.height = nTam;
+		var nWidth = nTam;
+		var nHeight = nTam;
+		var variation = {a: 0, desX: 0, desY: 0, cntX: -1, cntY: 0, swt:false};
+		if(img.width > img.height) {
+			nWidth = img.width * nTam / img.height;
+		} else if(img.width < img.height) {
+			nHeight = img.height * nTam / img.width;
+			variation = {a: 0, desX: 0, desY: 0, cntX: 0, cntY: -1, swt:false};
+		}
+		variation.width = nWidth;
+		variation.height = nHeight;
+		if(variation.swt) {
+			variation.width = nHeight;
+			variation.height = nWidth;
+		}
+		var cntVar = 0;
+		if (variation.width > nTam) {
+			cntVar = parseInt((variation.width - nTam)/2);
+		}
+		if (variation.height > nTam) {
+			cntVar = parseInt((variation.height - nTam)/2);
+		}
+		var xPoint = (nWidth*variation.desX) + cntVar*variation.cntX;
+		var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
+		ctx.rotate(variation.a*Math.PI/180);
+		ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+		var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
+		var imgQuality = mobile?0.75:0.75; // 0.5:0.75
+		var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
+		getGeo(function(coords) {
+			app.newPost.media = imageData;
+			app.newPost.coords = {};
+			app.newPost.coords.latitude = coords.latitude;
+			app.newPost.coords.longitude = coords.longitude;
+		}, function() {
+		});
+	}
+	img.src = "data:image/jpeg;base64," + imageData;
+}
+
+// Take picture using device camera, allow edit, and retrieve image as base64-encoded string
+function capturePhotoEdit() {
+  navigator.camera.getPicture(onPhotoDataSuccess, onFail, { quality: 20, allowEdit: true, saveToPhotoAlbum: true,
+    destinationType: destinationType.DATA_URL });
+}
+
+// Called if something bad happens.
+function onFail(message) {
+  alert('Failed because: ' + message);
+}
+
+function popupwindow(url, title, w, h) {
+	wLeft = window.screenLeft ? window.screenLeft : window.screenX;
+	wTop = window.screenTop ? window.screenTop : window.screenY;
+	var left = wLeft + (window.innerWidth / 2) - (w / 2);
+	var top = wTop + (window.innerHeight / 2) - (h / 2);
+	return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', heigh=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+}
+
+$(document).ready(function() {
+	$('.pop-up').click(function(event) {
+		if(!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )) {
+			event.preventDefault();
+			url = $(this).attr('href');
+			popupwindow(url, 'Acceso Juaku', 530, 300);
+			return false;
+		} else {
+			event.preventDefault();
+			document.location = $(this).attr('href');
+		}
+	});
+});
+
 function postsLoaded() {
 	$('.save').off('click');
 	$('.save').on('click', function(event) {
@@ -80,6 +177,7 @@ var sendingPost = false;
 var endOfList = false;
 var queryStart = 0;
 var numEmptyPosts = 0;
+var domain = 'https://juaku-dev.cloudapp.net:5000';
 
 function checkScroll(target) {
 	if($(target).scrollTop()*1.5 >= $(target).prop('scrollHeight') && !gettingPosts) {
@@ -94,8 +192,9 @@ Vue.directive('novetwo', function (el, binding) {
 var app = new Vue({
 	el: '#box',
 	data: {
+		user: localStorage.getItem('user')?JSON.parse(localStorage.getItem('user')):null,
 		route: null,
-		posts: createEmptyPosts(3),
+		posts: localStorage.getItem('token')?createEmptyPosts(0):createEmptyPosts(3),
 		newPost: {
 			shareOnFb: false
 		}
@@ -204,14 +303,16 @@ var app = new Vue({
 			checkScroll('main');
 		},
 		take: function() {
-			$('input#media-loader').click();
+			capturePhotoEdit();
+			//$('input#media-loader').click();
 		},
 		sendNewPost: function(event) {
 			if (confirm('¿Desear enviar el post?')) {
 				event.preventDefault();
 				if(!sendingPost) {
 					sendingPost = true;
-					this.$http.post('/post/new', this.newPost).then(function(data) {
+					this.$http.post(domain + '/post/new', this.newPost,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function(data) {
 						socket.emit('showPost', data.body);
 						sendingPost = false;
 						$('body').removeClass('new-post-view');
@@ -352,14 +453,37 @@ var app = new Vue({
 			})
 		},
 		logout: function() {
-			if(navigator.serviceWorker) {
+			/*if(navigator.serviceWorker) {
 				navigator.serviceWorker.getRegistrations().then(function(registrations) {
 					for (var i = 0; i < registrations.length; i++) {
 						registrations[i].unregister();
 					}
 				})
-			}
+			}*/
+			localStorage.removeItem('user');
+			localStorage.removeItem('token');
+			localStorage.removeItem('locale');
 			window.location = '/logout';
+			//window.location.reload(true);
+		},
+		login: function() {
+			var fbLoginSuccess = function (userData) {
+				app.$http.get(domain + '/auth/facebook/token?access_token=' + userData.authResponse.accessToken).then(function(res) {
+					user = res.body.user;
+					token = res.body.token;
+					localStorage.setItem('user', JSON.stringify(res.body.user));
+					localStorage.setItem('token', res.body.token);
+					localStorage.setItem('locale', res.body.locale);
+					window.location.reload(true);
+				}, function(res)  {
+					error(res);
+				});
+			}
+			facebookConnectPlugin.login(["public_profile"], fbLoginSuccess,
+				function loginError (error) {
+					console.error(error)
+				}
+			);
 		}
 	}
 });
@@ -375,7 +499,9 @@ function query(route, next, error) {
 	}
 	console.log('route!!');
 	console.log(route);
-	app.$http.get('/list/' + [route, queryStart].join('/')).then(function(res) {
+	token = localStorage.getItem('token');
+	app.$http.get(domain + '/list/' + [route, queryStart].join('/'),
+		{ headers: { Authorization: 'Bearer ' + token }}).then(function(res) {
 		socket.emit('joinChannel', route);
 		next(res.body.posts);
 	}, function(res)  {
@@ -429,10 +555,11 @@ function scrollTo(object, nextObject) {
 	}
 
 	var direction = $(object).offset().top - headerHeight >= 0 ? -1 : 1;
-	$(scrollingElement).scrollTop(Math.ceil(scrollTo) + (animationDistance * direction));
+	// TODO: Evaluar remoción
+	//$(scrollingElement).scrollTop(Math.ceil(scrollTo) + (animationDistance * direction));
 	$(scrollingElement).stop().animate({
 		'scrollTop':  Math.ceil(scrollTo)
-	}, 100, function() {
+	}, 160, function() {
 		//window.location.hash = refPost; // TODO: Actualizar hash
 	});
 }
@@ -509,9 +636,10 @@ function simplifyName(name, next) {
 }
 
 app.setGeo();
-app.router(window.location.pathname.substring(1));
+//app.router(window.location.pathname.substring(1)); //llama a router cuando se usa la url en escritorio para buscar
+app.router();
 
-if ('serviceWorker' in navigator) {
+/*if ('serviceWorker' in navigator) {
 	console.log('CLIENT: service worker registration in progress.');
 	navigator.serviceWorker.register('/service-worker.js').then(function() {
 		console.log('CLIENT: service worker registration complete.');
@@ -520,7 +648,7 @@ if ('serviceWorker' in navigator) {
 	});
 } else {
 	console.log('CLIENT: service worker is not supported.');
-}
+}*/
 
 //
 // Framework Angular
@@ -630,7 +758,7 @@ function getGeo(next, error) {
 			// TODO: Manejar error 
 			alert('Mal! ' + errorMsg);
 			error(errorMsg);
-		});
+		}, {enableHighAccuracy: true});
 	} else {
 		error("Geolocation is not supported by this browser.");
 	}

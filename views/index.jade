@@ -16,13 +16,15 @@ block content
         #more(v-on:click="more")
           i.more-back
             i.more-icon
-      section#account
+      section#account(v-if="user")
         a.user-link
-          img(src=user.picture).user-picture
-        .user-userName #{ user.name.hexCode}.#{user.name.givenName }
-        .user-displayName #{ user.name.familyName }
-      section#account-controls
-        a(href="/logout" v-on:click.stop.prevent="logout") #{__('Logout')}
+          img(:src="user.picture").user-picture
+        .user-userName {{user.name.hexCode}}.{{user.name.givenName}}
+        .user-displayName {{user.name.familyName}}
+        section#account-controls
+          a(href="/logout" v-on:click.stop.prevent="logout") #{__('Logout')}
+      section#account(v-else)
+        a.pop-up(href='/auth/facebook')#FB #{__('Continue with Facebook')}
         //section#events-side
           section#events-controls
             .promoted
@@ -43,17 +45,17 @@ block content
       footer
         a#brand-url juaku.com
         nav Términos y condiciones | Prensa
-        #brand Juaku 2016
+        #brand Juaku 2017
     main(v-on:scroll="scroll")
       section#start(v-on:click="changeTheme($event)")
         a#logo-link(href="/" v-on:click.prevent)
           h1 Juaku
           svg#logo
-            use#logo-icon(xlink:href="#logo-icon-svg" v-on:click.stop="reload")
+            use#logo-icon(xlink:href="#logo-icon-svg" v-on:click="reload")
       //
       // New Post
       //
-      input.needsclick(type="file" id="media-loader" accept="image/*" v-on:change="setNewMedia($event)")
+      //input.needsclick(type="file" id="media-loader" accept="image/*" v-on:change="setNewMedia($event)")
       #newSendPost
       section#new-post.post
         canvas#new-media-preview(v-on:click="assistedScroll")
@@ -119,7 +121,7 @@ block content
       section#end
         #endMessage(v-if="route") #{__('Llegaste al final de ')} {{ route }}
         #endMessage(v-else) #{__('Llegaste al final')} {{ route }}
-    #take.needsclick(v-on:click="take")
+    #take.needsclick(v-on:click="take", v-if='user')
   //
   //  Librería SVG
   //
@@ -131,7 +133,16 @@ block content
   //  Flotante
   //
   script(type='text/javascript').
+    var user = !{user} //si esta vacía lo iguala a undefined
+    user = user?user:null
     var url = '#{url}'
     var reqType = '#{reqType}'
     var token = '#{token}'
+    var locale = '#{locale}'
+    if(user && token && locale) {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+      localStorage.setItem('locale', locale);
+    }
+  script(type='text/javascript', charset='utf-8', src='cordova.js')
   script(src="/javascripts/application.js")

@@ -119,6 +119,7 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 	});
 	function saveMedia(data, name, ext) {
 		console.log('saveMedia');
+		console.log(name + '.' + ext);
 		var img = data;
 		// Strip off the data: url prefix to get just the base64-encoded bytes
 		var data = img.replace(/^data:image\/\w+;base64,/, "");
