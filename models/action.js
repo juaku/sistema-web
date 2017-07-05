@@ -1,43 +1,29 @@
 var mongoose = require('mongoose');
+var mongoosastic = require('mongoosastic');
 var Schema = mongoose.Schema;
 var FB = require('fb');
 
 var PostSchema = new Schema({
-	tag: String,
+	tag: {type: String, es_indexed: true},
 	originalTag: String,
-	geo: { type: [Number], index: '2d'},
+	geo: { type: [Number], index: '2d', es_indexed: true, es_type: 'geo_point' },
 	media: String,
-	active: Boolean,
-	authorId : String,
-	tagId: String,
-	createdAt: {type: Date, default: Date.now},
+	active: { type: Boolean, es_indexed: true },
+	authorId : { type: String, es_indexed: true },
+	tagId: { type: String, es_indexed: true },
+	createdAt: { type: Date, default: Date.now, es_indexed: true },
 	reportedBy: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-PostSchema.statics.getPosts = function (req, callback, error) {
-	var resultsLimit = 20;
-	var queryNumber = 0;
-	if(req.params.i!=undefined) {
-		queryNumber = parseInt(req.params.i);
-	}
-	this.find({
-		active: true,
-		geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
-	})
-	.sort({createdAt: -1})
-	.limit(resultsLimit)
-	.skip(resultsLimit * queryNumber)
-	.exec(function (err, posts) {
-		if (err) error();
-		callback(posts);
-	})
-}
+PostSchema.plugin(mongoosastic, {
+	hosts: ['localhost:9200'], hydrate:true, hydrateOptions: {lean: true}
+});
 
 PostSchema.statics.sharePostOnFb = function (req, callback, error) {
 	var str = req.body; //req.body es 420.jpg
 	var res = str.split(".");
 	
-	var url = 'http://juaku-dev.cloudapp.net:5000/uploads/' + res[0] + '.' + res[1];
+	var url = 'https://' + window.location.hostname + ':' + window.location.port + '/uploads/' + res[0] + '.' + res[1];
 	var albumId = '';
 	FB.api('/' + albumId + '/photos','POST',
 		{

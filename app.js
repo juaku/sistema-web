@@ -62,6 +62,7 @@ passport.use(new FacebookStrategy({
 // facebook will send back the tokens and profile
 function(req, accessToken, refreshToken, profile, done) {
     process.nextTick(function () {
+		profile.accessToken = accessToken;
 		return done(null, profile);
     });
 }));
