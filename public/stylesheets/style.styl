@@ -5,13 +5,13 @@
 */
 
 mainColor	= #F05
-backColor	= #000
-back1Color	= #222
-back2Color	= #333
+backColor	= #FFF
+back1Color	= #EEE
+back2Color	= #DDD
 midColor	= #888
-front2Color	= #DDD
-front1Color	= #EEE
-frontColor	= #FFF
+front2Color	= #333
+front1Color	= #222
+frontColor	= #000
 aux1color	= #181818
 auxFbColor	= #3b5998
 
@@ -111,7 +111,6 @@ input#title:focus:hover
 
 h3
 	font-weight: normal
-	font-size: 2.5vmin
 	letter-spacing: -0.03em
 	margin: 0.3em 0 0.3em 0
 
@@ -130,6 +129,7 @@ aside
 main
 	display: table-cell
 	width: 56vw
+	font-size: 2.5vmin
 
 /* Estilos modulares */
 		
@@ -208,17 +208,20 @@ main
 */									
 
 .post
-	background-color: inherit// #F05 Truco de maquetación
+	background-color: backColor
+	//background-color: inherit // #F05 Truco de maquetación
+	//width: calc(82vh + .5px) // Correción de pixel fracional
 	width: 82vh
 	max-width: 54vw
 	// margin-bottom: 3vh
-	border-bottom: 3vh solid back1Color
+	border-bottom: 4vh solid back1Color // 3vh +1 corrección
 	min-width: 30vw
 	position: relative
 
-.post .media
-	background-color: backColor
+.post .view
+	background-color: back1Color
 	width: 100%
+	//height: calc(82vh + .5px) // Correción de pixel fracional
 	height: 82vh
 	max-width: 54vw
 	max-height: 54vw
@@ -226,7 +229,7 @@ main
 	min-height: 30vw
 	position: relative
 
-.post .media img
+.post .view .media
 	width: 100%
 	height: 100%
 	display: block
@@ -235,13 +238,13 @@ main
 	user-select: none
 	// cursor: pointer
 
-.post .media.loaded
-	background-color: #000
+.post .view.loaded
+	background-color: backColor
 	
-.post .media.loaded img
+.post .view.loaded img
 	opacity: 1
 
-.post .media .preloader-animation
+.post .view .preloader-animation
 	width: 10%
 	height: 10%
 	border-radius: 50%
@@ -249,9 +252,9 @@ main
 	left: 50%
 	top: 50%
 	transform: translate(-50%, -50%)
-	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
+	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
-.post .media.loaded .preloader-animation
+.post .view.loaded .preloader-animation
 	display: none
 
 /*
@@ -275,7 +278,7 @@ main
 	vertical-align: middle
 
 .info .author-picture
-	width: 19%
+	width: 18%
 	padding: 2.5%
 
 .info .author-picture img
@@ -283,6 +286,7 @@ main
 	border-radius: 50%
 	margin: 0 auto
 	width: 100%
+	user-select: none
 
 .info .post-info
 	padding-left: 4% // 0.5em
@@ -307,6 +311,7 @@ main
 .info .post-time
 	font-size: 1.75vmin
 	color: midColor
+	user-select: none
 	// letter-spacing: -0.02em
 
 .info .save-button
@@ -321,9 +326,10 @@ main
 	background-color: midColor
 	border-radius: 50%
 	width: 50%
-	margin: 25%
+	margin: 0 auto
 	transition: background-color 100ms
 	transition-timing-function: ease-out
+	user-select: none
 
 .info a.save-post-link.saved .save
 	background-color: back1Color
@@ -340,6 +346,7 @@ main
 	background-color: rgba(0,0,0,.8)
 	transition: opacity 100ms
 	opacity: 0
+	visibility: hidden;
 
 /*@keyframes example
 	from
@@ -353,6 +360,7 @@ main
 	animation-fill-mode: forwards
 */
 .post.tools .post-tools
+	visibility: visible;
 	opacity: 1
 
 .post-tools ul
@@ -380,7 +388,7 @@ main
 	vertical-align: middle
 
 .post-tools ul li svg.icon
-	background-color: #CCC
+	background-color: front2Color
 	border-radius: 50%
 	width: 9.6%
 	height: 100%
@@ -582,75 +590,83 @@ input#media-loader
 	position: absolute
 	display: none
 
-section#new-post
+/*section#over-controls
+	width: 83vh
+	position: absolute*/
+	
+#up
+	width: 10vmin
+	height: 10vmin
+	background-color: rgba(0,0,0,.5)
+	border-radius: 50%
+	position: fixed
+	transform: translate(-50%,0)
+	left: 50%
+	top: 60px
+	z-index: 1
+
+section#post-preview
 	display: none
 
-section#new-post canvas#new-media-preview
-	width: 100%
-	height: 100vw
+section#post-preview
+//section#post-preview .view
+section#post-preview #post-preview-controls
 	background-color: back2Color
-	display: block
 
-section#new-post #new-post-controls
-	width: 100%
-	height: 44px
-	display: table
-
-section#new-post #new-post-controls #post-name-input
-section#new-post #new-post-controls #share
-section#new-post #new-post-controls #send-post
+section#post-preview #post-preview-controls #post-name-input
+section#post-preview #post-preview-controls #share
+section#post-preview #post-preview-controls #send-post
 	display: table-cell
 	vertical-align: middle
 
-section#new-post #new-post-controls #post-name-input
+section#post-preview #post-preview-controls #post-name-input
 	display: table
-	width: 100%
+	width: 98%
+	height: 100%
 	position: relative
 
-section#new-post #new-post-controls #post-name-input label.at-simbol
-section#new-post #new-post-controls #post-name-input input#new-post-tag
-	font-size: 17px
+section#post-preview #post-preview-controls #post-name-input label.at-simbol
+section#post-preview #post-preview-controls #post-name-input input#new-post-tag
 	letter-spacing: -0.5px
 	display: table-cell
 	vertical-align: middle
 	height: 24px
 
-section#new-post #new-post-controls #post-name-input label.at-simbol
-	padding: 10px 0 10px 10px
-	position: absolute
+section#post-preview #post-preview-controls #post-name-input label.at-simbol
 	font-family: 'Verdana', sans-serif
+	width: 1em
 
-section#new-post #new-post-controls #post-name-input input#new-tag
-	background-color: back1Color
+section#post-preview #post-preview-controls #post-name-input input#new-tag
+	background-color: back2Color
 	color: frontColor
-	width: calc(100% - 36px)
+	//width: calc(100% - 36px)
+	width: 100%
 	border: none
-	padding: 0 8px 0 28px
+	padding: 0
 	margin: 0
 	display: block
 	outline: none
 	border-radius: 0
-	font-size: 16px
-	height: 44px
+	font-size: 2.5vmin
+	height: 100%
 	transition: background-color 200ms
 	overflow: hidden
 	white-space: nowrap
 	text-overflow: ellipsis
 
-section#new-post #new-post-controls #post-name-input input#new-tag:focus 
-section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
+section#post-preview #post-preview-controls #post-name-input input#new-tag:focus 
+section#post-preview #post-preview-controls #post-name-input input#new-tag:focus + #share a.share-icon
 	background-color: back2Color
 
-section#new-post #new-post-controls #post-name-input input#new-tag
+section#post-preview #post-preview-controls #post-name-input input#new-tag
 	+placeholder()
 		color: midColor
 
-section#new-post #new-post-controls #share
+section#post-preview #post-preview-controls #share
 	width: 44px
 	height: 44px
 
-section#new-post #new-post-controls #share a.share-icon
-	background-color: backColor
+section#post-preview #post-preview-controls #share a.share-icon
 	width: 24px
 	height: 24px
 	padding: 10px
@@ -658,19 +674,17 @@ section#new-post #new-post-controls #share a.share-icon
 	display: block
 	transition: background-color 200ms
 
-section#new-post #new-post-controls #share a#share-fb.share #back
+section#post-preview #post-preview-controls #share a#share-fb.share #back
 	fill: auxFbColor
 
-section#new-post #new-post-controls #share a#share-fb.share #f
+section#post-preview #post-preview-controls #share a#share-fb.share #f
 	fill: front1Color
 
-section#new-post #new-post-controls #send-post
+section#post-preview #post-preview-controls #send-post
 	text-align: center
-	text-transform: uppercase
-	font-weight: bold
-	font-size: 11px
-	padding: 0 24px
-
+	/*text-transform: uppercase*/
+	/*font-weight: bold*/
+	width: 22.5%
 
 /*
  * Control de vistas
@@ -772,13 +786,13 @@ body.events-view #box #post-list
 		text-align: center
 	
 	aside.show
-		height: 320px
+		height: 340px
 	
 	aside section#view-controls
 	aside section#account
 	aside section#account-controls
 	aside footer
-		margin: 0 0 10px 0
+		margin: 0 0 1.5em 0
 		position: static
 		width: 100vw
 
@@ -788,6 +802,10 @@ body.events-view #box #post-list
 	aside section#account a.user-link img
 		display: block
 		margin: 0 auto
+	
+	#account img.user-picture
+		width: 5em
+		height: 5em
 
 	section#view-controls
 		height: 52px
@@ -901,8 +919,8 @@ body.events-view #box #post-list
 		display: block
 		margin: 0
 		height: 52px
-		padding: 0 52px 0 80px
-		width: calc(100% - 132px)
+		padding: 0 80px 0 80px
+		width: calc(100% - 160px)
 		font-family: 'Verdana'
 		text-align: left
 		-webkit-appearance: none
@@ -929,13 +947,17 @@ body.events-view #box #post-list
 		font-size: 4.5vw
 		transition: font-size 100ms
 	
+	section#post-preview #post-preview-controls #send-post
+	section#post-preview #post-preview-controls #post-name-input input#new-tag
+		font-size: 5vmin	
+	
 	.info
-		background-color: backColor
+		/*background-color: backColor*/
 		color: frontColor
 
 	.info .author-picture
-		width: 19.2%
-		padding: 2.4%
+		width: 22.5%
+		padding: 2.5%
 
 	#box
 		display: block /* Mejor control de la barra de scroll */
@@ -948,11 +970,13 @@ body.events-view #box #post-list
 		display: block
 		position: relative
 		top: 52px
+		font-size: 5vmin
 		//transition: height 200ms
+		-webkit-transform: translate3d(0,0,0)
 	
 	main,
 	.post,
-	.post .media,
+	.post .view,
 	#start
 		width: 100%
 
@@ -964,7 +988,7 @@ body.events-view #box #post-list
 		max-width: inherit
 
 	.dark .info
-		background-color: frontColor
+		/*background-color: frontColor*/
 		color: backColor
 	
 	@keyframes preloader
@@ -983,7 +1007,7 @@ body.events-view #box #post-list
 		100%
 			box-shadow: 0 0 0 3vw rgba(255,255,255,0.05)
 
-	.post .media,
+	.post .view,
 	#start
 		height: 100vw
 		max-width: inherit
@@ -1043,31 +1067,31 @@ body.dark input#title:hover
 body.dark .post
 	border-bottom-color: aux1color
 
-body.dark .post .media
+body.dark .post .view
 	background-color: front1Color
 	
-body.dark .post .media .preloader-animation
+body.dark .post .view .preloader-animation
 	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
 body.dark .info a.save-post-link.saved .save
 	background-color: front1Color
 	border-color: front2Color
 
-body.dark section#new-post canvas#new-media-preview
+body.dark section#post-preview canvas.media
 	background-color: front2Color
 
-body.dark section#new-post #new-post-controls #post-name-input input#new-tag
+body.dark section#post-preview #post-preview-controls #post-name-input input#new-tag
 	background-color: front1Color
 	color: backColor
 
-body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus 
-body.dark section#new-post #new-post-controls #post-name-input input#new-tag:focus + #share a.share-icon
+body.dark section#post-preview #post-preview-controls #post-name-input input#new-tag:focus 
+body.dark section#post-preview #post-preview-controls #post-name-input input#new-tag:focus + #share a.share-icon
 	background-color: front2Color
 
-body.dark section#new-post #new-post-controls #share a.share-icon
+body.dark section#post-preview #post-preview-controls #share a.share-icon
 	background-color: front1Color
 
-body.dark section#new-post #new-post-controls #share a#share-fb.share #f
+body.dark section#post-preview #post-preview-controls #share a#share-fb.share #f
 	fill: backColor
 
 .dark::-webkit-scrollbar 

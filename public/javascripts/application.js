@@ -306,6 +306,9 @@ var app = new Vue({
 			capturePhotoEdit();
 			//$('input#media-loader').click();
 		},
+		up: function() {
+			scrollTo($('#start'));
+		},
 		sendNewPost: function(event) {
 			if (confirm('¿Desear enviar el post?')) {
 				event.preventDefault();
@@ -334,7 +337,7 @@ var app = new Vue({
 			this.posts = [];
 			for(post in state.posts) {
 				state.posts[post].class = 'loaded'; // Hack de error Vue.js en popstate
-				this.posts.push(state.posts[post]);
+		 		this.posts.push(state.posts[post]);
 			}
 		},
 		togglePostTools: function(post) {
@@ -528,6 +531,7 @@ function createEmptyPosts(n) {
 	return emptyPosts;
 }
 
+var scrollTime = Date.now();
 function scrollTo(object, nextObject) {
 	var directScroll = (typeof nextObject === 'undefined') ? true : false;
 
@@ -546,7 +550,6 @@ function scrollTo(object, nextObject) {
 	}
 
 	var scrollTo = scrollCorrection;
-	console.log(scrollToNext);
 	if(directScroll) {
 		scrollTo += thisTop;
 	} else {
@@ -557,11 +560,39 @@ function scrollTo(object, nextObject) {
 	var direction = $(object).offset().top - headerHeight >= 0 ? -1 : 1;
 	// TODO: Evaluar remoción
 	//$(scrollingElement).scrollTop(Math.ceil(scrollTo) + (animationDistance * direction));
-	$(scrollingElement).stop().animate({
-		'scrollTop':  Math.ceil(scrollTo)
-	}, 160, function() {
-		//window.location.hash = refPost; // TODO: Actualizar hash
-	});
+	//$(scrollingElement).scrollTop(Math.ceil(scrollTo));
+	// TODO: Lento. Evaluar
+	/*var frames = 2;
+	var aniDistFrame = 20;
+	var frameMs = 12;
+
+	(function displacement(i) {
+		clearTimeout(aniScroll[i]);
+		console.log(i);
+		$(scrollingElement).scrollTop(Math.ceil(scrollTo+(aniDistFrame*i*direction)));
+		aniScroll[i] = setTimeout(function() {
+			if(i>0) {
+				displacement(--i);
+			}
+		},frameMs);
+	})(frames);*/
+	// Funciona ~
+	//$('#title').val(Date.now() - scrollTime);
+	var offsetTime = Date.now() - scrollTime;
+	if(offsetTime > 400 && false) {
+		//var aniDuration = offsetTime > 660 ? 220 : 160;
+		$(scrollingElement).stop().animate({
+			'scrollTop':  Math.ceil(scrollTo)
+		}, 200, function() {
+			//window.location.hash = refPost; // TODO: Actualizar hash
+			$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
+		});
+	} else {
+		$(scrollingElement).stop().scrollTop(Math.ceil(scrollTo));
+		$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
+	}
+	//$('#title').val(offsetTime);
+	scrollTime = Date.now();
 }
 
 function validateName(pathname, next, error) {
