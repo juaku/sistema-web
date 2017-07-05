@@ -12,25 +12,13 @@ var TagSchema = new Schema({
 	createdAt: {type: Date, default: Date.now}
 });
 
-TagSchema.statics.getPostsByTag = function (req, callback, error) {
-	var resultsLimit = 20;
-	var queryNumber = 0;
-	if(req.params.i!=undefined) {
-		queryNumber = parseInt(req.params.i);
-	}
+TagSchema.statics.getTagId = function (req, callback, error) {
 	var tag = req.session.path;
-	this.findOne({tag: tag})
-	.populate({
-		path: 'posts',
-		match: {
-			active: true, geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
-			},
-		options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
-	})
+	this.findOne({tag: tag}).select('tag')
 	.exec(function (err, tag) {
 		if (err) return handleError(err);
 		if(tag != null) {
-			callback(tag.posts);
+			callback(tag);
 		} else {
 			console.log('NO EXISTE tal tag');
 			error();

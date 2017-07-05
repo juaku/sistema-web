@@ -103,28 +103,15 @@ UserSchema.statics.signUp = function (req, callback, error) {
   }
 }
 
-UserSchema.statics.getPostsByUser = function (req, callback, error) {
-  var resultsLimit = 20;
-  var queryNumber = 0;
-
-  if(req.params.i!=undefined) {
-    queryNumber = parseInt(req.params.i);
-  }
+UserSchema.statics.getUserId = function (req, callback, error) {
   var path = req.session.path.split('.')
   var hexCode = path[0];
   var firstName = path[1];
-  this.findOne({hexCode: hexCode, firstName: firstName})
-  .populate({
-    path: 'posts',
-    match: {
-      active: true, geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
-    },
-    options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
-  })
+  this.findOne({hexCode: hexCode, firstName: firstName}).select('firstName')
   .exec(function (err, user) {
     if (err) return handleError(err);
     if(user != null) {
-      callback(user.posts);
+      callback(user);
     } else {
       console.log('NO EXISTE tal autor');
       error();
@@ -154,8 +141,8 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
       .populate({
         path: 'posts savedPosts',
         match: { tagId: tag.id,
-                 active: true,
-                 geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
+                 active: true//,
+                 //geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
                },
         options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
       })

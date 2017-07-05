@@ -266,11 +266,13 @@ jPack.showPosts = function(userId, accessToken, post, next) {
 			getUserInfo(post[i].authorId, i);
 			if(post[i].authorId == userId) {
 				posts[i].edittable = true;
+			} else {
+				posts[i].edittable = false;
 			}
 			posts[i].tag = post[i].tag;
 			posts[i].originalTag = post[i].originalTag;
 			posts[i].time = post[i].createdAt;
-			posts[i].media = 'https://juaku-dev.cloudapp.net:5000/uploads/' + post[i].media;
+			posts[i].media = '/uploads/' + post[i].media;
 			posts[i].location = {};
 			posts[i].location.latitude = post[i].geo[0];
 			posts[i].location.longitude = post[i].geo[1];

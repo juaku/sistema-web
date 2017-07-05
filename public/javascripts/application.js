@@ -175,9 +175,9 @@ $(document).scroll(function() {
 var gettingPosts = false;
 var sendingPost = false;
 var endOfList = false;
-var queryStart = 0;
+var queryStart = -1;
 var numEmptyPosts = 0;
-var domain = 'https://juaku-dev.cloudapp.net:5000';
+var domain = 'https://' + window.location.hostname + ':' + window.location.port;
 
 function checkScroll(target) {
 	if($(target).scrollTop()*1.5 >= $(target).prop('scrollHeight') && !gettingPosts) {
@@ -303,8 +303,8 @@ var app = new Vue({
 			checkScroll('main');
 		},
 		take: function() {
-			capturePhotoEdit();
-			//$('input#media-loader').click();
+			//capturePhotoEdit();
+			$('input#media-loader').click();
 		},
 		sendNewPost: function(event) {
 			if (confirm('¿Desear enviar el post?')) {
@@ -636,7 +636,9 @@ function simplifyName(name, next) {
 }
 
 app.setGeo();
-//app.router(window.location.pathname.substring(1)); //llama a router cuando se usa la url en escritorio para buscar
+if(window.location.pathname.substring(1) != '') {
+	app.router(window.location.pathname.substring(1)); //llama a router cuando se usa la url en escritorio para buscar
+}
 app.router();
 
 /*if ('serviceWorker' in navigator) {
