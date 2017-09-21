@@ -90,13 +90,16 @@ var routes = require('./routes/index');
 
 var app = express();
 
-// Inicializar Nib
+// Inicializar Stylus + Nib
 function compile(str, path) {
 	return stylus(str)
 		.set('filename', path)
 		.set('compress', false)		// .css final comprimido en una linea
-		.use(nib());
+		.use(nib())
+		.import('nib');				// Nuevo en documentación
 }
+
+app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
 
 // ver configuración de motor
 app.set('views', path.join(__dirname, 'views'));
@@ -126,7 +129,6 @@ app.use(session({ secret: "R4y6G5j7D3c3R4273092", store: new redisStore({
 
 // Inicializar Passport!  También use el middleware passport.session(), para apoyar
 // Sesiones de inicio de sesión persistentes (recomendado).
-app.use(stylus.middleware({ src: __dirname + '/public', compile: compile }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));

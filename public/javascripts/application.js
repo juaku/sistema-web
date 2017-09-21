@@ -67,7 +67,7 @@ function onPhotoDataSuccess(imageData) {
 	var canvas = document.getElementById('new-media-preview');
 	var ctx = canvas.getContext('2d');
 	$('body').addClass('new-post-view');
-	scrollTo($('#new-post'));
+	scrollTo($('#post-preview'));
 	var img = new Image();
 	img.onload = function() {
 		var nTam = 1080;
@@ -99,6 +99,7 @@ function onPhotoDataSuccess(imageData) {
 		var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
 		ctx.rotate(variation.a*Math.PI/180);
 		ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+		$(canvas).parent('.view').addClass('loaded');
 		var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
 		var imgQuality = mobile?0.75:0.75; // 0.5:0.75
 		var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
@@ -179,10 +180,39 @@ var queryStart = -1;
 var numEmptyPosts = 0;
 var domain = 'https://' + window.location.hostname + ':' + window.location.port;
 
+var lastScrollPosition = 0;
+var maxScrollDown = 0;
+var minScrollDown = 9999;
+var minScrollDirection = 20;
+
 function checkScroll(target) {
+	if(target == 'body') {
+		target = $(document);
+	}
 	if($(target).scrollTop()*1.5 >= $(target).prop('scrollHeight') && !gettingPosts) {
 		app.router();
 	}
+	/* ScrollUp */
+	var diffScroll = $(target).scrollTop() - lastScrollPosition;
+	if (diffScroll > 0) {
+		if(maxScrollDown < $(target).scrollTop()) {
+			maxScrollDown = $(target).scrollTop();
+		}
+		if($(target).scrollTop() - minScrollDown > minScrollDirection) {
+			$('#box').removeClass('scrollingUp');
+			minScrollDown = 9999;
+		}
+	} else {
+		if(minScrollDown > $(target).scrollTop()) {
+			minScrollDown = $(target).scrollTop();
+		}
+		if(maxScrollDown - $(target).scrollTop() > minScrollDirection) {
+			$('#box').addClass('scrollingUp');
+			maxScrollDown = 0;
+		}
+	}
+
+	lastScrollPosition = $(target).scrollTop();
 }
 
 Vue.directive('novetwo', function (el, binding) {
@@ -307,7 +337,12 @@ var app = new Vue({
 			$('input#media-loader').click();
 		},
 		up: function() {
-			scrollTo($('#start'));
+			setTimeout(function() {
+				$('main, html, body').stop().animate({	// Se necesita ambos html y body en escritorio
+					'scrollTop':  0
+				}, 300);
+				//scrollTo($('#start'));
+			}, 50); // Hack: Se espera 50ms para que no se cruce con el 'scroll' del usuario
 		},
 		sendNewPost: function(event) {
 			if (confirm('¿Desear enviar el post?')) {
@@ -361,9 +396,8 @@ var app = new Vue({
 		setNewMedia: function(event) {
 			var canvas = document.getElementById('new-media-preview');
 			var ctx = canvas.getContext('2d');
-
 			$('body').addClass('new-post-view');
-			scrollTo($('#new-post'));
+			scrollTo($('#post-preview'));
 			if(event.target.files[0]) {
 				EXIF.getData(event.target.files[0], function() {
 					var orientation = this.exifdata.Orientation;
@@ -413,6 +447,7 @@ var app = new Vue({
 							var yPoint = (nHeight*variation.desY) + cntVar*variation.cntY;
 							ctx.rotate(variation.a*Math.PI/180);
 							ctx.drawImage(img,xPoint,yPoint,nWidth,nHeight);
+							$(canvas).parent('.view').addClass('loaded');
 							var mobile = ( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) )?true:false;
 							var imgQuality = mobile?0.75:0.75; // 0.5:0.75
 							var newImg = canvas.toDataURL( 'image/jpeg' , imgQuality );
@@ -533,66 +568,41 @@ function createEmptyPosts(n) {
 
 var scrollTime = Date.now();
 function scrollTo(object, nextObject) {
-	var directScroll = (typeof nextObject === 'undefined') ? true : false;
+	//setTimeout(function() {
+		var directScroll = (typeof nextObject === 'undefined') ? true : false;
 
-	var thisTop = $(object).offset().top;
-	var scrollCorrection = 0;
-	var scrollToNext = false;
-	var headerHeight = 52;
-	var animationDistance = 60;
-	if(window.innerWidth <= 480) {
-		scrollToNext = (Math.abs(thisTop) < 1 + headerHeight);
-		scrollingElement = 'main'
-		scrollCorrection = $(scrollingElement).scrollTop() - headerHeight;
-	} else {
-		scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
-		scrollingElement = 'html, body';
-	}
+		var thisTop = $(object).offset().top;
+		var scrollCorrection = 0;
+		var scrollToNext = false;
+		var headerHeight = 52;
 
-	var scrollTo = scrollCorrection;
-	if(directScroll) {
-		scrollTo += thisTop;
-	} else {
-		var nextTop = $(nextObject).offset().top;
-		scrollTo += (scrollToNext ? nextTop : thisTop);
-	}
+		if(window.innerWidth <= 480) {
+			scrollToNext = (Math.abs(thisTop) < 1 + headerHeight);
+			scrollingElement = 'main'
+			scrollCorrection = $(scrollingElement).scrollTop() - headerHeight;
+		} else {
+			scrollToNext = (Math.abs(thisTop - $(window).scrollTop()) < 1);
+			scrollingElement = 'html, body';
+		}
 
-	var direction = $(object).offset().top - headerHeight >= 0 ? -1 : 1;
-	// TODO: Evaluar remoción
-	//$(scrollingElement).scrollTop(Math.ceil(scrollTo) + (animationDistance * direction));
-	//$(scrollingElement).scrollTop(Math.ceil(scrollTo));
-	// TODO: Lento. Evaluar
-	/*var frames = 2;
-	var aniDistFrame = 20;
-	var frameMs = 12;
+		var scrollTo = scrollCorrection;
+		if(directScroll) {
+			scrollTo += thisTop;
+		} else {
+			var nextTop = $(nextObject).offset().top;
+			scrollTo += (scrollToNext ? nextTop : thisTop);
+		}
 
-	(function displacement(i) {
-		clearTimeout(aniScroll[i]);
-		console.log(i);
-		$(scrollingElement).scrollTop(Math.ceil(scrollTo+(aniDistFrame*i*direction)));
-		aniScroll[i] = setTimeout(function() {
-			if(i>0) {
-				displacement(--i);
-			}
-		},frameMs);
-	})(frames);*/
-	// Funciona ~
-	//$('#title').val(Date.now() - scrollTime);
-	var offsetTime = Date.now() - scrollTime;
-	if(offsetTime > 400 && false) {
-		//var aniDuration = offsetTime > 660 ? 220 : 160;
-		$(scrollingElement).stop().animate({
+		/*$(scrollingElement).stop().animate({
 			'scrollTop':  Math.ceil(scrollTo)
-		}, 200, function() {
+		/*}, 50, function() {
 			//window.location.hash = refPost; // TODO: Actualizar hash
-			$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
-		});
-	} else {
-		$(scrollingElement).stop().scrollTop(Math.ceil(scrollTo));
-		$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
-	}
-	//$('#title').val(offsetTime);
-	scrollTime = Date.now();
+		});*/
+		//$(scrollingElement).scrollTop(Math.ceil(scrollTo));
+		$(scrollingElement).scrollTop(Math.ceil(scrollTo));
+		//setTimeout( function() {
+			//$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
+		//}, 50); // Hack: Se espera 50ms para que no se cruce con el 'scroll' del usuario
 }
 
 function validateName(pathname, next, error) {

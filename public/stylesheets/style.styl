@@ -50,7 +50,7 @@ body
 
 section#view-controls
 	position: fixed
-	height: 82vh
+	height: 82.5vh
 	max-height: 54vw
 	min-height: 30vw
 
@@ -171,9 +171,9 @@ main
 	display: none
 
 #start
-	width: 82vh
+	width: 82.5vh
 	position: relative
-	height: 82vh
+	height: 82.5vh
 	max-width: 54vw
 	max-height: 54vw
 	min-width: 30vw
@@ -211,10 +211,10 @@ main
 	background-color: backColor
 	//background-color: inherit // #F05 Truco de maquetación
 	//width: calc(82vh + .5px) // Correción de pixel fracional
-	width: 82vh
+	width: 82.5vh
 	max-width: 54vw
 	// margin-bottom: 3vh
-	border-bottom: 4vh solid back1Color // 3vh +1 corrección
+	border-bottom: 2.5vh solid back1Color // 3vh +1 corrección. Prueba estático 32px
 	min-width: 30vw
 	position: relative
 
@@ -222,7 +222,7 @@ main
 	background-color: back1Color
 	width: 100%
 	//height: calc(82vh + .5px) // Correción de pixel fracional
-	height: 82vh
+	height: 82.5vh
 	max-width: 54vw
 	max-height: 54vw
 	min-width: 30vw
@@ -241,7 +241,7 @@ main
 .post .view.loaded
 	background-color: backColor
 	
-.post .view.loaded img
+.post .view.loaded .media
 	opacity: 1
 
 .post .view .preloader-animation
@@ -252,7 +252,7 @@ main
 	left: 50%
 	top: 50%
 	transform: translate(-50%, -50%)
-	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
+	animation: preloader 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
 
 .post .view.loaded .preloader-animation
 	display: none
@@ -315,7 +315,7 @@ main
 	// letter-spacing: -0.02em
 
 .info .save-button
-	width: 19.2%
+	width: 20%
 
 .info a.save-post-link
 	display: block
@@ -344,6 +344,7 @@ main
 	// mix-blend-mode: hard-light
 	// background: linear-gradient(to right, rgba(0,0,0,.4) 0%, rgba(0,0,0,.8) 100%)
 	background-color: rgba(0,0,0,.8)
+	color: backColor
 	transition: opacity 100ms
 	opacity: 0
 	visibility: hidden;
@@ -595,15 +596,23 @@ input#media-loader
 	position: absolute*/
 	
 #up
-	width: 10vmin
-	height: 10vmin
-	background-color: rgba(0,0,0,.5)
+	width: 32px
+	height: 32px
+	background-color: frontColor
 	border-radius: 50%
 	position: fixed
 	transform: translate(-50%,0)
 	left: 50%
-	top: 60px
 	z-index: 1
+	bottom: 96px
+	opacity: 0
+	transition: bottom 200ms ease, opacity 200ms ease
+	border: 2px solid backColor
+	box-shadow: 0 2px 1px rgba(0,0,0,.2)
+	
+.scrollingUp #up
+	bottom: 70px
+	opacity: 1
 
 section#post-preview
 	display: none
@@ -626,13 +635,10 @@ section#post-preview #post-preview-controls #post-name-input
 	position: relative
 
 section#post-preview #post-preview-controls #post-name-input label.at-simbol
-section#post-preview #post-preview-controls #post-name-input input#new-post-tag
 	letter-spacing: -0.5px
 	display: table-cell
 	vertical-align: middle
 	height: 24px
-
-section#post-preview #post-preview-controls #post-name-input label.at-simbol
 	font-family: 'Verdana', sans-serif
 	width: 1em
 
@@ -692,7 +698,7 @@ section#post-preview #post-preview-controls #send-post
 
 // .config-view
 
-body.config-view #box #new-post
+body.config-view #box #post-preview
 body.config-view #box #post-list
 	display: none
 body.config-view #box 
@@ -701,7 +707,7 @@ body.config-view #box
 // .posts-view
 
 body.posts-view #box 
-body.posts-view #box #new-post
+body.posts-view #box #post-preview
 	display: none
 body.posts-view #box #post-list
 	display: block
@@ -713,13 +719,13 @@ body.new-post-view #box #post-list
 	display: none
 
 @media screen and (max-width: 480px)
-	body.new-post-view #box #new-post
-		display: block	
+	body.new-post-view #box #post-preview
+		display: block
 
 // .events-view
 
 body.events-view #box #side
-body.events-view #box #new-post
+body.events-view #box #post-preview
 body.events-view #box #post-list
 	display: none
 
@@ -820,9 +826,9 @@ body.events-view #box #post-list
 		right: 50%
 		bottom: 0
 		border-radius: 50%
-		margin-bottom: 10px
-		background-color: backColor
-		box-shadow: 0 2px 1px rgba(0,0,0,.2)
+		margin-bottom: 8px
+		background-color: frontColor
+		//box-shadow: 0 2px 1px rgba(0,0,0,.2)
 
 	#take:before
 	//#take:after
@@ -831,7 +837,7 @@ body.events-view #box #post-list
 		top: 50%
 		left: 50%
 		transform: translate(-50%, -50%)
-		background-color: front2Color
+		background-color: backColor
 
 	#take:before
 		width: 44px
@@ -986,11 +992,8 @@ body.events-view #box #post-list
 
 	.post
 		max-width: inherit
+		border-bottom-width: 16px
 
-	.dark .info
-		/*background-color: frontColor*/
-		color: backColor
-	
 	@keyframes preloader
 		0%
 			box-shadow: 0 0 0 0 rgba(0,0,0,0)
@@ -1072,6 +1075,10 @@ body.dark .post .view
 	
 body.dark .post .view .preloader-animation
 	animation: preloaderDark 750ms linear infinite // Infinite Genera parpadeo en chrome debug cambiar por otra cosa
+
+body.dark .info
+	background-color: frontColor
+	color: backColor
 
 body.dark .info a.save-post-link.saved .save
 	background-color: front1Color
