@@ -104,8 +104,8 @@ block content
                 a(ng-if="post.edittable" ng-click="fn(post)").more
                   span #{__('more')}
                   svg.icon
-            //button(ng-if="post.edittable" v-show="post.editing" ng-click="modifyTag(post)") #{__('Modificar TAG')}
-            //button(ng-if="post.edittable" v-show="post.editing" ng-click="updateTag(post)") #{__('Actualizar TAG')}
+        button(v-if="post.edittable" v-show="!post.editTag" v-on:click="modifyTag(post)") #{__('Modificar TAG')}
+        button(v-if="post.edittable" v-show="post.editTag" v-on:click="updateTag(post)") #{__('Actualizar TAG')}
         .info
           .author-picture
             img(:src="post.author.picture")
@@ -116,13 +116,14 @@ block content
                 span.author-name {{ post.author.originalFirstName }}
               a.post-tag-link(href='' v-on:click="router('@' + post.tag, $event)")
                 span.at(v-show="post.tag") @
-                span(v-show="!post.editing" ng-model="newTag") {{post.originalTag}}
-              span(v-show="post.editing")
-                input.event-name(type="text", ng-model="post.tag")
+                span(v-show="!post.editTag") {{post.originalTag}}
+              span(v-show="post.editTag")
+                input.event-name(type="text", v-model="post.newTag" )
             time.post-time(v-bind:datetime="post.time") {{ post.timeFromNow }}
           .save-button(v-show="post.saved!=undefined")
-            a(v-on:click="togglePostTools(post)" v-bind:class="{ saved: post.saved }").save-post-link
+            a(v-bind:class="{ saved: post.saved }").save-post-link
               img(src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==').save
+            //a(v-if="!post.edittable" v-on:click="reportPost(post)" v-bind:class="{ saved: post.saved }").save-post-link
       section#end
         #endMessage(v-if="route") #{__('Llegaste al final de ')} {{ route }}
         #endMessage(v-else) #{__('Llegaste al final')} {{ route }}

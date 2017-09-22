@@ -6,6 +6,9 @@ var config = require('../config');
 var expressJwt = require('express-jwt');
 var ensureAuthenticated = expressJwt({secret : config.tokenSecret});
 
+//Modelos
+var User = require('../models/user');
+
 // Clases jPack
 var jPack = require('../jPack');
 
@@ -73,13 +76,14 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 				console.log(error);
 			});
-		} */else if (req.params.action=='change-language') {
-			jUser.changeLanguage(req, res, function() {
+		} */else if (req.params.action=='changeLanguage') {
+			jPack.changeLanguage(req, res, function() {
 				res.status(201).end();
 			}, function(error) {
 				res.status(400).end();
 				console.log(error);
 			});
+		} else if (req.params.action=='reportUser') {
 		}
 	}
 });

@@ -58,10 +58,10 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 			if(err) error();
 			User.update({ _id: userId }, { $push: { posts: post._id }}, function (err, doc) {
 				if (err) error();
-				console.log('accion referenciada a user');
+				console.log('post referenciada a user');
 				console.log(doc);
 				if(objectTag!= null) {
-					Post.update({ _id: post._id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
+					Post.findOneAndUpdate({ _id: post._id }, { $set: { tagId: objectTag._id }}, { new: true }, function (err, doc) {
 						if (err) error();
 					});
 					objectTag.posts.push(post._id);
@@ -74,14 +74,19 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 					tag.posts = post._id;
 					tag.save(function (err) {
 						if (err) error();
-						Post.update({ _id: post._id }, { $set: { tagId: tag._id }}, function (err, doc) {
+						Post.findOneAndUpdate({ _id: post._id }, { $set: { tagId: tag._id }}, { new: true }, function (err, doc) {
 							if (err) error();
 						});
 						console.log('Tag guardado y acción referenciada');
 					});
 				}
-				callback(mediaName);
 			});
+			post.on('es-indexed', function(err, res){
+				if (err) throw err;
+				/* Document is indexed */
+				console.log('El post se guardó en elastic también!');
+			});
+			callback(mediaName);
 		});
 		if(newPost.shareOnFb) {
 			var url = 'http://juaku-dev.cloudapp.net:3000/uploads/' + mediaName + '.' + mediaExt;
@@ -119,50 +124,60 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 	}
 }
 
-TagSchema.statics.editTag = function (post, userId, callback, error) {
+TagSchema.statics.editTag = function (post, currentUserId, callback, error) {
 	var Post = mongoose.model('Post');
 	var User = mongoose.model('User');
-	var newSimpleTag = simplifyName(post.tag);
-	var oldSimpleTag = simplifyName(post.oldTag);
+	var oldTag = post.tagToBeChanged;
+	var newTag = simplifyName(post.newTag);
+
 	var FB = require('fb');
-	if(post.author.id == userId && oldSimpleTag != newSimpleTag && newSimpleTag != '' && newSimpleTag != undefined) {
-		//Remueve POST referenciado a TAG antiguo
-		this.update({ name: oldSimpleTag }, { $pull: { posts: post.id }}, function (err, doc) {
-			if (err) error();
-			console.log('accion removida de tag: ' + oldSimpleTag);
-			console.log(doc);
-		});
-		//Cambia nombre de TAG dentro de POST
-		Post.update({ _id: post.id }, { $set: { name: post.tag }}, function (err, doc) {
-			if (err) error();
-			console.log('Actualización de tag en post: ' + newSimpleTag);
-			console.log(doc);
-		});
-		//Referencia POST a nuevo TAG
-		this.findOne({name: newSimpleTag}, function(err, objectTag) {
-			if(err) throw err;
-			if(objectTag!= null) {
-				Post.update({ _id: post.id }, { $set: { tagId: objectTag._id }}, function (err, doc) {
-					if (err) error();
-				});
-				objectTag.posts.push(post.id);
-				objectTag.save();
-				console.log('Acción referenciada a tag');
-			} else {
-				var Tag = mongoose.model('Tag', TagSchema);
-				var tag = new Tag();
-				tag.name = newSimpleTag;
-				tag.posts = post.id;
-				tag.save(function (err) {
-					if (err) error();
-					Post.update({ _id: post.id }, { $set: { tagId: tag._id }}, function (err, doc) {
+	if(post.oldTag != newTag) { // Compara si el tag nuevo es igual al anterior
+		if(post.author.id == currentUserId && oldTag != newTag && newTag != '' && newTag != undefined) {
+			// Remueve POST referenciado a TAG antiguo
+			this.update({ tag: oldTag }, { $pull: { posts: post.id }}, function (err, doc) {
+				if (err) error();
+				console.log('post removida de tag: ' + oldTag);
+				console.log(doc);
+			});
+			// Actualiza tag y originalTag
+			// findOneAndUpdate de mongoose actualizará automáticamente la data dentro de elastic siempre y cuando new: true esté seteado en las opciones
+			Post.findOneAndUpdate({ _id: post.id }, { $set: { tag: newTag }}, { new: true }, function (err, doc) {
+				if (err) error();
+				console.log('Actualización de tag: ' + newTag);
+				console.log(doc);
+			});
+			Post.update({ _id: post.id }, { $set:{ originalTag: post.newTag }}, function (err, doc) {
+				if (err) error();
+				console.log('Actualización de originalTag: ' + post.newTag);
+				console.log(doc);
+			});
+			// Referencia POST a nuevo TAG
+			this.findOne({tag: newTag}, function(err, objectTag) {
+				if(err) throw err;
+				if(objectTag!= null) {
+					Post.findOneAndUpdate({ _id: post.id }, { $set: { tagId: objectTag._id }}, { new: true }, function (err, doc) {
 						if (err) error();
 					});
-					console.log('Tag guardado y acción referenciada');
-				});
-			}
-		});
-		callback();
+					objectTag.posts.push(post.id);
+					objectTag.save();
+					console.log('Acción referenciada a tag');
+				} else {
+					var Tag = mongoose.model('Tag', TagSchema);
+					var tag = new Tag();
+					tag.tag = newTag;
+					tag.originalTag = post.newTag;
+					tag.posts = post.id;
+					tag.save(function (err) {
+						if (err) error();
+						Post.findOneAndUpdate({ _id: post.id }, { $set: { tagId: tag._id }}, { new: true }, function (err, doc) {
+							if (err) error();
+						});
+						console.log('Tag guardado y acción referenciada');
+					});
+				}
+			});
+			callback();
+		}
 	}
 }
 
