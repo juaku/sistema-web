@@ -170,7 +170,7 @@ function postsLoaded() {
 }
 
 $(document).scroll(function() {
-	checkScroll('body');
+	checkScroll('html');
 });
 
 var gettingPosts = false;
@@ -186,9 +186,6 @@ var minScrollDown = 9999;
 var minScrollDirection = 20;
 
 function checkScroll(target) {
-	if(target == 'body') {
-		target = $(document);
-	}
 	if($(target).scrollTop()*1.5 >= $(target).prop('scrollHeight') && !gettingPosts) {
 		app.router();
 	}
@@ -316,7 +313,10 @@ var app = new Vue({
 				}
 
 				if(queryStart == 0 && route!='') {
-					scrollTo($('.post').first().next());
+					// TODO: Hack para esperar al render del DOM
+					setTimeout(function() {
+						scrollTo($('article.post').first());
+					}, 1);
 				}
 
 				next();
@@ -338,7 +338,7 @@ var app = new Vue({
 		},
 		up: function() {
 			setTimeout(function() {
-				$('main, html, body').stop().animate({	// Se necesita ambos html y body en escritorio
+				$('main, html, body').stop().animate({ // Se necesita html en vez de o con body en escritorio
 					'scrollTop':  0
 				}, 300);
 				//scrollTo($('#start'));
@@ -570,14 +570,24 @@ var scrollTime = Date.now();
 function scrollTo(object, nextObject) {
 	//setTimeout(function() {
 		var directScroll = (typeof nextObject === 'undefined') ? true : false;
-
 		var thisTop = $(object).offset().top;
+		var nextTop = !directScroll ? $(nextObject).offset().top : 0;
 		var scrollCorrection = 0;
 		var scrollToNext = false;
-		var headerHeight = 52;
+		var headerHeight = $('#side').height();
+
+		if($(object).parents('body').height() <= 520) {
+			if($(object).parents('#box').hasClass('scrollingUp')) {
+				thisTop -= headerHeight;
+				nextTop -= headerHeight;
+			}
+			headerHeight = 0;
+		}
 
 		if(window.innerWidth <= 480) {
-			scrollToNext = (Math.abs(thisTop) < 1 + headerHeight);
+			//scrollToNext = (Math.abs(thisTop) < 1 + headerHeight); // TODO: ¿Error?
+			// TODO: El ceil para 51.25 a 52
+			scrollToNext = (Math.abs(Math.ceil(thisTop)) == headerHeight);
 			scrollingElement = 'main'
 			scrollCorrection = $(scrollingElement).scrollTop() - headerHeight;
 		} else {
@@ -586,10 +596,10 @@ function scrollTo(object, nextObject) {
 		}
 
 		var scrollTo = scrollCorrection;
+
 		if(directScroll) {
 			scrollTo += thisTop;
 		} else {
-			var nextTop = $(nextObject).offset().top;
 			scrollTo += (scrollToNext ? nextTop : thisTop);
 		}
 
@@ -598,8 +608,16 @@ function scrollTo(object, nextObject) {
 		/*}, 50, function() {
 			//window.location.hash = refPost; // TODO: Actualizar hash
 		});*/
-		//$(scrollingElement).scrollTop(Math.ceil(scrollTo));
 		$(scrollingElement).scrollTop(Math.ceil(scrollTo));
+
+		// Prevenir que el auto scroll revele la barra superior
+		if(!directScroll) {
+			// TODO: Hack para evitar que se adiera la clase
+			setTimeout(function() {
+				$(object).parents('#box').removeClass('scrollingUp');
+			}, 5);
+		}
+
 		//setTimeout( function() {
 			//$('#title').val($('#title').val()); // Hack para forzar Vue a renderizar. Evita fotograma corrupto.
 		//}, 50); // Hack: Se espera 50ms para que no se cruce con el 'scroll' del usuario

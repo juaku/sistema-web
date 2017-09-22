@@ -43,11 +43,11 @@ block content
               a#load-more(href='#' ng-click="showMoreEvents(limit)") #{__('Show more')}
       section#account-controls
         a(href="/logout" v-on:click.stop.prevent="logout") #{__('Logout')}
-      #up(v-on:click="up")
       footer
         a#brand-url juaku.com
         nav Términos y condiciones | Prensa
         #brand Juaku 2017
+    #up(v-on:click="up")
     main(v-on:scroll="scroll")
       section#start(v-on:click="changeTheme($event)")
         a#logo-link(href="/" v-on:click.prevent)

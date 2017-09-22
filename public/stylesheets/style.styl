@@ -609,6 +609,7 @@ input#media-loader
 	transition: bottom 200ms ease, opacity 200ms ease
 	border: 2px solid backColor
 	box-shadow: 0 2px 1px rgba(0,0,0,.2)
+	cursor: pointer
 	
 .scrollingUp #up
 	bottom: 70px
@@ -1036,6 +1037,25 @@ body.events-view #box #post-list
 	
 	.info .post-time
 		font-size: 12px
+
+@media screen and (max-height: 520px)
+	#side
+		position: absolute
+		top: -52px
+		transition: top 200ms ease
+	
+	.scrollingUp #side
+		top: 0
+
+@media screen and (max-width: 480px) and (max-height: 520px)
+	main
+		transition: top 200ms ease, height 200ms ease
+		top:0
+		height: 100vh
+	
+	.scrollingUp main
+		top: 52px
+		height: calc(100vh - 52px)
 
 /*
 	Temas
