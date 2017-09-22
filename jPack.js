@@ -269,6 +269,7 @@ jPack.showPosts = function(userId, accessToken, post, next) {
 			} else {
 				posts[i].edittable = false;
 			}
+			posts[i].editTag = false;
 			posts[i].tag = post[i].tag;
 			posts[i].originalTag = post[i].originalTag;
 			posts[i].time = post[i].createdAt;
@@ -361,9 +362,9 @@ jPack.validateName = function(pathname, next, error) {
 }
 
 jPack.checkTag = function(tag, next, error) {
-	var pathRegExp = new RegExp(/[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß]{3,}/g);
-	var tagName = pathRegExp.exec(tag);
-	if(tagName) {
+	var pathRegExp = new RegExp(/(^[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+	var tagName = pathRegExp.test(tag);
+	if(tagName) { // false o true
 		simplifyName(tag, function(tag) {
 			next(tag);
 		});
@@ -1102,16 +1103,14 @@ function savePost(req, simpleEventName, data, next, error) {
  * @par {string} data, {object} data, {function} next, {function} error.
  * @return null
  */
-jPack.user.prototype.changeLanguage = function(req, res, next, error) {
+jPack.changeLanguage = function(req, res, next, error) {
 	var locale = req.body.language;
-	if(locale == req.cookies.locale) {
-		console.log('no cambio nada');
-		next();
-	} else {
+	if(locale != req.cookies.locale) {
 		console.log('cambio de idioma exitoso');
 		res.cookie('locale', locale, { maxAge: 1000*60*60*24*15, httpOnly: true });
 		next();
 	}
+	next();
 }
 
 /*

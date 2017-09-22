@@ -224,7 +224,9 @@ var app = new Vue({
 		posts: localStorage.getItem('token')?createEmptyPosts(0):createEmptyPosts(3),
 		newPost: {
 			shareOnFb: false
-		}
+		},
+		oldTag: null,
+		newTag: null
 	},
 	http: {
 		headers: {
@@ -377,21 +379,88 @@ var app = new Vue({
 		},
 		togglePostTools: function(post) {
 			if (!post.tools) {
-			/*if (!post.saved) {*/
-	 			post.tools = true;
-	 			/*post.saved = true;
-	 			this.$http.post('/post/save', post).then(function(data) {
-					socket.emit('showPostSaved', data.body);
-	 			},function(e) {
-	 			});*/
-	 		} else {
-	 			post.tools = false;
-	 			/*post.saved = false;
-	 			console.log(post);
-	 			this.$http.post('/post/unsave', post).then(function(data) {
-	 			},function(e) {
-	 			});*/
-	 		}
+				post.tools = true;
+			} else {
+				post.tools = false;
+			}
+		},
+		savePost: function(post) {
+			if(!post.edittable) {
+				if (!post.saved) {
+					post.saved = true;
+					this.$http.post('/post/save', post).then(function(data) {
+						socket.emit('showPostSaved', data.body);
+					},function(e) {
+					});
+				} else {
+					post.saved = false;
+					console.log(post);
+					this.$http.post('/post/unsave', post).then(function(data) {
+					},function(e) {
+					});
+				}
+			}
+		},
+		sharePost: function(post) {
+			this.$http.post('/post/shareActionOnFb', post).then(function(data) {
+			},function(e) {
+			});
+		},
+		deletePost: function(post) {
+			if(post.edittable) {
+				if(confirm("Seguro que desas borrar este post?")) {
+					this.$http.post('/post/deletePost', post).then(function(data) {
+					},function(e) {
+					});
+				}
+			}
+		},
+		modifyTag: function(post) {
+			post.editTag = true;
+			post.tagToBeChanged = post.tag;
+		},
+		updateTag: function(post) {
+			post.oldTag = post.tag;
+			var pathRegExp = new RegExp(/(^[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+			var bool = pathRegExp.test(post.newTag); // false o true
+			if(post.newTag != '' && post.newTag != undefined) {
+				if(bool) {
+					simplifyName(post.newTag, function(tag) {
+						post.tag = tag; // Cuando se haga click sobre el tag, apuntará hacia el nuevo post
+					});
+					post.originalTag = post.newTag; // Muestra el tag cambiado
+					post.editTag = false;
+					this.$http.post('/post/editTag', post).then(function() {
+					},function(e) {
+					});
+				} else {
+					post.editTag = false;
+					alert('Tag no permitido');
+				}
+			} else {
+				post.editTag = false;
+				alert('Tag no permitido');
+			}
+		},
+		changeLanguage: function(language) {
+			// TODO: No cambia el idioma, revisar
+			var object = {};
+			object.language = language;
+			this.$http.post('/user/changeLanguage', object).then(function() {
+			},function(e) {
+			});
+		},
+		reportPost: function(post) {
+			if(!post.edittable) {
+				if(confirm("Seguro que desas reportar este post?")) {
+					this.$http.post('/post/reportPost', post).then(function() {
+					},function(e) {
+					});
+				}
+			}
+		},
+		postURL: function(post) {
+			app.router('p/' + post.id);
 		},
 		setNewMedia: function(event) {
 			var canvas = document.getElementById('new-media-preview');
@@ -624,9 +693,9 @@ function scrollTo(object, nextObject) {
 }
 
 function validateName(pathname, next, error) {
-	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?(?:@([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?$|^([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+	var pathRegExp = new RegExp(/^((?:[0-9A-Fa-f]{3})\.(?:[A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?(?:@([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,}))?$|^([0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$|^([p\/0-9a-fA-F]+)$/g);
 	var path = pathRegExp.exec(pathname);
-	var userId, hexCode, nameUser, tagName, channelRequest, userRequest, tagRequest;
+	var userId, hexCode, nameUser, tagName, channelRequest, userRequest, tagRequest, post;
 	if(path[0]) {
 		if(path[1]) {
 			if(path[2]) {
@@ -662,6 +731,10 @@ function validateName(pathname, next, error) {
 				});
 			} else if(path[3]) {
 				console.log('Tag path[3]');
+			} else if(path[4]) {
+				//Post
+				post = path[4];
+				next(post);
 			}
 		}
 	} else {
@@ -670,28 +743,21 @@ function validateName(pathname, next, error) {
 	}
 }
 
-function simplifyName(name, next) {
-	console.log('simplifyName');
-	var diacritics = [
-		{re:/[\xC0-\xC6]/g, ch:'A'},
-		{re:/[\xE0-\xE6]/g, ch:'a'},
-		{re:/[\xC8-\xCB]/g, ch:'E'},
-		{re:/[\xE8-\xEB]/g, ch:'e'},
-		{re:/[\xCC-\xCF]/g, ch:'I'},
-		{re:/[\xEC-\xEF]/g, ch:'i'},
-		{re:/[\xD2-\xD6]/g, ch:'O'},
-		{re:/[\xF2-\xF6]/g, ch:'o'},
-		{re:/[\xD9-\xDC]/g, ch:'U'},
-		{re:/[\xF9-\xFC]/g, ch:'u'},
-		{re:/[\xD1]/g, ch:'N'},
-		{re:/[\xF1]/g, ch:'n'},
-		{re:/[\307]/g, ch:'C'},
-		{re:/[\347]/g, ch:'c'}
+function simplifyName(tag, next) {
+	var diacritics =[
+		/[\300-\306]/g, /[\340-\346]/g,  // A, a
+		/[\310-\313]/g, /[\350-\353]/g,  // E, e
+		/[\314-\317]/g, /[\354-\357]/g,  // I, i
+		/[\322-\330]/g, /[\362-\370]/g,  // O, o
+		/[\331-\334]/g, /[\371-\374]/g,  // U, u
+		/[\321]/g, /[\361]/g, // N, n
+		/[\307]/g, /[\347]/g, // C, c
 	];
+	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
 	for (var i = 0; i < diacritics.length; i++) {
-		name = name.replace(diacritics[i].re, diacritics[i].ch);
+		tag = tag.replace(diacritics[i],chars[i]);
 	}
-	next(name.toLowerCase());
+	next(tag.toLowerCase());
 }
 
 app.setGeo();

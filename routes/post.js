@@ -36,7 +36,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log(error);
 				res.status(400).end();
 			});
-		} else if (req.params.action=='reportAction') {
+		} else if (req.params.action=='reportPost') {
 			Post.reportPost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {
@@ -44,8 +44,8 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='editTag') {
-			var pathRegExp = new RegExp(/([0-9A-Za-z%]{3,})/g);
-			var newTag = pathRegExp.exec(req.body.tag);
+			var pathRegExp = new RegExp(/(^[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+			var newTag = pathRegExp.test(req.body.newTag); // false o true
 			if(newTag) {
 				Tag.editTag(req.body, req.session.idMongoDb, function () {
 					res.status(201).end();
@@ -57,7 +57,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				console.log('TAG no permitido');
 				res.status(400).end();
 			}
-		} else if (req.params.action=='deleteAction') {
+		} else if (req.params.action=='deletePost') {
 			Post.deletePost(req.body, req.session.idMongoDb, function() {
 				res.status(201).end();
 			}, function(error) {

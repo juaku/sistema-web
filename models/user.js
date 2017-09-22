@@ -5,6 +5,7 @@ var fs = require('fs');
 var http = require('http');
 var url = require('url');
 require('./tag');
+require('./action');
 
 var UserSchema = new Schema({
   providerId: {type: String, unique: true},
@@ -102,20 +103,47 @@ UserSchema.statics.signUp = function (req, callback, error) {
     callback();
   }
 }
+UserSchema.statics.getPostsByUser = function (req, callback, error) {
+  var resultsLimit = 20;
+  var queryNumber = 0;
 
-UserSchema.statics.getUserId = function (req, callback, error) {
+  if(req.params.i!=undefined) {
+    queryNumber = parseInt(req.params.i);
+  }
+
   var path = req.session.path.split('.')
   var hexCode = path[0];
   var firstName = path[1];
-  this.findOne({hexCode: hexCode, firstName: firstName}).select('firstName')
+  this.findOne({_id: req.session.idMongoDb})
+  .populate({
+    path: 'posts',
+    match: {
+      active: true
+    }
+  })
+  .select('reportedPosts')
   .exec(function (err, user) {
     if (err) return handleError(err);
-    if(user != null) {
-      callback(user);
-    } else {
-      console.log('NO EXISTE tal autor');
-      error();
-    }
+    var User = mongoose.model('User', UserSchema);
+    User.findOne({hexCode: hexCode, firstName: firstName})
+    .populate({
+      path: 'posts',
+      match: {
+        $and: [
+          {_id: {$nin: user.reportedPosts}},
+          {active: true}
+        ]
+      },
+      options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+    })
+    .exec(function (err, post) {
+      if(post != null) {
+        callback(post.posts);
+      } else {
+        console.log('NO EXISTE tal autor');
+        error();
+      }
+    })
   })
 }
 
@@ -137,24 +165,38 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
 
   Tag.findOne({ 'tag': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
-      User.findOne({hexCode: hexCode, firstName: firstName})
+      User.findOne({_id: req.session.idMongoDb})
       .populate({
-        path: 'posts savedPosts',
-        match: { tagId: tag.id,
-                 active: true//,
-                 //geo: { $geoWithin: {$center: [[req.session.coords.longitude, req.session.coords.latitude], 500]} }
-               },
-        options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+        path: 'posts',
+        match: {
+          active: true
+        }
       })
+      .select('reportedPosts')
       .exec(function (err, user) {
         if (err) return handleError(err);
-        if(user != null) {
-          var posts = user.posts.concat(user.savedPosts);
-          callback(posts);
-        } else {
-          console.log('NO EXISTE tal autor');
-          error();
-        }
+        User.findOne({hexCode: hexCode, firstName: firstName})
+        .populate({
+          path: 'posts savedPosts',
+          match: {
+            $and: [
+              {tagId: tag.id},
+              {active: true},
+              {_id: {$nin: user.reportedPosts}}
+            ]
+          },
+          options: {skip: resultsLimit*queryNumber, limit: resultsLimit, sort: { createdAt: -1 }}
+        })
+        .exec(function (err, user) {
+          if (err) return handleError(err);
+          if(user != null) {
+            var posts = user.posts.concat(user.savedPosts);
+            callback(posts);
+          } else {
+            console.log('NO EXISTE tal autor');
+            error();
+          }
+        })
       })
     } else {
       console.log('NO EXISTE tal evento');
