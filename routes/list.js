@@ -24,6 +24,37 @@ var jPack = require('../jPack');
 		console.log(mapping);
 	}
 });*/
+/*Tag.createMapping({
+	"settings": {
+		"analysis": {
+			"filter": {
+				"autocomplete_filter": {
+					"type": "edge_ngram",
+					"min_gram": 1,
+					"max_gram": 20
+				}
+			},
+			"analyzer": {
+				"autocomplete": {
+					"type": "custom",
+					"tokenizer": "standard",
+					"filter": [
+						"lowercase",
+						"autocomplete_filter"
+					]
+				}
+			}
+		}
+	}
+}, function(err, mapping){
+	if(err) {
+		console.log('error creating mapping');
+		console.log(err);
+	} else {
+		console.log('Mapping created');
+		console.log(mapping);
+	}
+});*/
 
 // TODO: Método synchronize abre un 'mongoose stream' e inicia la indexación de documentos individualmente.
 /*var stream = Post.synchronize();
@@ -171,6 +202,33 @@ router.get('/:media([p\/0-9a-fA-F]+)', ensureAuthenticated, function(req, res) {
 				res.json(post);
 			}
 		});
+	});
+});
+
+router.get('/:search/:q/:word', ensureAuthenticated, function(req, res) {
+	var word = req.params.word.split('@');
+	var tag = word[1];
+	Tag.esSearch({
+		from : 0,
+		size : 3,
+		query: {
+			"match": {
+				"tag": tag
+			}
+		},
+	}, function(err, results){
+		if(err) {
+			console.log(err);
+			res.status(400).end();
+		}
+		var suggestedTags = results.hits.hits.map(function(hit){
+			return hit._source.tag;
+		});
+		if(suggestedTags.length > 0) {
+			res.json(suggestedTags);
+		} else {
+			res.status(202).end();
+		}
 	});
 });
 

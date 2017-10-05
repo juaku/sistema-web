@@ -226,7 +226,9 @@ var app = new Vue({
 			shareOnFb: false
 		},
 		oldTag: null,
-		newTag: null
+		newTag: null,
+		suggestedTags: [],
+		lastWordSuggested: null
 	},
 	http: {
 		headers: {
@@ -449,6 +451,22 @@ var app = new Vue({
 			this.$http.post('/user/changeLanguage', object).then(function() {
 			},function(e) {
 			});
+		},
+		suggest: function(word) {
+			var pathRegExp = new RegExp(/(^@[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+			var bool = pathRegExp.test(word); // false o true
+			if(bool) {
+				if(app.lastWordSuggested != word) {
+					app.lastWordSuggested = word;
+					simplifyName(word, function(tag) {
+						app.$http.get('/list/search/q/' + tag).then(function(res) {
+							app.suggestedTags = res.body;
+							console.log(app.suggestedTags);
+						},function(e) {
+						});
+					});
+				}
+			}
 		},
 		reportPost: function(post) {
 			if(!post.edittable) {
@@ -730,7 +748,10 @@ function validateName(pathname, next, error) {
 					next(tagRequest);
 				});
 			} else if(path[3]) {
-				console.log('Tag path[3]');
+				//solo una palabra
+				simplifyName(path[3], function(tag){
+					next(tag);
+				});
 			} else if(path[4]) {
 				//Post
 				post = path[4];

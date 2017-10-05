@@ -12,7 +12,7 @@ block content
       //
       section#view-controls
         #back(v-on:click="back")
-        input(type="text" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:change="router(route)")#title
+        input(type="text" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:keyup="suggest(route)" v-on:keydown.13="router(route)")#title
         #more(v-on:click="more")
           i.more-back
             i.more-icon

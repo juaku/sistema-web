@@ -1,4 +1,5 @@
 var mongoose = require('mongoose');
+var mongoosastic = require('mongoosastic');
 var Schema = mongoose.Schema;
 var fs = require('fs');
 var FB = require('fb');
@@ -7,9 +8,13 @@ require('./action');
 require('./user');
 
 var TagSchema = new Schema({
-	tag: String,
+	tag: {type: String, es_indexed: true, es_analyzer: "autocomplete", es_search_analyzer: "standard"},
 	posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
 	createdAt: {type: Date, default: Date.now}
+});
+
+TagSchema.plugin(mongoosastic, {
+	hosts: ['localhost:9200']
 });
 
 TagSchema.statics.getTagId = function (req, callback, error) {

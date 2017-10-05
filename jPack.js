@@ -318,7 +318,7 @@ jPack.validateName = function(pathname, next, error) {
 	if(path[0]) {
 		if(path[1]) {
 			if(path[2]) {
-				//Channel
+				//Channel ejm:b3e.diego@aura
 				userId = path[1].split('.')
 				hexCode = userId[0];
 				simplifyName(userId[1], function(nameuser) {
@@ -331,7 +331,7 @@ jPack.validateName = function(pathname, next, error) {
 					});
 				});
 			} else {
-				//User
+				//User ejm: b3e.diego
 				userId = path[1].split('.')
 				simplifyName(userId[0], function(hexCode) {
 					hexCode = hexCode;
@@ -345,14 +345,19 @@ jPack.validateName = function(pathname, next, error) {
 			}
 		} else {
 			if(path[2]) {
-				//Tag
+				//Tag ejm: @aura
 				simplifyName(path[2], function(tag){
 					tagName = tag;
 					type = 'tag';
 					next(tagName, type);
 				});
 			} else if(path[3]) {
-				console.log('Tag path[3]');
+				//solo palabra ejm: aura
+				simplifyName(path[3], function(tag){
+					tagName = tag;
+					type = 'tag';
+					next(tagName, type);
+				});
 			}
 		}
 	} else {
