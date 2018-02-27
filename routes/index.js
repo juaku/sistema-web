@@ -13,4 +13,8 @@ router.get('/:path((([0-9A-Fa-f]{3})(\.+[A-Za-záéíóúàèìòùäëïöüÿ�
 	res.render('index', { user: JSON.stringify(req.user), locale: req.getLocale(), url: req.params.path, reqType: 'path', token: req.session.token });
 });
 
+router.get('/privacypolicy', function(req, res) {
+	res.render('privacypolicy');
+});
+
 module.exports = router;

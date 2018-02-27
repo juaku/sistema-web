@@ -251,7 +251,7 @@ var app = new Vue({
 				if(endOfList)
 					return;
 				queryStart++;
-				var emptyPosts = createEmptyPosts(1);
+				var emptyPosts = createEmptyPosts(0);
 				for(post in emptyPosts) {
 					this.posts.push(emptyPosts[post]);
 				}
@@ -259,7 +259,7 @@ var app = new Vue({
 			} else {
 				queryStart = 0;
 				endOfList = false;
-				this.posts = createEmptyPosts(3);
+				this.posts = createEmptyPosts(0); // TODO: Analizar
 				if(this.route == null) {
 					pushToHistory =  false;
 				} else {
@@ -331,7 +331,8 @@ var app = new Vue({
 			});
 		},
 		reload: function() {
-			window.location = '/';
+			//window.location.href = 'index.html';
+			window.location = '/'
 		},
 		scroll: function() {
 			checkScroll('main');
@@ -390,35 +391,39 @@ var app = new Vue({
 			if(!post.edittable) {
 				if (!post.saved) {
 					post.saved = true;
-					this.$http.post('/post/save', post).then(function(data) {
+					this.$http.post(domain + '/post/save', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function(data) {
 						socket.emit('showPostSaved', data.body);
 					},function(e) {
 					});
 				} else {
 					post.saved = false;
 					console.log(post);
-					this.$http.post('/post/unsave', post).then(function(data) {
+					this.$http.post(domain + '/post/unsave', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function(data) {
 					},function(e) {
 					});
 				}
 			}
 		},
 		sharePost: function(post) {
-			this.$http.post('/post/shareActionOnFb', post).then(function(data) {
+			this.$http.post(domain + '/post/shareActionOnFb', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function(data) {
 			},function(e) {
 			});
 		},
 		deletePost: function(post) {
 			if(post.edittable) {
 				if(confirm("Seguro que desas borrar este post?")) {
-					this.$http.post('/post/deletePost', post).then(function(data) {
+					this.$http.post(domain + '/post/deletePost', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function(data) {
 					},function(e) {
 					});
 				}
 			}
 		},
 		modifyTag: function(post) {
-			post.editTag = true;
+			post.editedTag = true;
 			post.tagToBeChanged = post.tag;
 		},
 		updateTag: function(post) {
@@ -430,17 +435,18 @@ var app = new Vue({
 					simplifyName(post.newTag, function(tag) {
 						post.tag = tag; // Cuando se haga click sobre el tag, apuntará hacia el nuevo post
 					});
-					post.originalTag = post.newTag; // Muestra el tag cambiado
-					post.editTag = false;
-					this.$http.post('/post/editTag', post).then(function() {
+					post.tag = post.newTag; // Muestra el tag cambiado
+					post.editedTag = false;
+					this.$http.post(domain + '/post/updateTag', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function() {
 					},function(e) {
 					});
 				} else {
-					post.editTag = false;
+					post.editedTag = false;
 					alert('Tag no permitido');
 				}
 			} else {
-				post.editTag = false;
+				post.editedTag = false;
 				alert('Tag no permitido');
 			}
 		},
@@ -448,12 +454,14 @@ var app = new Vue({
 			// TODO: No cambia el idioma, revisar
 			var object = {};
 			object.language = language;
-			this.$http.post('/user/changeLanguage', object).then(function() {
+			this.$http.post(domain + '/user/changeLanguage', object,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function() {
 			},function(e) {
 			});
 		},
 		suggest: function(word) {
-			var pathRegExp = new RegExp(/(^@[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
+			console.log('word: ' + word);
+			var pathRegExp = new RegExp(/(^@[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{1,})$/g);
 			var bool = pathRegExp.test(word); // false o true
 			if(bool) {
 				if(app.lastWordSuggested != word) {
@@ -471,7 +479,8 @@ var app = new Vue({
 		reportPost: function(post) {
 			if(!post.edittable) {
 				if(confirm("Seguro que desas reportar este post?")) {
-					this.$http.post('/post/reportPost', post).then(function() {
+					this.$http.post(domain + '/post/reportPost', post,
+						{ headers: { Authorization: 'Bearer ' + token }}).then(function() {
 					},function(e) {
 					});
 				}
@@ -571,11 +580,12 @@ var app = new Vue({
 		},
 		setGeo: function() {
 			getGeo(function(coords) {
-				app.$http.post('/user/setGeo', coords).then(function() {
+				app.$http.post(domain + '/user/setGeo', coords,
+					{ headers: { Authorization: 'Bearer ' + token }}).then(function() {
 				}, function(){
 				});
 			}, function() {
-			})
+			});
 		},
 		logout: function() {
 			/*if(navigator.serviceWorker) {
@@ -597,8 +607,8 @@ var app = new Vue({
 					user = res.body.user;
 					token = res.body.token;
 					localStorage.setItem('user', JSON.stringify(res.body.user));
-					localStorage.setItem('token', res.body.token);
 					localStorage.setItem('locale', res.body.locale);
+					localStorage.setItem('token', res.body.token);
 					window.location.reload(true);
 				}, function(res)  {
 					error(res);
@@ -765,18 +775,24 @@ function validateName(pathname, next, error) {
 }
 
 function simplifyName(tag, next) {
-	var diacritics =[
-		/[\300-\306]/g, /[\340-\346]/g,  // A, a
-		/[\310-\313]/g, /[\350-\353]/g,  // E, e
-		/[\314-\317]/g, /[\354-\357]/g,  // I, i
-		/[\322-\330]/g, /[\362-\370]/g,  // O, o
-		/[\331-\334]/g, /[\371-\374]/g,  // U, u
-		/[\321]/g, /[\361]/g, // N, n
-		/[\307]/g, /[\347]/g, // C, c
+	var diacritics = [
+		{re:/[\xC0-\xC6]/g, ch:'A'},
+		{re:/[\xE0-\xE6]/g, ch:'a'},
+		{re:/[\xC8-\xCB]/g, ch:'E'},
+		{re:/[\xE8-\xEB]/g, ch:'e'},
+		{re:/[\xCC-\xCF]/g, ch:'I'},
+		{re:/[\xEC-\xEF]/g, ch:'i'},
+		{re:/[\xD2-\xD6]/g, ch:'O'},
+		{re:/[\xF2-\xF6]/g, ch:'o'},
+		{re:/[\xD9-\xDC]/g, ch:'U'},
+		{re:/[\xF9-\xFC]/g, ch:'u'},
+		{re:/[\xD1]/g, ch:'N'},
+		{re:/[\xF1]/g, ch:'n'},
+		{re:/[\307]/g, ch:'C'},
+		{re:/[\347]/g, ch:'c'}
 	];
-	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
 	for (var i = 0; i < diacritics.length; i++) {
-		tag = tag.replace(diacritics[i],chars[i]);
+		tag = tag.replace(diacritics[i].re, diacritics[i].ch);
 	}
 	next(tag.toLowerCase());
 }
@@ -906,7 +922,7 @@ function getGeo(next, error) {
 			// TODO: Manejar error 
 			alert('Mal! ' + errorMsg);
 			error(errorMsg);
-		}, {enableHighAccuracy: true});
+		}, {maximumAge:600000, timeout:10000, enableHighAccuracy: true});
 	} else {
 		error("Geolocation is not supported by this browser.");
 	}

@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 var FB = require('fb');
 
 var PostSchema = new Schema({
-	tag: {type: String, es_indexed: true},
-	originalTag: String,
+	simpleTag: {type: String, es_indexed: true},
+	tag: String,
 	geo: { type: [Number], index: '2d', es_indexed: true, es_type: 'geo_point' },
 	media: String,
 	active: { type: Boolean, es_indexed: true },
@@ -45,16 +45,18 @@ PostSchema.statics.sharePostOnFb = function (req, callback, error) {
 	);
 }
 
-// $addToSet no agrega el elemento al campo dado si ya lo contiene, por otro lado $ push agregará el objeto dado al campo si existe o no
-PostSchema.statics.reportPost = function (post, userId, callback, error) {
-	if(post.author.id != userId) {
+// $addToSet no agrega el elemento al campo dado si ya lo contiene, por otro lado $push agregará el objeto dado al campo si existe o no
+PostSchema.statics.reportPost = function (req, callback, error) {
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
+	if(post.author.id != currentUserId) {
 		var User = mongoose.model('User');
 		// findOneAndUpdate de mongoose actualizará automáticamente la data dentro de elastic siempre y cuando new: true esté seteado en las opciones
-		this.findOneAndUpdate({ _id: post.id }, { $addToSet: { reportedBy: userId }}, { new: true }, function (err, doc) {
+		this.findOneAndUpdate({ _id: post.id }, { $addToSet: { reportedBy: currentUserId }}, { new: true }, function (err, doc) {
 			if (err) error();
 			console.log('post reportado con éxito');
 			console.log(doc);
-			User.update({ _id: userId }, { $addToSet: { reportedPosts: post.id }}, function (err, doc) {
+			User.update({ _id: currentUserId }, { $addToSet: { reportedPosts: post.id }}, function (err, doc) {
 				if (err) error();
 				console.log('post reportado referenciada a user');
 				console.log(doc);
@@ -64,14 +66,16 @@ PostSchema.statics.reportPost = function (post, userId, callback, error) {
 	callback();
 }
 
-PostSchema.statics.unReportPost = function (post, userId, callback, error) {
-	if(post.author.id != userId) {
+PostSchema.statics.unReportPost = function (req, callback, error) {
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
+	if(post.author.id != currentUserId) {
 		var User = mongoose.model('User');
-		this.findOneAndUpdate({ _id: post.id }, { $pull: { reportedBy: userId }}, { new: true }, function (err, doc) {
+		this.findOneAndUpdate({ _id: post.id }, { $pull: { reportedBy: currentUserId }}, { new: true }, function (err, doc) {
 			if (err) error();
 			console.log('este post ya no está reportado');
 			console.log(doc);
-			User.update({ _id: userId }, { $pull: { reportedPosts: post.id }}, function (err, doc) {
+			User.update({ _id: currentUserId }, { $pull: { reportedPosts: post.id }}, function (err, doc) {
 				if (err) error();
 				console.log(doc);
 			});
@@ -80,8 +84,10 @@ PostSchema.statics.unReportPost = function (post, userId, callback, error) {
 	callback();
 }
 
-PostSchema.statics.deletePost = function (post, userId, callback, error) {
-	if(post.author.id == userId) {
+PostSchema.statics.deletePost = function (req, callback, error) {
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
+	if(post.author.id == currentUserId) {
 		this.findOneAndUpdate({ _id: post.id }, { $set: { active: false }}, { new: true }, function (err, doc) {
 			if (err) error();
 			console.log('Post desactivado con éxito');
@@ -91,11 +97,13 @@ PostSchema.statics.deletePost = function (post, userId, callback, error) {
 	}
 }
 
-PostSchema.statics.savePost = function (post, userId, callback, error) {
-	if(post.author.id != userId) {
+PostSchema.statics.savePost = function (req, callback, error) {
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
+	if(post.author.id != currentUserId) {
 		console.log('savePost');
 		var User = mongoose.model('User');
-		User.update({ _id: userId }, { $push: { savedPosts: post.id }}, function (err, doc) {
+		User.update({ _id: currentUserId }, { $push: { savedPosts: post.id }}, function (err, doc) {
 			if (err) error();
 			console.log('post guardada con éxito en savedPosts');
 			console.log(doc);
@@ -104,11 +112,13 @@ PostSchema.statics.savePost = function (post, userId, callback, error) {
 	callback(post);
 }
 
-PostSchema.statics.unsavePost = function (post, userId, callback, error) {
-	if(post.author.id != userId) {
+PostSchema.statics.unsavePost = function (req, callback, error) {
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
+	if(post.author.id != currentUserId) {
 		console.log('unsavePost');
 		var User = mongoose.model('User');
-		User.update({ _id: userId }, { $pull: { savedPosts: post.id }}, function (err, doc) {
+		User.update({ _id: currentUserId }, { $pull: { savedPosts: post.id }}, function (err, doc) {
 			if (err) error();
 			console.log('post removida de savedPosts');
 			console.log(doc);

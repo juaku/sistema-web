@@ -10,13 +10,13 @@ var config = require('../config');
 /*
  * GET router para '/access' 
  */
-router.get('/', ensureAuthenticated, function(req, res) {
+/*router.get('/', ensureAuthenticated, function(req, res) {
 	// TODO: LIBERAR. Establecer 'Locale'
 	// Crear token
 	req.session.token = jwt.sign(
 		{ id: req.user.id },
 		config.tokenSecret,
-		{ expiresIn : 60*60*24*15 /* 15 Días */}
+		{ expiresIn : 60*60*24*15 /* 15 Días *//*}
   	);
 	// Registrar al usuario, si lo está devolverá datos de usuario
 	var User = mongoose.model('User');
@@ -26,6 +26,6 @@ router.get('/', ensureAuthenticated, function(req, res) {
 		res.redirect('/login');
 	});
 	
-});
+});*/
 
 module.exports = router;

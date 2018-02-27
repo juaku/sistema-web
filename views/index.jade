@@ -104,8 +104,8 @@ block content
                 a(ng-if="post.edittable" ng-click="fn(post)").more
                   span #{__('more')}
                   svg.icon
-        button(v-if="post.edittable" v-show="!post.editTag" v-on:click="modifyTag(post)") #{__('Modificar TAG')}
-        button(v-if="post.edittable" v-show="post.editTag" v-on:click="updateTag(post)") #{__('Actualizar TAG')}
+        button(v-if="post.edittable" v-show="!post.editedTag" v-on:click="modifyTag(post)") #{__('Modificar TAG')}
+        button(v-if="post.edittable" v-show="post.editedTag" v-on:click="updateTag(post)") #{__('Actualizar TAG')}
         .info
           .author-picture
             img(:src="post.author.picture")
@@ -113,11 +113,11 @@ block content
             h3.post-title
               span(v-on:click="router(post.author.hexCode + '.' + post.author.firstName + '@' + post.tag, $event)" v-bind:style="[post.author.hexCode ? { backgroundColor: '#' + post.author.hexCode } : '' ]").author-hex-code
               a.author-name-link(href="" v-on:click="router(post.author.hexCode + '.' + post.author.firstName, $event)")
-                span.author-name {{ post.author.originalFirstName }}
+                span.author-name {{ post.author.firstName }}
               a.post-tag-link(href='' v-on:click="router('@' + post.tag, $event)")
                 span.at(v-show="post.tag") @
-                span(v-show="!post.editTag") {{post.originalTag}}
-              span(v-show="post.editTag")
+                span(v-show="!post.editedTag") {{post.tag}}
+              span(v-show="post.editedTag")
                 input.event-name(type="text", v-model="post.newTag" )
             time.post-time(v-bind:datetime="post.time") {{ post.timeFromNow }}
           .save-button(v-show="post.saved!=undefined")

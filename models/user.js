@@ -10,10 +10,10 @@ require('./action');
 var UserSchema = new Schema({
   providerId: {type: String, unique: true},
   provider: String,
+  simpleFirstName: String,
+  simpleLastName: String,
   firstName: String,
   lastName: String,
-  originalFirstName: String,
-  originalLastName: String,
   hexCode: String,
   posts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
   savedPosts : [{ type: Schema.Types.ObjectId, ref: 'Post' }],
@@ -24,6 +24,11 @@ var UserSchema = new Schema({
   profilePic: String
 });
 
+/*
+ * @descrip Busca el id de fb del usuario que ingresa, si está registrado sus datos serán retornado y sino registrará un usuario nuevo retornando sus datos
+ * @par {object} req, {function} callback, {function} error.
+ * @return null
+ */
 UserSchema.statics.signUp = function (req, callback, error) {
   this.findOne({providerId: req.user.id}, function(err, user) {
     var currentUser = user;
@@ -56,25 +61,52 @@ UserSchema.statics.signUp = function (req, callback, error) {
             console.log("Got error: " + e.message);
           });
       }
+      var firstName = "";
+      var lastName = req.user.name.familyName;
+      var simpleFirstName = "";
+      var simpleLastName = simplifyName(req.user.name.familyName);
+      var res = req.user.name.givenName.split(" ");
+      if(res[1]) {
+        for(var i in res) {
+          firstName = firstName.concat(res[i]);
+        }
+        simpleFirstName = simplifyName(firstName);
+        firstName = req.user.name.givenName;
+      } else {
+        firstName = req.user.name.givenName;
+        simpleFirstName = simplifyName(firstName);
+      }
       if(!err && currentUser!= null) {
-        console.log('el usuario ya se registró');
+        console.log('Si está registrado');
         var User = mongoose.model('User');
-        User.update({ _id: currentUser.id }, { $set: { profilePic: profilePic }}, function (err, doc) {
+        if(firstName != currentUser.firstName) {
+          firstName = firstName;
+          simpleFirstName = simpleFirstName;
+        } else {
+          firstName = currentUser.firstName;
+          simpleFirstName = currentUser.simpleFirstName;
+        }
+        if(lastName != currentUser.lastName) {
+          lastName = lastName;
+          simpleLastName = simpleLastName;
+        } else {
+          lastName = currentUser.lastName;
+          simpleLastName = currentUser.simpleLastName;
+        }
+        User.findOneAndUpdate({ _id: currentUser.id }, { $set: { simpleFirstName: simpleFirstName, firstName: firstName, simpleLastName: simpleLastName, lastName: lastName, profilePic: profilePic }}, function (err, doc) {
           if (err) error();
           fillReqSessionVariables(currentUser, callback);
         });
       } else {
         console.log('no esta registrado, se creará una cuenta nueva');
-        var firstName = simplifyName(req.user.name.givenName);
-        var lastName = simplifyName(req.user.name.familyName);
         var User = mongoose.model('User', UserSchema);
         var user = new User({
           providerId: req.user.id,
           provider: req.user.provider,
+          simpleFirstName: simpleFirstName,
+          simpleLastName: simpleLastName,
           firstName: firstName,
-          lastName: lastName,
-          originalFirstName: req.user.name.givenName,
-          originalLastName: req.user.name.familyName,
+          lastName: req.user.name.familyName,
           hexCode: color,
           profilePic: profilePic
           //photo: profile.photos[0].value
@@ -95,26 +127,33 @@ UserSchema.statics.signUp = function (req, callback, error) {
   function fillReqSessionVariables(user, callback) {
     req.user.picture = user.profilePic;
     req.user.name.hexCode = user.hexCode;
+    req.user.name.givenName = user.firstName;
     req.session.idMongoDb = user.id;
-    req.session.firstName = user.firstName;
-    req.session.lastName = user.lastName;
+    req.session.simpleFirstName = user.simpleFirstName;
+    req.session.simpleLastName = user.simpleLastName;
     req.session.hexCode = user.hexCode;
     req.session.profilePic = user.profilePic;
     callback();
   }
 }
+
+/*
+ * @descrip Retorna posts por un usuario en particular
+ * @par {object} req, {function} callback, {function} error.
+ * @return {object} posts
+ */
 UserSchema.statics.getPostsByUser = function (req, callback, error) {
   var resultsLimit = 20;
   var queryNumber = 0;
-
+  var currentUserId = req.session.idMongoDb;
   if(req.params.i!=undefined) {
     queryNumber = parseInt(req.params.i);
   }
 
   var path = req.session.path.split('.')
   var hexCode = path[0];
-  var firstName = path[1];
-  this.findOne({_id: req.session.idMongoDb})
+  var simpleFirstName = path[1];
+  this.findOne({_id: currentUserId})
   .populate({
     path: 'posts',
     match: {
@@ -125,7 +164,7 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   .exec(function (err, user) {
     if (err) return handleError(err);
     var User = mongoose.model('User', UserSchema);
-    User.findOne({hexCode: hexCode, firstName: firstName})
+    User.findOne({hexCode: hexCode, simpleFirstName: simpleFirstName})
     .populate({
       path: 'posts',
       match: {
@@ -147,25 +186,30 @@ UserSchema.statics.getPostsByUser = function (req, callback, error) {
   })
 }
 
+/*
+ * @descrip Retorna posts por un canal en particular por ejemplo 3bc.jose@casa
+ * @par {object} req, {function} callback, {function} error.
+ * @return {object} posts
+ */
 UserSchema.statics.getPostsByChannel = function (req, callback, error) {
   var User = mongoose.model('User');
   var Tag = mongoose.model('Tag');
 
   var resultsLimit = 20;
   var queryNumber = 0;
+  var currentUserId = req.session.idMongoDb;
 
   if(req.params.i!=undefined) {
     queryNumber = parseInt(req.params.i);
   }
-
   var path = req.session.path.split('.')
   var hexCode = path[0];
-  var firstName = path[1];
+  var simpleFirstName = path[1];
   var tagName = path[2];
 
   Tag.findOne({ 'tag': tagName }, '_id', function (err, tag) {
     if(tag!= null) {
-      User.findOne({_id: req.session.idMongoDb})
+      User.findOne({_id: currentUserId})
       .populate({
         path: 'posts',
         match: {
@@ -175,7 +219,7 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
       .select('reportedPosts')
       .exec(function (err, user) {
         if (err) return handleError(err);
-        User.findOne({hexCode: hexCode, firstName: firstName})
+        User.findOne({hexCode: hexCode, simpleFirstName: simpleFirstName})
         .populate({
           path: 'posts savedPosts',
           match: {
@@ -205,20 +249,31 @@ UserSchema.statics.getPostsByChannel = function (req, callback, error) {
   });
 }
 
+/*
+ * @descrip Remueve tildes de las vocales y retorna un string en minúsculas
+ * @par {string} userName
+ * @return {string} userName
+ */
 function simplifyName(userName) {
   console.log('simplifyName ' + userName);
-  var diacritics =[
-    /[\300-\306]/g, /[\340-\346]/g,  // A, a
-    /[\310-\313]/g, /[\350-\353]/g,  // E, e
-    /[\314-\317]/g, /[\354-\357]/g,  // I, i
-    /[\322-\330]/g, /[\362-\370]/g,  // O, o
-    /[\331-\334]/g, /[\371-\374]/g,  // U, u
-    /[\321]/g, /[\361]/g, // N, n
-    /[\307]/g, /[\347]/g, // C, c
+  var diacritics = [
+    {re:/[\xC0-\xC6]/g, ch:'A'},
+    {re:/[\xE0-\xE6]/g, ch:'a'},
+    {re:/[\xC8-\xCB]/g, ch:'E'},
+    {re:/[\xE8-\xEB]/g, ch:'e'},
+    {re:/[\xCC-\xCF]/g, ch:'I'},
+    {re:/[\xEC-\xEF]/g, ch:'i'},
+    {re:/[\xD2-\xD6]/g, ch:'O'},
+    {re:/[\xF2-\xF6]/g, ch:'o'},
+    {re:/[\xD9-\xDC]/g, ch:'U'},
+    {re:/[\xF9-\xFC]/g, ch:'u'},
+    {re:/[\xD1]/g, ch:'N'},
+    {re:/[\xF1]/g, ch:'n'},
+    {re:/[\307]/g, ch:'C'},
+    {re:/[\347]/g, ch:'c'}
   ];
-  var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
   for (var i = 0; i < diacritics.length; i++) {
-    userName = userName.replace(diacritics[i],chars[i]);
+    userName = userName.replace(diacritics[i].re, diacritics[i].ch);
   }
   return userName.toLowerCase();
 }

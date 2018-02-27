@@ -17,9 +17,9 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 	console.log('POST media ');
 	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
 		if (req.params.action=='new') {
-			jPack.checkTag(req.body.tag, function(tagSimple) {
-				req.body.tagSimple = tagSimple;
-				Tag.newPost(req, req.session.idMongoDb, function (mediaName) {
+			jPack.checkTag(req.body.tag, function(simpleTag) {
+				req.body.simpleTag = simpleTag;
+				Tag.newPost(req, function (mediaName) {
 					res.json(mediaName);
 				}, function(error) {
 					console.log(error);
@@ -37,17 +37,17 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='reportPost') {
-			Post.reportPost(req.body, req.session.idMongoDb, function() {
+			Post.reportPost(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
-		} else if (req.params.action=='editTag') {
+		} else if (req.params.action=='updateTag') {
 			var pathRegExp = new RegExp(/(^[0-9A-Za-záéíóúàèìòùäëïöüÿâêîôûçæœãõñÁÉÍÓÚÀÈÌÒÙÄËÏÖÜŸÂÊÎÔÛÇÆŒÃÕÑß%]{3,})$/g);
 			var newTag = pathRegExp.test(req.body.newTag); // false o true
 			if(newTag) {
-				Tag.editTag(req.body, req.session.idMongoDb, function () {
+				Tag.updateTag(req, function () {
 					res.status(201).end();
 				}, function(error) {
 					console.log(error);
@@ -58,14 +58,14 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			}
 		} else if (req.params.action=='deletePost') {
-			Post.deletePost(req.body, req.session.idMongoDb, function() {
+			Post.deletePost(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);
 				res.status(400).end();
 			});
 		} else if (req.params.action=='save') {
-			Post.savePost(req.body, req.session.idMongoDb, function(post) {
+			Post.savePost(req, function(post) {
 				var channel = req.session.hexCode + '.' + req.session.firstName + '@' + post.tag;
 				post.channelTo = channel;
 				res.json(post);
@@ -74,7 +74,7 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 			});
 		} else if (req.params.action=='unsave') {
-			Post.unsavePost(req.body, req.session.idMongoDb, function() {
+			Post.unsavePost(req, function() {
 				res.status(201).end();
 			}, function(error) {
 				console.log(error);

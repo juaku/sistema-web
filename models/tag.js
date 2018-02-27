@@ -17,6 +17,11 @@ TagSchema.plugin(mongoosastic, {
 	hosts: ['localhost:9200']
 });
 
+/*
+ * @descrip Retorna un objecto tag si es que está almacenado en la bd
+ * @par {object} req, {function} callback, {function} error.
+ * @return {object} tag
+ */
 TagSchema.statics.getTagId = function (req, callback, error) {
 	var tag = req.session.path;
 	this.findOne({tag: tag}).select('tag')
@@ -31,10 +36,16 @@ TagSchema.statics.getTagId = function (req, callback, error) {
 	})
 }
 
-TagSchema.statics.newPost = function (req, userId, callback, error) {
+/*
+ * @descrip Crea nuevo post, si el tag no existe se crea uno, y se hace referencia a los posts de cada modelo User y Tag
+ * @par {object} req, {function} callback, {function} error.
+ * @return // TODO: que retorna
+ */
+TagSchema.statics.newPost = function (req, callback, error) {
 	var Post = mongoose.model('Post');
 	var User = mongoose.model('User');
 	var newPost = req.body;
+	var currentUserId = req.session.idMongoDb;
 	var mediaName = parseInt(Math.random(255,2)*10000);
 	var mediaExt = 'jpg';
 	var FB = require('fb');
@@ -46,22 +57,22 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 	var coords = [];
 	coords[0] = newPost.coords.latitude;
 	coords[1] = newPost.coords.longitude;
-	this.findOne({tag: newPost.tagSimple}, function(err, tag) {
+	this.findOne({tag: newPost.simpleTag}, function(err, tag) {
 		var objectTag = tag;
 		saveMedia(newPost.media, mediaName, mediaExt);
 		if(err) throw(err);
 		console.log(coords);
 		var post = new Post({
-			tag: newPost.tagSimple,
-			originalTag: newPost.tag,
+			simpleTag: newPost.simpleTag,
+			tag: newPost.tag,
 			geo: coords,
 			media: mediaName + '.' + mediaExt,
 			active: true,
-			authorId: userId
+			authorId: currentUserId
 		});
 		post.save(function(err) {
 			if(err) error();
-			User.update({ _id: userId }, { $push: { posts: post._id }}, function (err, doc) {
+			User.update({ _id: currentUserId }, { $push: { posts: post._id }}, function (err, doc) {
 				if (err) error();
 				console.log('post referenciada a user');
 				console.log(doc);
@@ -75,7 +86,7 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 				} else {
 					var Tag = mongoose.model('Tag', TagSchema);
 					var tag = new Tag();
-					tag.tag = newPost.tagSimple;
+					tag.tag = newPost.simpleTag;
 					tag.posts = post._id;
 					tag.save(function (err) {
 						if (err) error();
@@ -129,9 +140,16 @@ TagSchema.statics.newPost = function (req, userId, callback, error) {
 	}
 }
 
-TagSchema.statics.editTag = function (post, currentUserId, callback, error) {
+/*
+ * @descrip Edita tag de un post propio
+ * @par {object} req, {function} callback, {function} error.
+ * @return null
+ */
+TagSchema.statics.updateTag = function (req, callback, error) {
 	var Post = mongoose.model('Post');
 	var User = mongoose.model('User');
+	var post = req.body;
+	var currentUserId = req.session.idMongoDb;
 	var oldTag = post.tagToBeChanged;
 	var newTag = simplifyName(post.newTag);
 
@@ -144,16 +162,16 @@ TagSchema.statics.editTag = function (post, currentUserId, callback, error) {
 				console.log('post removida de tag: ' + oldTag);
 				console.log(doc);
 			});
-			// Actualiza tag y originalTag
+			// Actualiza simpleTag y tag
 			// findOneAndUpdate de mongoose actualizará automáticamente la data dentro de elastic siempre y cuando new: true esté seteado en las opciones
-			Post.findOneAndUpdate({ _id: post.id }, { $set: { tag: newTag }}, { new: true }, function (err, doc) {
+			Post.findOneAndUpdate({ _id: post.id }, { $set: { simpleTag: newTag }}, { new: true }, function (err, doc) {
 				if (err) error();
-				console.log('Actualización de tag: ' + newTag);
+				console.log('Actualización de simpleTag: ' + newTag);
 				console.log(doc);
 			});
-			Post.update({ _id: post.id }, { $set:{ originalTag: post.newTag }}, function (err, doc) {
+			Post.update({ _id: post.id }, { $set:{ tag: post.newTag }}, function (err, doc) {
 				if (err) error();
-				console.log('Actualización de originalTag: ' + post.newTag);
+				console.log('Actualización de tag: ' + post.newTag);
 				console.log(doc);
 			});
 			// Referencia POST a nuevo TAG
@@ -170,7 +188,7 @@ TagSchema.statics.editTag = function (post, currentUserId, callback, error) {
 					var Tag = mongoose.model('Tag', TagSchema);
 					var tag = new Tag();
 					tag.tag = newTag;
-					tag.originalTag = post.newTag;
+					//tag.originalTag = post.newTag;
 					tag.posts = post.id;
 					tag.save(function (err) {
 						if (err) error();
@@ -188,18 +206,24 @@ TagSchema.statics.editTag = function (post, currentUserId, callback, error) {
 
 function simplifyName(tag) {
 	console.log('simplifyName ' + tag);
-	var diacritics =[
-		/[\300-\306]/g, /[\340-\346]/g,  // A, a
-		/[\310-\313]/g, /[\350-\353]/g,  // E, e
-		/[\314-\317]/g, /[\354-\357]/g,  // I, i
-		/[\322-\330]/g, /[\362-\370]/g,  // O, o
-		/[\331-\334]/g, /[\371-\374]/g,  // U, u
-		/[\321]/g, /[\361]/g, // N, n
-		/[\307]/g, /[\347]/g, // C, c
+	var diacritics = [
+		{re:/[\xC0-\xC6]/g, ch:'A'},
+		{re:/[\xE0-\xE6]/g, ch:'a'},
+		{re:/[\xC8-\xCB]/g, ch:'E'},
+		{re:/[\xE8-\xEB]/g, ch:'e'},
+		{re:/[\xCC-\xCF]/g, ch:'I'},
+		{re:/[\xEC-\xEF]/g, ch:'i'},
+		{re:/[\xD2-\xD6]/g, ch:'O'},
+		{re:/[\xF2-\xF6]/g, ch:'o'},
+		{re:/[\xD9-\xDC]/g, ch:'U'},
+		{re:/[\xF9-\xFC]/g, ch:'u'},
+		{re:/[\xD1]/g, ch:'N'},
+		{re:/[\xF1]/g, ch:'n'},
+		{re:/[\307]/g, ch:'C'},
+		{re:/[\347]/g, ch:'c'}
 	];
-	var chars = ['A','a','E','e','I','i','O','o','U','u','N','n','C','c'];
 	for (var i = 0; i < diacritics.length; i++) {
-		tag = tag.replace(diacritics[i],chars[i]);
+		tag = tag.replace(diacritics[i].re, diacritics[i].ch);
 	}
 	return tag.toLowerCase();
 }
