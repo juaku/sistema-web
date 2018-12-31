@@ -919,8 +919,8 @@ function getGeo(next, error) {
 					errorMsg = "An unknown error occurred."
 					break;
 			}
-			// TODO: Manejar error 
-			alert('Mal! ' + errorMsg);
+			// TODO: Manejar error, sin alert
+			// alert('Mal! ' + errorMsg);
 			error(errorMsg);
 		}, {maximumAge:600000, timeout:10000, enableHighAccuracy: true});
 	} else {

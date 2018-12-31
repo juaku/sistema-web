@@ -88,6 +88,9 @@ var user = require('./routes/user');
 var list = require('./routes/list');
 var routes = require('./routes/index');
 
+// geo block
+var ipgeoblock = require("node-ipgeoblock");
+
 var app = express();
 
 // Inicializar Stylus + Nib
@@ -133,6 +136,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// geo block
+app.use(ipgeoblock({
+	geolite2: "./GeoLite2-Country.mmdb",
+	allowedCountries: [ "PE" ]
+}, function (req, res) {
+	res.status(403).end();
+	//res.statusCode = 500;
+	//res.end("Internal Server Error");
+}));
+
 //Inicializar i18n
 app.use(i18n.init);
 
@@ -143,7 +156,8 @@ app.locals.title = 'Juaku';
 if (app.get('env') === 'development') {
 	app.use(function(req, res, next) {
 		var IPv4 = req.ip.split(':')[3];
-		if(IPv4 == process.env.SSH_CLIENT.split(' ')[0] || IPv4.includes('179.7.') || IPv4.includes('190.113.')) { // IP cliente SSH e ip's de Claro
+		// TODO: true en if
+		if(true || IPv4 == process.env.SSH_CLIENT.split(' ')[0] || IPv4.includes('179.7.') || IPv4.includes('190.113.')) { // IP cliente SSH e ip's de Claro
 			next();
 		} else {
 			console.log('Acceso denegado para: ' + req.ip )

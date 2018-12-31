@@ -27,5 +27,19 @@
 	"hours": "hours",
 	"at": "at",
 	"min": "min",
-	"h": "h"
+	"h": "h",
+	"Juaku": "Juaku",
+	"Trends": "Trends",
+	"Logout": "Logout",
+	"tag": "tag",
+	"Send": "Send",
+	"save": "save",
+	"share": "share",
+	"channel": "channel",
+	"more": "more",
+	"Llegaste al final de ": "Llegaste al final de ",
+	"Llegaste al final": "Llegaste al final",
+	"hide": "hide",
+	"Modificar TAG": "Modificar TAG",
+	"Actualizar TAG": "Actualizar TAG"
 }
