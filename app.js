@@ -55,7 +55,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
 	clientID: FACEBOOK_APP_ID,
 	clientSecret: FACEBOOK_APP_SECRET,
-	callbackURL: 'https://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
+	callbackURL: 'https://juaku.com/auth/facebook/callback', // 'http://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
 	passReqToCallback: true, // TODO: ¿Cómo funciona?
 	profileFields: ['id', 'name', 'email', 'photos']
 },

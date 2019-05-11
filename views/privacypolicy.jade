@@ -1,6 +1,163 @@
+extends layout
+
 block head
   body
 
 block content
-header
-  aside#side Lorem ipsum dolor sit amet consectetur adipiscing elit dictumst eget inceptos phasellus, himenaeos vehicula venenatis pellentesque eleifend odio torquent mattis in vulputate. Mattis litora massa odio enim mollis varius condimentum tortor rutrum ad, sapien nec mus per neque magna quisque commodo luctus, parturient tempus nibh libero dui viverra fusce egestas ullamcorper. Elementum platea ultricies suscipit cum ornare purus taciti potenti metus, curae leo tellus congue est tortor cursus commodo aptent mollis, cras tempus fusce dui odio gravida ligula nisi. Euismod montes elementum ullamcorper phasellus quis felis cum himenaeos sagittis, sociosqu nullam pulvinar risus habitasse venenatis commodo augue senectus, mattis maecenas erat class primis curabitur varius tempus. Conubia dapibus eget tincidunt ornare ridiculus primis sem interdum, metus litora platea tortor erat elementum velit ultrices morbi, nec accumsan porta varius porttitor sociis imperdiet. Condimentum porttitor commodo in class leo eget cubilia maecenas nostra erat massa, risus a venenatis sem augue tortor lobortis ac fermentum per, sollicitudin pulvinar malesuada interdum bibendum elementum libero integer est penatibus.
+  header
+  #box
+    aside#side
+      //
+      // Side controls
+      //
+      section#view-controls
+        #back(v-on:click="back")
+        input(type="text" size="1" v-model="route" placeholder="#{__('Juaku')}" v-on:keyup="suggest(route)" v-on:keydown.13="router(route)")#title
+        #more(v-on:click="more")
+          i.more-back
+            i.more-icon
+      footer
+        a#brand-url juaku.com
+        nav Términos y condiciones | Prensa
+        #brand Juaku 2019
+    #up(v-on:click="up")
+    main(v-on:scroll="scroll")
+      section#start(v-on:click="changeTheme($event)")
+        a#logo-link(href="/" v-on:click.prevent)
+          h1 Juaku
+          svg#logo
+            use#logo-icon(xlink:href="#logo-icon-svg" v-on:click="reload")
+      //
+      // Post
+      //
+      article.post
+        .privacyPolicy
+          p Last updated: 10/05/2019
+          p Welcome to Juaku SAC (“Platform”, "us", "we", or "our") operates <a href="https://www.juaku.com">https://www.juaku.com</a>(the "Site").  Juaku provides a new way to discover and share media around you through our content-sharing platform.
+          p We use your Personal Information only for providing and improving the Site. By using the Site, you agree to the collection and use of information in accordance with this policy
+          h2 1. What information do we collect?
+            h3 Information you provide us directly:
+              ul
+                li Your registration information, such as age, language, apassword and e-mail address when you register for a Juaku account.
+                li Profile information that you provide for your user profile (e.g., first and last name, picture, phone number). This information allows us to help you or others be "found" on Juaku.
+                li User Content (e.g., photos, geoTags, and other materials) that you post to the Service.
+                li Payment information, such as PayPal or other third-party payment information (where required for the purpose of payment).
+                li Communications between you and Juaku. For example, we may send you Service-related emails (e.g., account verification, changes/updates to features of the Service, technical and security notices). Note that you may not opt out of Service-related e-mails.
+            h3 Information we collect automatically
+              p We automatically collect certain information from you when you use the Platform, including your IP address, location-related data (as described below), unique device identifiers, browsing history (including content you have viewed in the Platform), Cookies (as defined below), your mobile carrier, time zone setting, and mobile or device information including the model of your device, screen resolution, operating system, app and file names and types, and platform.
+            h3 Location data
+              p We collect information about your location, including location information based on your SIM card and/or IP address. With your permission, we may also collect Global Positioning System (GPS) data.
+
+            h3 Device Information. 
+              p We collect information from and about the devices you use. For example, we collect:
+                ul
+                  li information about your hardware and software, such as the hardware model, operating system version, device memory, advertising identifiers, unique application identifiers, apps installed, unique device identifiers, browser type, language, battery level, and time zone;
+                  li information from device sensors, such as accelerometers, gyroscopes, compasses, microphones, and whether you have headphones connected; and
+                  li information about your wireless and mobile network connections, such as mobile phone number, service provider, and signal strength.
+
+            h3 Camera and photos.
+              p Many of our services require us to collect images and other information from your device’s camera and photos. For example, you won’t be able to upload photos from your device camera unless we can access your camera and photos.
+
+            h3 Log Information. 
+              p We also collect log information when you use our website. That information includes, among other things:
+                ul
+                  li details about how you’ve used our platform.
+                  li device information, such as your web browser type and language.
+                  li access times.
+                  li pages viewed.
+                  li IP address.
+                  li identifiers associated with cookies or other technologies that may uniquely identify your device or browser.
+                  li pages you visited before or after navigating to our website.
+
+            h3 Information we obtain from other sources
+              p We may receive information about you from other sources. For example, if you choose to link or sign up using your social network (such as Facebook, Twitter, Instagram, or Google), we may collect information from these third-party services, including your contact lists for these services and information relating to your use of the Platform in relation to these services.
+
+              p We will also receive information about you (including age data and demographic information) from third parties (such as advertising networks and analytics providers) and from other sources, including business directories and other commercially or publicly available sources.
+
+            h3 Metadata:
+              p Metadata is usually technical data that is associated with User Content. For example, Metadata can describe how, when and by whom a piece of User Content was collected and how that content is formatted.
+
+              p It also includes information, such as your account name, that enables other users to trace back the video to your user account. Additionally, metadata will consist of data that you chose to provide with the video, e.g. any geotag, to mark your location to a photo or video.
+
+            h3 Cookies and similar technologies:
+              p When you visit the Service, we may use cookies and similar technologies like pixels, web beacons, and local storage to automatically collect information, measure and analyze which web pages you click on and how you use the Platform, enhance your experience using the Platform, improve our services, and provide you with targeted advertising on the Platform and elsewhere across your different devices. Cookies are small files which, when placed on your device, enable the Platform to provide certain features and functionality. Web beacons are very small images or small pieces of data embedded in images, also known as “pixel tags” or “clear GIFs,” that can recognize Cookies, the time and date a page is viewed, a description of the page where the pixel tag is placed, and similar information from your computer or device. By using the Platform, you consent to our use of Cookies.
+
+
+          h2 2. How we use your information
+          p In addition to some of the specific uses of information we describe in this Privacy Policy, we may use information that we receive to:
+          ul
+            li improve and develop our Platform and conduct product development
+            li measure and understand the effectiveness of the advertising we serve to you and others and to deliver targeted advertising
+            li use User Content as part of our advertising and marketing campaigns to promote the Platform
+            li help us detect abuse, fraud, and illegal activity on the Platform
+            li ensure that you are old enough to use the Platform (as required by law)
+            li communicate with you, including to notify you about changes in our services
+            li enforce our terms, conditions, and policies
+            li consistent with your permissions, to provide you with location-based services, such as advertising and other personalized content
+            li inform our algorithms
+            li help you efficiently access your information after you sign in
+            li remember information so you will not have to re-enter it during your visit or the next time you visit the Service;
+            li provide personalized content and information to you and others, which could include online ads or other forms of marketing
+            li provide, improve, test, and monitor the effectiveness of our Service
+            li develop and test new products and features
+            li monitor metrics such as total number of visitors, traffic, and demographic patterns
+            li diagnose or fix technology problems
+            li automatically update the Juaku application on your device
+            li for any other purposes disclosed to you at the time we collect your information or pursuant to your consent.
+
+
+          h2 3. How we share your information
+          p We may share information about you in the following ways:
+          h3 3.1 With others Juaku users
+            p information about you, such as your name, geotags or photos that you shared to the platform, you should be aware that any information you share may be read, collected, or used by other users. You should use caution in disclosing personal information while engaging. We are not responsible for the information you choose to submit.
+          h3 3.2 With the following selected third parties:
+            ul
+              li Business partners. We may share your information with our business partners so that we can make you special offers via the Platform.
+              li Legal purposes. We may disclose information to respond to subpoenas, court orders, legal process, law enforcement requests, legal claims or government inquiries, and to protect and defend the rights, interests, safety, and security of musical.ly Inc, our affiliates, users, or the public.
+              li Advertisers. We give advertisers reports about the types of people seeing their ads and how their ads are performing.
+              li With your consent. We may share information for any other purposes disclosed to you at the time we collect the information or pursuant to your consent.
+
+            p If you access third-party services, such as Facebook, Google, or Twitter, to login to the Platform or to share information about your usage on the Platform with others, these third-party services may be able to collect information about you, including information about your activity on the Platform, and they may notify your connections on the third-party services about your use of the Platform, in accordance with their privacy policies.
+          h2 4. Your choices about your information
+          ul
+            li Update your account at any time by logging in and changing your profile settings.
+            li We store your basic account information—like your name, phone number, email address, and list of friends until you ask us to delete them.
+            li You can switch off GPS location information functionality on your mobile device if you do not wish to share GPS information.
+            li You may be able to refuse or disable Cookies by adjusting your browser settings. If you choose to refuse, disable, or delete Cookies, some of the functionality of the Platform may no longer be available to you.
+            li Unsubscribe from email communications from us by utilizing the “unsubscribe” link or mechanism noted in marketing or advertising emails.
+          h2 5. Children's privacy
+          p The Platform is not directed at children under the age of 13. If we become aware that personal information has been collected on the Platform from a person under the age of 13 we will delete this information and terminate the person’s account. If you believe that we have collected information from a child under the age of 13 on the Platform, please contact us at <a href="mailto:privacy@juaku.com">privacy@juaku.com</a>
+          h2 6. Other web sites and services
+          p We are not responsible for the practices employed by any websites or services linked to or from our Service, including the information or content contained within them. Please remember that when you use a link to go from our Service to another website or service, our Privacy Policy does not apply to those third-party websites or services.
+          h2 7. How to contact us
+          p If you have any questions about this Privacy Policy should be addressed to:
+            ul
+              li Juaku SAC. Address: Maria Nieves y Bustamante Street 101 Umacollo Arequipa
+              li <a href="mailto:privacy@juaku.com">privacy@juaku.com</a>
+          h2 8.Changes
+          p We may update this Privacy Policy from time to time. When we update the Privacy Policy, we will notify you by updating the “Last Updated” date at the top of this policy and posting the new Privacy Policy and providing any other notice required by applicable law. We recommend that you review the Privacy Policy each time you visit the Platform to stay informed of our privacy practices.
+
+  //
+  //  Librería SVG
+  //
+  svg#svg-library(xmlns='http://www.w3.org/2000/svg')
+    symbol#logo-icon-svg(viewBox='0 0 67 90')
+      polygon(fill='#FF0055' points='44.538,0 22.269,12.857 22.269,38.571 0,51.429 0,77.143 22.269,90 66.808,64.286 66.808,12.857')
+
+  //
+  //  Flotante
+  //
+  script(type='text/javascript').
+    var user = !{user} //si esta vacía lo iguala a undefined
+    user = user?user:null
+    var url = '#{url}'
+    var reqType = '#{reqType}'
+    var token = '#{token}'
+    var locale = '#{locale}'
+    if(user && token && locale) {
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+      localStorage.setItem('locale', locale);
+    }
+  script(type='text/javascript', charset='utf-8', src='cordova.js')
+  script(src="/javascripts/application.js")

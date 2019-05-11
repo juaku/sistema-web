@@ -2,13 +2,12 @@
 // 	 * Framework socket.io
 // 	 */
 	var socket = io();
-
 	socket.on('newEvent', function() {
 		$scope.showEvents();
 	});
 
 	socket.on('showPost', function(media) {
-		var html = "<img src='/uploads/" + media  + " ' " + " alt='Nueva Imagen' width='70%' height='70%'>";
+		var html = "<article class='post'><div class='view loaded'><img class='media' src='/uploads/" + media  + "'" + " alt='Nueva Imagen' width='100%' height='100%'></div></article>";
 		document.getElementById('newSendPost').innerHTML = html;
 	});
 
@@ -888,10 +887,10 @@ app.router();
 // 	// Geo
 // 	//
 function getGeo(next, error) {
+	var coords = {};
 	if (navigator.geolocation) {
 		var position = 0;		
 		navigator.geolocation.getCurrentPosition(function(position) {
-			var coords = {};
 			coords.accuracy = position.coords.accuracy;
 			coords.altitude = position.coords.altitude;
 			coords.altitudeAccuracy = position.coords.altitudeAccuracy;

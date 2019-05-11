@@ -3,6 +3,7 @@ var Schema = mongoose.Schema;
 var FB = require('fb');
 var fs = require('fs');
 var http = require('http');
+var https = require('https');
 var url = require('url');
 require('./tag');
 require('./action');
@@ -38,34 +39,29 @@ UserSchema.statics.signUp = function (req, callback, error) {
     for (var i = 0; i < 3; i++ ) {
       color += letters[Math.floor(Math.random() * 16)];
     }
-    FB.api('/v2.8/'+ req.user.id +'?fields=picture.width(200).height(200)', {access_token: req.user.accessToken}, function(response) {
-      var profilePic = response.picture.data.url;
-      var getImg = function(o, cb){
-        var port = o.port || 80;
-        var parsed = url.parse(o.url);
-        var options = {
-          host: parsed.hostname,
-          port: port,
-          path: parsed.path
-        };
-        http.get(options, function(res) {
-          res.setEncoding('binary');
-          var imagedata = '';
-          res.on('data', function(chunk){
-            imagedata+= chunk;
-          });
-          res.on('end', function(){
-            fs.writeFile(o.dest, imagedata, 'binary', cb);
-          });
-        }).on('error', function(e) {
-            console.log("Got error: " + e.message);
-          });
+    FB.api('/' + req.user.id + '/picture', 'GET', {"redirect":"false", "height": 200}, function(response) {
+      /*
+      response data sample
+      { data:
+        { height: 200,
+          is_silhouette: false,
+          url: 'https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/12647373_10208631356966931_4483358289258923957_n.jpg?_nc_cat=108&_nc_ht=scontent.xx&oh=381e6855e61fe768859591346761b873&oe=5D662DFB',
+          width: 200 } }
+      */
+      var profilePic = response.data.url;
+
+      function saveImageToDisk(url, localPath) {
+        var file = fs.createWriteStream(localPath);
+        var request = https.get(url, function(response) {
+          response.pipe(file);
+        });
       }
       var firstName = "";
       var lastName = req.user.name.familyName;
       var simpleFirstName = "";
       var simpleLastName = simplifyName(req.user.name.familyName);
       var res = req.user.name.givenName.split(" ");
+      var image_path= "./public/profilePictures/profPic"+req.session.passport.user.id+".png";
       if(res[1]) {
         for(var i in res) {
           firstName = firstName.concat(res[i]);
@@ -95,6 +91,7 @@ UserSchema.statics.signUp = function (req, callback, error) {
         }
         User.findOneAndUpdate({ _id: currentUser.id }, { $set: { simpleFirstName: simpleFirstName, firstName: firstName, simpleLastName: simpleLastName, lastName: lastName, profilePic: profilePic }}, function (err, doc) {
           if (err) error();
+          saveImageToDisk(profilePic, image_path);
           fillReqSessionVariables(currentUser, callback);
         });
       } else {
@@ -113,11 +110,7 @@ UserSchema.statics.signUp = function (req, callback, error) {
         });
         user.save(function(err) {
           if(err) throw err;
-          getImg({
-            url: profilePic,
-            dest: "./public/images/profPic"+req.session.id+".png"
-          },function(err){
-          })
+          saveImageToDisk(profilePic, image_path);
           console.log('Se logueo al usuario satisfoctoriamente');
           fillReqSessionVariables(user, callback);
         });

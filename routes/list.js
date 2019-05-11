@@ -76,7 +76,7 @@ stream.on('error', function(err) {
 /* GET router para '/account'
  * Autentica al usuario y carga la vista 'account.jade'
  */
-router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
+router.get('/:i([0-9]+)?', function(req, res) {
 	if(req.session.coords == undefined) { // Arequipa
 		req.session.coords = {};
 		req.session.coords.latitude = -16.3989;
@@ -160,16 +160,20 @@ router.get('/:i([0-9]+)?', ensureAuthenticated, function(req, res) {
 			console.log(err);
 			res.status(400).end();
 		}
-		var posts = results.hits.hits.map(function(hit){
-			return hit;
-		});
-		jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
-			if(posts.length == 0) {
-				res.status(204).end();
-			} else {
-				res.json(posts);
-			}
-		});
+		if(results != undefined) {
+			var posts = results.hits.hits.map(function(hit){
+				return hit;
+			});
+			jPack.showPosts(req.session.idMongoDb, req.session.passport.user.accessToken, posts, function(posts) {
+				if(posts.length == 0) {
+					res.status(204).end();
+				} else {
+					res.json(posts);
+				}
+			});
+		} else {
+			console.log('elasticsearch no habilitado');
+		}
 	});
 });
 
@@ -205,9 +209,8 @@ router.get('/:media([p\/0-9a-fA-F]+)', ensureAuthenticated, function(req, res) {
 	});
 });
 
-router.get('/:search/:q/:word', ensureAuthenticated, function(req, res) {
-	var word = req.params.word.split('@');
-	var tag = word[1];
+router.get('/search/q/:word', ensureAuthenticated, function(req, res) {
+	var tag = req.params.word.split('@')[1];
 	Tag.esSearch({
 		from : 0,
 		size : 3,
