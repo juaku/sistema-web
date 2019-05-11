@@ -7,12 +7,16 @@ var https = require('https');
 
 app.set('port', process.env.PORT || 3000);
 
-var options = {
+/*var options = {
 	key: fs.readFileSync(path.join(__dirname, '../ssl', 'server.key')),
 	cert: fs.readFileSync(path.join(__dirname, '../ssl', 'server.crt'))
 }
 
-var server = https.createServer(options, app).listen(app.get('port'));
+var server = https.createServer(options, app).listen(app.get('port'));*/
+
+var server = app.listen(app.get('port'), function() {
+	debug('Express server listening on port ' + server.address().port);
+});
 
 require('../socket')(server);
 

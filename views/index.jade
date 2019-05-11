@@ -45,8 +45,8 @@ block content
         a(href="/logout" v-on:click.stop.prevent="logout") #{__('Logout')}
       footer
         a#brand-url juaku.com
-        nav Términos y condiciones | Prensa
-        #brand Juaku 2017
+        //nav Términos y condiciones | Prensa
+        #brand Juaku 2019
     #up(v-on:click="up")
     main(v-on:scroll="scroll")
       section#start(v-on:click="changeTheme($event)")
@@ -104,7 +104,7 @@ block content
                 a(ng-if="post.edittable" ng-click="fn(post)").more
                   span #{__('more')}
                   svg.icon
-        button(v-if="post.edittable" v-show="!post.editedTag" v-on:click="modifyTag(post)") #{__('Modificar TAG')}
+        button(v-if="post.edittable" v-show="post.editedTag" v-on:click="modifyTag(post)") #{__('Modificar TAG')}
         button(v-if="post.edittable" v-show="post.editedTag" v-on:click="updateTag(post)") #{__('Actualizar TAG')}
         .info
           .author-picture
