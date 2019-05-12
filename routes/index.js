@@ -14,7 +14,7 @@ router.get('/:path((([0-9A-Fa-f]{3})(\.+[A-Za-záéíóúàèìòùäëïöüÿ�
 });
 
 router.get('/privacy', function(req, res) {
-	res.render('privacypolicy');
+	res.render('privacy');
 });
 
 module.exports = router;

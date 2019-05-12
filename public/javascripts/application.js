@@ -177,7 +177,7 @@ var sendingPost = false;
 var endOfList = false;
 var queryStart = -1;
 var numEmptyPosts = 0;
-var domain = 'https://' + window.location.hostname + ':' + window.location.port;
+var domain = window.location.protocol + '//' + window.location.hostname + ':' + window.location.port;
 
 var lastScrollPosition = 0;
 var maxScrollDown = 0;
@@ -918,9 +918,13 @@ function getGeo(next, error) {
 					errorMsg = "An unknown error occurred."
 					break;
 			}
-			// TODO: Manejar error, sin alert
-			// alert('Mal! ' + errorMsg);
-			error(errorMsg);
+			// TODO: Manejar error
+			// TODO: si el usuario niega su ubicación se tendría que obtener las coordenadas de acuerdo a su dirección ip
+			console.log(errorMsg);
+			coords.latitude = "-16.3988900";
+			coords.longitude = "-71.5350000";
+			next(coords);
+			//error(errorMsg);
 		}, {maximumAge:600000, timeout:10000, enableHighAccuracy: true});
 	} else {
 		error("Geolocation is not supported by this browser.");
