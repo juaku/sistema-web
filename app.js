@@ -4,9 +4,10 @@ var config = require("./config");
 var session = require("express-session");
 var path = require("path");
 var favicon = require("static-favicon");
-var logger = require("morgan");
+var morgan = require("morgan");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
+var passport = require("passport");
 
 //json web token
 var jwt = require("jsonwebtoken");
@@ -17,12 +18,7 @@ var mongoose = require("mongoose");
 var stylus = require("stylus");
 var nib = require("nib");
 
-//Coneccion con Facebook
-var passport = require("passport");
-var FacebookStrategy = require("passport-facebook").Strategy;
-var FacebookTokenStrategy = require("passport-facebook-token");
-
-// Concección con MongoDB
+// Conexión con MongoDB
 var db = require("./mongodbConnect");
 
 //Sesion permanente
@@ -37,56 +33,6 @@ i18n.configure({
   cookie: "locale",
   directory: __dirname + "/locales",
 });
-
-//Codigos de aplicación de Facebook
-var FACEBOOK_APP_ID = config.facebook.id;
-var FACEBOOK_APP_SECRET = config.facebook.secret;
-
-//Serialización de sesión
-passport.serializeUser(function (user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function (obj, done) {
-  done(null, obj);
-});
-
-//FacebookStrategy
-passport.use(
-  new FacebookStrategy(
-    {
-      clientID: FACEBOOK_APP_ID,
-      clientSecret: FACEBOOK_APP_SECRET,
-      callbackURL: "https://juaku.com/auth/facebook/callback", // 'http://juaku-dev.cloudapp.net:' +  (process.env.PORT || 3000) + '/auth/facebook/callback',
-      passReqToCallback: true, // TODO: ¿Cómo funciona?
-      profileFields: ["id", "name", "email", "photos", "location", "birthday"], // los permisos que se solicitan en el scope de passportjs se tienen que replicar aquí para poder obtener los campos solicitados
-    },
-    // facebook will send back the tokens and profile
-    function (req, accessToken, refreshToken, profile, done) {
-      process.nextTick(function () {
-        profile.accessToken = accessToken;
-        return done(null, profile);
-      });
-    }
-  )
-);
-
-//FacebookTokenStrategy
-passport.use(
-  new FacebookTokenStrategy(
-    {
-      clientID: FACEBOOK_APP_ID,
-      clientSecret: FACEBOOK_APP_SECRET,
-      passReqToCallback: true, // TODO: ¿Cómo funciona?
-    },
-    // facebook will send back the tokens and profile
-    function (req, accessToken, refreshToken, profile, done) {
-      process.nextTick(function () {
-        return done(null, profile);
-      });
-    }
-  )
-);
 
 var access = require("./routes/access");
 var login = require("./routes/login");
@@ -117,7 +63,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
 app.use(favicon());
-app.use(logger("dev"));
+app.use(morgan("dev"));
 app.use(bodyParser.json({ limit: "1mb" }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -137,16 +83,16 @@ app.use(
 //NO CACHE
 /*app.use(function(req, res, next) {
   req.headers['if-none-match'] = 'no-match-for-this';
-  next();    
+  next();
 });*/
 
 // Usar Multer - Ya no se require
 //app.use(multer({ dest: './public/uploads/'}));
 
-// Inicializar Passport!  También use el middleware passport.session(), para apoyar
-// Sesiones de inicio de sesión persistentes (recomendado).
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(passport.initialize()); // Inicializa Passport
+app.use(passport.session()); // Sesiones de inicio de sesión persistentes (recomendado).
+require("./utils/auth/strategies/facebook"); // Facebook strategy
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // geo block
@@ -201,13 +147,8 @@ app.use("/user", user);
 app.use("/list", list);
 app.use("/", routes);
 
-//Urls logueo con facebook en escritorio
-
+// Autenticación con Facebook
 // GET /auth/facebook
-//   Use passport.authenticate() como una ruta middleware para autenticar la
-//   petición.  El primero paso en la auntenticación de Facebook implicará
-//   redirigir al usuario a facebook.com.  Después de la autorizacón, Facebook
-//   redirigirá al usuario a esta aplicación at /auth/facebook/callback
 app.get(
   "/auth/facebook",
   passport.authenticate("facebook", {
@@ -215,13 +156,9 @@ app.get(
     failureRedirect: "/login",
     display: "popup",
   })
-); // los permisos adicionales que se requieren del usuario se definen a través del scope de passportjs
+);
 
 // GET /auth/facebook/callback
-//   Use passport.authenticate() como una ruta middleware para autenticar la
-//   petición.  Si la autenticación falla, el usuario será redirigido a la
-//   página de inicio de sesión.  De lo contrario, la función de la ruta principal se llamará
-//   el cual, en este ejemplo, se redirigirá al usuario a la página de inicio.
 app.get(
   "/auth/facebook/callback",
   passport.authenticate("facebook", { failureRedirect: "/login" }),
@@ -236,33 +173,6 @@ app.get(
       req,
       function () {
         res.render("access");
-      },
-      function (error) {
-        console.log("error");
-      }
-    );
-  }
-);
-
-///Url logueo con facebook en móvil - cordova
-
-app.get(
-  "/auth/facebook/token",
-  passport.authenticate("facebook-token"),
-  function (req, res) {
-    req.session.token = jwt.sign({ id: req.user.id }, config.tokenSecret, {
-      expiresIn: 60 * 60 * 24 * 15 /* 15 Días */,
-    });
-    // Loguear al usuario
-    var User = mongoose.model("User");
-    var data = {};
-    User.signUp(
-      req,
-      function () {
-        data.user = req.user;
-        data.token = req.session.token;
-        data.locale = req.getLocale();
-        res.json(data);
       },
       function (error) {
         console.log("error");

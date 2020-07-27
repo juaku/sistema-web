@@ -64,10 +64,10 @@ UserSchema.statics.signUp = function (req, callback, error) {
           });
         }
         var firstName = "";
-        var lastName = req.user._json.last_name;
+        var lastName = req.user.lastName;
         var simpleFirstName = "";
         var simpleLastName = simplifyName(lastName);
-        var res = req.user._json.first_name.split(" ");
+        var res = req.user.firstName.split(" ");
         var profileImagePath =
           "./public/profilePictures/profPic" + req.user.id + ".png";
         // si res[1] existe quiere decir que el usuario tiene tiene más de un nombre
@@ -76,9 +76,9 @@ UserSchema.statics.signUp = function (req, callback, error) {
             firstName = firstName.concat(res[i]);
           }
           simpleFirstName = simplifyName(firstName);
-          firstName = req.user._json.first_name;
+          firstName = req.user.firstName;
         } else {
-          firstName = req.user._json.first_name;
+          firstName = req.user.firstName;
           simpleFirstName = simplifyName(firstName);
         }
         // si currentUser existe entonces entra al if y quiere decir que el usuario ya se encuentra regitrado sino entonces se creará una cuenta nueva
@@ -134,6 +134,7 @@ UserSchema.statics.signUp = function (req, callback, error) {
   });
   function fillReqSessionVariables(user, callback) {
     req.user.picture = user.profilePic;
+    req.user.name = {}; // TODO: Borrar este objeto
     req.user.name.hexCode = user.hexCode;
     req.user.name.givenName = user.firstName;
     req.session.idMongoDb = user.id;
