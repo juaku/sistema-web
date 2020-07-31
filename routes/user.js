@@ -1,21 +1,21 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
 //Autenticación basada en JWT
-var config = require('../config');
-var expressJwt = require('express-jwt');
-var ensureAuthenticated = expressJwt({secret : config.tokenSecret});
+var config = require("../config");
+var expressJwt = require("express-jwt");
+var ensureAuthenticated = expressJwt({ secret: config.tokenSecret });
 
 //Modelos
-var User = require('../models/user');
+var User = require("../models/user");
 
 // Clases jPack
-var jPack = require('../jPack');
+var jPack = require("../jPack");
 
-router.get('/:action', ensureAuthenticated, function(req, res) {
-	if(req.params.action!=undefined) {
-		//TODO: Remover
-		/*req.session.jUser = new jPack.user(req.session.jUser);
+router.get("/:action", ensureAuthenticated, function (req, res) {
+  if (req.params.action != undefined) {
+    //TODO: Remover
+    /*req.session.jUser = new jPack.user(req.session.jUser);
 		var jUser = req.session.jUser;
 		if(req.params.action=='getAllUsers') {
 			jUser.getAllUsers(req, function(allUsers) {
@@ -27,21 +27,29 @@ router.get('/:action', ensureAuthenticated, function(req, res) {
 			var parseSessionToken = {};
 			res.json({parseSessionToken:req.session.jUser.parseSessionToken});
 		}*/
-	}
+  }
 });
 
-router.post('/:action', ensureAuthenticated, function(req, res) {
-	if(req.body!=undefined && req.body!='' && req.params.action!=undefined) {
-		//req.session.jUser = new jPack.user(req.session.jUser);
-		//var jUser = req.session.jUser;
-		if(req.params.action=='setGeo') {
-			jPack.setGenericData(req, function() {
-				res.status(201).end();
-			}, function(error) {
-				res.status(400).end();
-				console.log(error);
-			});
-		}/* else if (req.params.action=='follow') {
+router.post("/:action", ensureAuthenticated, function (req, res) {
+  if (
+    req.body != undefined &&
+    req.body != "" &&
+    req.params.action != undefined
+  ) {
+    //req.session.jUser = new jPack.user(req.session.jUser);
+    //var jUser = req.session.jUser;
+    if (req.params.action == "setGeo") {
+      jPack.setGenericData(
+        req,
+        function () {
+          res.status(201).end();
+        },
+        function (error) {
+          res.status(400).end();
+          console.log(error);
+        }
+      );
+    } /* else if (req.params.action=='follow') {
 			jUser.setFollowRelation(req.body.userToFollow, function() {
 				res.status(201).end();
 			}, function(error) {
@@ -76,16 +84,23 @@ router.post('/:action', ensureAuthenticated, function(req, res) {
 				res.status(400).end();
 				console.log(error);
 			});
-		} */else if (req.params.action=='changeLanguage') {
-			jPack.changeLanguage(req, res, function() {
-				res.status(201).end();
-			}, function(error) {
-				res.status(400).end();
-				console.log(error);
-			});
-		} else if (req.params.action=='reportUser') {
-		}
-	}
+		} */ else if (
+      req.params.action == "changeLanguage"
+    ) {
+      jPack.changeLanguage(
+        req,
+        res,
+        function () {
+          res.status(201).end();
+        },
+        function (error) {
+          res.status(400).end();
+          console.log(error);
+        }
+      );
+    } else if (req.params.action == "reportUser") {
+    }
+  }
 });
 
 module.exports = router;
