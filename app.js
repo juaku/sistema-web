@@ -91,7 +91,8 @@ app.use(
 
 app.use(passport.initialize()); // Inicializa Passport
 app.use(passport.session()); // Sesiones de inicio de sesión persistentes (recomendado).
-require("./utils/auth/strategies/facebook"); // Facebook strategy
+// Facebook strategy
+require("./utils/auth/strategies/facebook");
 
 app.use(express.static(path.join(__dirname, "public")));
 
