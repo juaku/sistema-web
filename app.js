@@ -1,4 +1,4 @@
-//Predeterminado de express
+// Import modules
 var express = require("express");
 var config = require("./config");
 var session = require("express-session");
@@ -9,12 +9,12 @@ var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var passport = require("passport");
 
-//json web token
+// json web token
 var jwt = require("jsonwebtoken");
 var config = require("./config");
 var mongoose = require("mongoose");
 
-//Stylus y Nib
+// Stylus y Nib
 var stylus = require("stylus");
 var nib = require("nib");
 
@@ -46,6 +46,10 @@ var routes = require("./routes/index");
 var ipgeoblock = require("node-ipgeoblock");
 
 var app = express();
+
+// Import routes
+const postsApi = require("./routes/posts");
+postsApi(app);
 
 // Inicializar Stylus + Nib
 function compile(str, path) {
