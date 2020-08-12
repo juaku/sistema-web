@@ -1,13 +1,15 @@
 const express = require("express");
-const { mockDocument } = require("../utils/mocks/mock");
+const UsersService = require("../services/users");
 
 function usersApi(app) {
   const router = express.Router();
   app.use("/api/users", router);
 
+  const usersService = new UsersService();
+
   router.get("/", async function (req, res, next) {
     try {
-      const users = await Promise.resolve(mockDocument);
+      const users = await usersService.getUsers();
       res.status(200).json({
         data: users,
         message: "users listed",
@@ -20,7 +22,7 @@ function usersApi(app) {
   router.get("/:userId", async function (req, res, next) {
     try {
       const { userId } = req.params;
-      const user = await Promise.resolve(mockDocument[0]);
+      const user = await usersService.getUser({ userId });
       res.status(200).json({
         data: user,
         message: "user retrieved",
@@ -33,7 +35,7 @@ function usersApi(app) {
   router.post("/", async function (req, res, next) {
     try {
       const { body: user } = req;
-      const createdUserId = await Promise.resolve(mockDocument[0]._id);
+      const createdUserId = await usersService.createUser({ user });
       res.status(201).json({
         data: createdUserId,
         message: "user created",
@@ -47,7 +49,7 @@ function usersApi(app) {
     try {
       const { userId } = req.params;
       const { body: user } = req;
-      const updatedUserId = await Promise.resolve(mockDocument[0]._id);
+      const updatedUserId = await usersService.updateUser({ userId, user });
       res.status(200).json({
         data: updatedUserId,
         message: "user updated",
@@ -60,7 +62,7 @@ function usersApi(app) {
   router.delete("/:userId", async function (req, res, next) {
     try {
       const { userId } = req.params;
-      const deletedUserId = await Promise.resolve(mockDocument[0]._id);
+      const deletedUserId = await usersService.deleteUser({ userId });
       res.status(200).json({
         data: deletedUserId,
         message: "user deleted",

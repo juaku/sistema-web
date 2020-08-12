@@ -2,13 +2,13 @@ const { mockDocument } = require("../utils/mocks/mock");
 
 class PostsService {
   async getPosts() {
-    const expenses = await Promise.resolve(mockDocument);
-    return expenses || [];
+    const posts = await Promise.resolve(mockDocument);
+    return posts || [];
   }
 
   async getPost() {
-    const expense = await Promise.resolve(mockDocument[0]);
-    return expense || [];
+    const post = await Promise.resolve(mockDocument[0]);
+    return post || [];
   }
 
   async createPost() {

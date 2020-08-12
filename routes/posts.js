@@ -62,7 +62,7 @@ function postsApi(app) {
   router.delete("/:postId", async function (req, res, next) {
     try {
       const { postId } = req.params;
-      const deletedPostId = await await postsService.deletePost({ postId });
+      const deletedPostId = await postsService.deletePost({ postId });
       res.status(200).json({
         data: deletedPostId,
         message: "post deleted",
