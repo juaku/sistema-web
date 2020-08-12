@@ -1,13 +1,15 @@
 const express = require("express");
-const { mockDocument } = require("../utils/mocks/mock");
+const PostsService = require("../services/posts");
 
 function postsApi(app) {
   const router = express.Router();
   app.use("/api/posts", router);
 
+  const postsService = new PostsService();
+
   router.get("/", async function (req, res, next) {
     try {
-      const posts = await Promise.resolve(mockDocument);
+      const posts = await postsService.getPosts();
       res.status(200).json({
         data: posts,
         message: "posts listed",
@@ -19,7 +21,8 @@ function postsApi(app) {
 
   router.get("/:postId", async function (req, res, next) {
     try {
-      const post = await Promise.resolve(mockDocument[0]);
+      const { postId } = req.params;
+      const post = await postsService.getPost({ postId });
       res.status(200).json({
         data: post,
         message: "post retrieved",
@@ -31,7 +34,8 @@ function postsApi(app) {
 
   router.post("/", async function (req, res, next) {
     try {
-      const createdPostId = await Promise.resolve(mockDocument[0]._id);
+      const { body: post } = req;
+      const createdPostId = await postsService.createPost({ post });
       res.status(201).json({
         data: createdPostId,
         message: "post created",
@@ -43,7 +47,9 @@ function postsApi(app) {
 
   router.put("/:postId", async function (req, res, next) {
     try {
-      const updatedPostId = await Promise.resolve(mockDocument[0]._id);
+      const { postId } = req.params;
+      const { body: post } = req;
+      const updatedPostId = await postsService.updatePost({ postId, post });
       res.status(200).json({
         data: updatedPostId,
         message: "post updated",
@@ -55,7 +61,8 @@ function postsApi(app) {
 
   router.delete("/:postId", async function (req, res, next) {
     try {
-      const deletedPostId = await Promise.resolve(mockDocument[0]._id);
+      const { postId } = req.params;
+      const deletedPostId = await await postsService.deletePost({ postId });
       res.status(200).json({
         data: deletedPostId,
         message: "post deleted",
