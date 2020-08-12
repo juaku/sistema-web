@@ -49,7 +49,9 @@ var app = express();
 
 // Import routes
 const postsApi = require("./routes/posts");
+const usersApi = require("./routes/users");
 postsApi(app);
+usersApi(app);
 
 // Inicializar Stylus + Nib
 function compile(str, path) {
