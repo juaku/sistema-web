@@ -1,13 +1,15 @@
 const express = require("express");
-const { mockDocument } = require("../utils/mocks/mock");
+const TagsService = require("../services/tags");
 
 function tagsApi(app) {
   const router = express.Router();
   app.use("/api/tags", router);
 
+  const tagsService = new TagsService();
+
   router.get("/", async function (req, res, next) {
     try {
-      const tags = await Promise.resolve(mockDocument);
+      const tags = await tagsService.getTags();
       res.status(200).json({
         data: tags,
         message: "tags listed",
@@ -20,7 +22,7 @@ function tagsApi(app) {
   router.get("/:tagId", async function (req, res, next) {
     try {
       const { tagId } = req.params;
-      const tag = await Promise.resolve(mockDocument[0]);
+      const tag = await tagsService.getTag({ tagId });
       res.status(200).json({
         data: tag,
         message: "tag retrieved",
@@ -33,7 +35,7 @@ function tagsApi(app) {
   router.post("/", async function (req, res, next) {
     try {
       const { body: tag } = req;
-      const createdTagId = await Promise.resolve(mockDocument[0]._id);
+      const createdTagId = await tagsService.createTag({ tag });
       res.status(201).json({
         data: createdTagId,
         message: "tag created",
@@ -47,7 +49,7 @@ function tagsApi(app) {
     try {
       const { tagId } = req.params;
       const { body: tag } = req;
-      const updatedTagId = await Promise.resolve(mockDocument[0]._id);
+      const updatedTagId = await tagsService.updateTag({ tagId, tag });
       res.status(200).json({
         data: updatedTagId,
         message: "tag updated",
@@ -60,7 +62,7 @@ function tagsApi(app) {
   router.delete("/:tagId", async function (req, res, next) {
     try {
       const { tagId } = req.params;
-      const deletedTagId = await Promise.resolve(mockDocument[0]._id);
+      const deletedTagId = await tagsService.deleteTag({ tagId });
       res.status(200).json({
         data: deletedTagId,
         message: "tag deleted",
