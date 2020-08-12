@@ -23,7 +23,7 @@ function usersApi(app) {
       const user = await Promise.resolve(mockDocument[0]);
       res.status(200).json({
         data: user,
-        message: "user retrieve",
+        message: "user retrieved",
       });
     } catch (err) {
       next(err);

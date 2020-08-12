@@ -50,8 +50,10 @@ var app = express();
 // Import routes
 const postsApi = require("./routes/posts");
 const usersApi = require("./routes/users");
+const tagsApi = require("./routes/tags");
 postsApi(app);
 usersApi(app);
+tagsApi(app);
 
 // Inicializar Stylus + Nib
 function compile(str, path) {

@@ -22,7 +22,7 @@ function postsApi(app) {
       const post = await Promise.resolve(mockDocument[0]);
       res.status(200).json({
         data: post,
-        message: "post retrieve",
+        message: "post retrieved",
       });
     } catch (err) {
       next(err);
