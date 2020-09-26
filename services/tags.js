@@ -1,29 +1,36 @@
-const { mockDocument } = require("../utils/mocks/mock");
+const TagModel = require("../utils/schemas/tag");
+const MongoLib = require("../lib/mongo");
 
 class TagsService {
+  constructor() {
+    this.model = TagModel;
+    this.mongoose = new MongoLib();
+  }
+
   async getTags() {
-    const tags = await Promise.resolve(mockDocument);
+    const query = {};
+    const tags = await this.mongoose.getAll(this.model, query);
     return tags || [];
   }
 
-  async getTag() {
-    const tag = await Promise.resolve(mockDocument[0]);
+  async getTag({ tagId }) {
+    const tag = await this.mongoose.get(this.model, tagId);
     return tag || [];
   }
 
-  async createTag() {
-    const createdTagId = await Promise.resolve(mockDocument[0]._id);
-    return createdTagId || [];
+  async createTag({ tag }) {
+    const createdTagId = await this.mongoose.create(this.model, tag);
+    return createdTagId;
   }
 
-  async updateTag() {
-    const updatedTagId = await Promise.resolve(mockDocument[0]._id);
-    return updatedTagId || [];
+  async updateTag({ tagId, tag }) {
+    const updatedTagId = await this.mongoose.update(this.model, tagId, tag);
+    return updatedTagId;
   }
 
-  async deleteTag() {
-    const deletedTagId = await Promise.resolve(mockDocument[0]._id);
-    return deletedTagId || [];
+  async deleteTag({ tagId }) {
+    const deletedTagId = await this.mongoose.delete(this.model, tagId);
+    return deletedTagId;
   }
 }
 

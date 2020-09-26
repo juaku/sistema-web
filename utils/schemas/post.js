@@ -23,6 +23,6 @@ var postSchema = new Schema({
   ],
 });
 
-let Tmppost = mongoose.model("Posts", postSchema);
+let Post = mongoose.model("Posts", postSchema);
 
-module.exports = Tmppost;
+module.exports = Post;

@@ -19,7 +19,7 @@ var stylus = require("stylus");
 var nib = require("nib");
 
 // Conexión con MongoDB
-var db = require("./mongodbConnect");
+//var db = require("./mongodbConnect"); // DESCOMENTAR ESTA LINEA
 
 //Sesion permanente
 var redisStore = require("connect-redis")(session);
@@ -51,9 +51,6 @@ var app = express();
 const postsApi = require("./routes/posts");
 const usersApi = require("./routes/users");
 const tagsApi = require("./routes/tags");
-postsApi(app);
-usersApi(app);
-tagsApi(app);
 
 // Inicializar Stylus + Nib
 function compile(str, path) {
@@ -155,6 +152,9 @@ app.use("/post", post);
 app.use("/user", user);
 app.use("/list", list);
 app.use("/", routes);
+postsApi(app);
+usersApi(app);
+tagsApi(app);
 
 // Autenticación con Facebook
 // GET /auth/facebook

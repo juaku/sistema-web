@@ -1,4 +1,5 @@
 const express = require("express");
+var ObjectId = require("mongoose").Types.ObjectId;
 const TagsService = require("../services/tags");
 
 function tagsApi(app) {
@@ -22,6 +23,7 @@ function tagsApi(app) {
   router.get("/:tagId", async function (req, res, next) {
     try {
       const { tagId } = req.params;
+      if (!ObjectId.isValid(tagId)) throw new Error("Invalid id");
       const tag = await tagsService.getTag({ tagId });
       res.status(200).json({
         data: tag,
@@ -49,6 +51,7 @@ function tagsApi(app) {
     try {
       const { tagId } = req.params;
       const { body: tag } = req;
+      if (!ObjectId.isValid(tagId)) throw new Error("Invalid id");
       const updatedTagId = await tagsService.updateTag({ tagId, tag });
       res.status(200).json({
         data: updatedTagId,
@@ -62,6 +65,7 @@ function tagsApi(app) {
   router.delete("/:tagId", async function (req, res, next) {
     try {
       const { tagId } = req.params;
+      if (!ObjectId.isValid(tagId)) throw new Error("Invalid id");
       const deletedTagId = await tagsService.deleteTag({ tagId });
       res.status(200).json({
         data: deletedTagId,

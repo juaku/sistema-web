@@ -7,6 +7,6 @@ let tagSchema = new Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-let Tmptag = mongoose.model("Tags", tagSchema);
+let Tag = mongoose.model("Tags", tagSchema);
 
-module.exports = Tmptag;
+module.exports = Tag;
