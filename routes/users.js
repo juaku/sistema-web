@@ -1,4 +1,5 @@
 const express = require("express");
+var ObjectId = require("mongoose").Types.ObjectId;
 const UsersService = require("../services/users");
 
 function usersApi(app) {
@@ -22,6 +23,7 @@ function usersApi(app) {
   router.get("/:userId", async function (req, res, next) {
     try {
       const { userId } = req.params;
+      if (!ObjectId.isValid(userId)) throw new Error("Invalid id");
       const user = await usersService.getUser({ userId });
       res.status(200).json({
         data: user,
@@ -49,6 +51,7 @@ function usersApi(app) {
     try {
       const { userId } = req.params;
       const { body: user } = req;
+      if (!ObjectId.isValid(userId)) throw new Error("Invalid id");
       const updatedUserId = await usersService.updateUser({ userId, user });
       res.status(200).json({
         data: updatedUserId,
@@ -62,6 +65,7 @@ function usersApi(app) {
   router.delete("/:userId", async function (req, res, next) {
     try {
       const { userId } = req.params;
+      if (!ObjectId.isValid(userId)) throw new Error("Invalid id");
       const deletedUserId = await usersService.deleteUser({ userId });
       res.status(200).json({
         data: deletedUserId,

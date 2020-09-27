@@ -1,29 +1,36 @@
-const { mockDocument } = require("../utils/mocks/mock");
+const UserModel = require("../utils/schemas/user");
+const MongoLib = require("../lib/mongo");
 
 class UsersService {
+  constructor() {
+    this.model = UserModel;
+    this.mongoose = new MongoLib();
+  }
+
   async getUsers() {
-    const users = await Promise.resolve(mockDocument);
+    const query = {};
+    const users = await this.mongoose.getAll(this.model, query);
     return users || [];
   }
 
-  async getUser() {
-    const user = await Promise.resolve(mockDocument[0]);
+  async getUser({ userId }) {
+    const user = await this.mongoose.get(this.model, userId);
     return user || [];
   }
 
-  async createUser() {
-    const createdUserId = await Promise.resolve(mockDocument[0]._id);
-    return createdUserId || [];
+  async createUser({ user }) {
+    const createdUserId = await this.mongoose.create(this.model, user);
+    return createdUserId;
   }
 
-  async updateUser() {
-    const updatedUserId = await Promise.resolve(mockDocument[0]._id);
-    return updatedUserId || [];
+  async updateUser({ userId, user }) {
+    const updatedUserId = await this.mongoose.update(this.model, userId, user);
+    return updatedUserId;
   }
 
-  async deleteUser() {
-    const deletedUserId = await Promise.resolve(mockDocument[0]._id);
-    return deletedUserId || [];
+  async deleteUser({ userId }) {
+    const deletedUserId = await this.mongoose.delete(this.model, userId);
+    return deletedUserId;
   }
 }
 
