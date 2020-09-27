@@ -1,4 +1,5 @@
 const express = require("express");
+var ObjectId = require("mongoose").Types.ObjectId;
 const PostsService = require("../services/posts");
 
 function postsApi(app) {
@@ -22,6 +23,7 @@ function postsApi(app) {
   router.get("/:postId", async function (req, res, next) {
     try {
       const { postId } = req.params;
+      if (!ObjectId.isValid(postId)) throw new Error("Invalid id");
       const post = await postsService.getPost({ postId });
       res.status(200).json({
         data: post,
@@ -49,6 +51,7 @@ function postsApi(app) {
     try {
       const { postId } = req.params;
       const { body: post } = req;
+      if (!ObjectId.isValid(postId)) throw new Error("Invalid id");
       const updatedPostId = await postsService.updatePost({ postId, post });
       res.status(200).json({
         data: updatedPostId,
@@ -62,6 +65,7 @@ function postsApi(app) {
   router.delete("/:postId", async function (req, res, next) {
     try {
       const { postId } = req.params;
+      if (!ObjectId.isValid(postId)) throw new Error("Invalid id");
       const deletedPostId = await postsService.deletePost({ postId });
       res.status(200).json({
         data: deletedPostId,
