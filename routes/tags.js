@@ -20,11 +20,17 @@ function tagsApi(app) {
     }
   });
 
-  router.get("/:tagId", async function (req, res, next) {
+  router.get("/:id", async function (req, res, next) {
     try {
-      const { tagId } = req.params;
-      if (!ObjectId.isValid(tagId)) throw new Error("Invalid id");
-      const tag = await tagsService.getTag({ tagId });
+      const { id } = req.params;
+      let query;
+      if (!ObjectId.isValid(id)) {
+        query = { tag: id };
+      } else {
+        query = { _id: id };
+      }
+
+      const tag = await tagsService.getTag(query);
       res.status(200).json({
         data: tag,
         message: "tag retrieved",
