@@ -30,7 +30,7 @@ function tagsApi(app) {
         query = { _id: id };
       }
 
-      const tag = await tagsService.getTag(query);
+      const tag = await tagsService.getTag({ query });
       res.status(200).json({
         data: tag,
         message: "tag retrieved",

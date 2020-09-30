@@ -1,5 +1,6 @@
 const PostModel = require("../utils/schemas/post");
 const MongoLib = require("../lib/mongo");
+const TagsService = require("../services/tags");
 
 class PostsService {
   constructor() {
@@ -19,6 +20,25 @@ class PostsService {
   }
 
   async createPost({ post }) {
+    let query = {
+      tag: post.tag.name,
+    };
+    const tagsService = new TagsService();
+    let tag = await tagsService.getTag({ query });
+    let tagId = tag ? tag._id : null;
+    let tagName = post.tag.name;
+    if (!tagId) {
+      let tag = query;
+      tagId = await tagsService.createTag({ tag });
+    }
+    post.tag = {};
+    post.tag.id = tagId;
+    post.tag.name = tagName;
+    post.user = {};
+    post.user.id = "5f6fe8c4488a9ae713a55a9a"; // TODO: Refactor later
+    post.user.username = "diegocaminor";
+    post.user.hexcode = "f05";
+
     const createdPostId = await this.mongoose.create(this.model, post);
     return createdPostId;
   }

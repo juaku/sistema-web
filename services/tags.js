@@ -13,14 +13,14 @@ class TagsService {
     return tags || [];
   }
 
-  async getTag(query) {
+  async getTag({ query }) {
     const tag = await this.mongoose.get(this.model, query);
     return tag || [];
   }
 
   async createTag({ tag }) {
     const createdTagId = await this.mongoose.create(this.model, tag);
-    return createdTagId;
+    return createdTagId || null;
   }
 
   async updateTag({ tagId, tag }) {
