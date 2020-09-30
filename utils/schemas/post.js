@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 // Defining schema of 'Posts' collection
 var postSchema = new Schema({
   tag: {
-    tagId: { type: Schema.ObjectId, ref: "Tag", required: true },
+    id: { type: Schema.ObjectId, ref: "Tag", required: true },
     name: { type: String, required: true },
   },
   coordinates: { type: [Number], required: true },
@@ -12,7 +12,11 @@ var postSchema = new Schema({
   media: String,
   city: String,
   country: String,
-  user: { type: Schema.ObjectId, ref: "User" },
+  user: {
+    id: { type: Schema.ObjectId, ref: "User", required: true },
+    username: { type: String, required: true },
+    hexcode: { type: String, required: true },
+  },
   createdAt: { type: Date, default: Date.now },
   reportedBy: [
     {
