@@ -24,7 +24,8 @@ function postsApi(app) {
     try {
       const { postId } = req.params;
       if (!ObjectId.isValid(postId)) throw new Error("Invalid id");
-      const post = await postsService.getPost({ postId });
+      const query = { _id: postId };
+      const post = await postsService.getPost({ query });
       res.status(200).json({
         data: post,
         message: "post retrieved",

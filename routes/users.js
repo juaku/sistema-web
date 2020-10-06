@@ -24,7 +24,8 @@ function usersApi(app) {
     try {
       const { userId } = req.params;
       if (!ObjectId.isValid(userId)) throw new Error("Invalid id");
-      const user = await usersService.getUser({ userId });
+      const query = { _id: userId };
+      const user = await usersService.getUser({ query });
       res.status(200).json({
         data: user,
         message: "user retrieved",

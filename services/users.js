@@ -13,8 +13,8 @@ class UsersService {
     return users || [];
   }
 
-  async getUser({ userId }) {
-    const user = await this.mongoose.get(this.model, userId);
+  async getUser({ query }) {
+    const user = await this.mongoose.get(this.model, query);
     return user || [];
   }
 

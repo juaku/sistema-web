@@ -14,8 +14,8 @@ class PostsService {
     return posts || [];
   }
 
-  async getPost({ postId }) {
-    const post = await this.mongoose.get(this.model, postId);
+  async getPost({ query }) {
+    const post = await this.mongoose.get(this.model, query);
     return post || [];
   }
 
@@ -23,6 +23,7 @@ class PostsService {
     let query = {
       tag: post.tag.name,
     };
+
     const tagsService = new TagsService();
     let tag = await tagsService.getTag({ query });
     let tagId = tag ? tag._id : null;
@@ -31,6 +32,7 @@ class PostsService {
       let tag = query;
       tagId = await tagsService.createTag({ tag });
     }
+
     post.tag = {};
     post.tag.id = tagId;
     post.tag.name = tagName;
@@ -38,6 +40,7 @@ class PostsService {
     post.user.id = "5f6fe8c4488a9ae713a55a9a"; // TODO: Refactor later
     post.user.username = "diegocaminor";
     post.user.hexcode = "f05";
+    post.media = "123.png";
 
     const createdPostId = await this.mongoose.create(this.model, post);
     return createdPostId;

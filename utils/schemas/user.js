@@ -18,7 +18,8 @@ let userSchema = new Schema({
       "Please fill a valid email address",
     ],
   },
-  userName: { type: String, required: "Username is required", unique: true },
+  hexCode: { type: String, required: "Hexcode is required" },
+  userName: { type: String, required: "Username is required" },
   password: String,
   isAdmin: Boolean,
   profilePic: String,
@@ -27,6 +28,8 @@ let userSchema = new Schema({
   blockedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   createdAt: { type: Date, default: Date.now },
 });
+
+userSchema.index({ hexCode: 1, userName: 1 }); // clave compuesta en mongodb
 
 let User = mongoose.model("Users", userSchema);
 
